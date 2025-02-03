@@ -10,6 +10,10 @@
   .secondPart {
     color: #B28E4E; 
   }
+
+  h3{
+    font-size: 10px;
+  }
 .logga{
 margin: 0;
 display:flex;

@@ -1,0 +1,155 @@
+
+form {
+
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 2rem;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+label {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 8px;
+    display: block; 
+    margin-top: 15px; 
+  }
+.btnpadding{
+    margin: 1em;
+    height: 2em;
+}
+
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+input[type="file"] {
+    margin-bottom: 1rem;
+}
+
+
+input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+div {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.step-header {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+input,
+select,
+textarea {
+    font-family: Arial, sans-serif;
+    font-size: 1rem;
+}
+
+button:disabled {
+    background-color: #ccc;
+}
+
+form > div {
+    margin-bottom: 20px;
+}
+
+form > div > label {
+    margin-bottom: 0.3rem;
+}
+.interest-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .interest-button {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .interest-button.selected {
+    background-color: #28a745; 
+    color: white;
+  }
+  
+  .interest-button:hover {
+    background-color: #d1d1d1;
+  }
+  
+  .interest-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+
+  .confirmation-message {
+    text-align: center;
+    padding: 30px;
+    background-color: #f0f8ff; 
+    border-radius: 15px;
+    border: 1px solid #996A30; ; 
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0px 4px 10px rgba(#865d2b); 
+  }
+  
+  .confirmation-message h2 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #5c5b2c; 
+    margin-bottom: 20px;
+
+  }
+  
+  
+  .confirmation-message button {
+    background-color: #996A30; 
+    color: rgb(0, 0, 0);
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+    padding: 5px 15px; 
+    margin:1em;
+   
+  }
+  
+  .confirmation-message button:hover {
+    background-color: #996A30;  
+  }
+  
+  .confirmation-message button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.5);
+  }
+  

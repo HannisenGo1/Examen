@@ -26,6 +26,27 @@
         width:20em;
         margin-top:2em;
     }
+    .confirmation-message button {
+        font-size: 12px;
+    }
+    .confirmation-message{
+        width: 50%;
+    }
+    .allowedTohomebtn{
+        width: 5.5em;
+    }
+    .confirmation-message h2{
+        font-size: 14px;
+    }
+    form button{
+        width: 75%;
+    }
+    form input{
+        width: 80%;
+    }
+    form {
+        width: 75%;
+    }
 }
 
 @media (max-width: 350px) {
@@ -46,6 +67,12 @@
 
     .btncontainer {
         flex-direction: column;  
+    }
+    .buttonbk, .buttonnext {
+        width: 90%;
+        font-size: 14px;
+        margin: 0; 
+
     }
 
 }

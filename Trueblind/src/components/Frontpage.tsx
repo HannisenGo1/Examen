@@ -1,8 +1,23 @@
 import logga from '../img/logga.png'
+import { useNavigate } from 'react-router-dom';
+export interface frontbutton {
+  loginbtn: () => void;
+  registerbtn: () => void;
+}
 
+
+
+// ({loginbtn, registerbtn}: frontbutton)
 export const Frontpage = () => {
-    
-    
+
+  const navigate = useNavigate();
+
+const handleRegisterClick = () => {
+  navigate('/register'); // Navigera till /register när knappen klickas
+};
+
+
+
     return(
         <> 
            <div className="logga">
@@ -18,16 +33,17 @@ export const Frontpage = () => {
 </div>
        
         <div className="btncontainer"> 
-            <button> Logga in </button> 
-            <button> Registrera dig </button> 
+            <button > Logga in </button> 
+            <button onClick={handleRegisterClick}> Registrera dig </button> 
             </div> 
           <div className="frontpagetextDiv"> 
         <h2 className="welcometexttopage">
         Vi hjälper dig att hitta äkta förbindelser baserat på känslor och gemensamma värderingar, 
         utan att döma utifrån yttre faktorer. 
-        Öppna ditt hjärta och låt känslorna leda dig till din sanna match. </h2> </div> 
+        Öppna ditt hjärta och låt känslorna leda dig till din sanna match. 
+        Hitta din dröm partner här!</h2> </div> 
       <div className="Footer"> 
-        
+        <h3> Developer: Hanna Karlsson </h3> 
         </div> 
         
         </>
