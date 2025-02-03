@@ -1,0 +1,51 @@
+@media (max-width: 480px) {
+    .Rubriktext {
+        font-size: 40px; 
+        align-items: center;
+        margin-top:1em; 
+    }
+    .logga {
+        width: 100px; 
+        height: 70px;
+        margin-bottom: 1em;
+    }
+    .welcometexttopage {
+        font-size: 16px;  
+        margin-top: 2em;
+        margin-bottom: 1em;
+    }
+    .btncontainer {
+        flex-direction: column;  
+        align-items: center;
+    }
+    button {
+        width: 70%;  
+        margin-bottom: 15px;
+    }
+    .frontpagetextDiv {
+        width:20em;
+        margin-top:2em;
+    }
+}
+
+@media (max-width: 350px) {
+    .Rubriktext {
+        font-size: 30px;  
+    }
+
+    .logga {
+        width: 130px;  
+        height: 60px;
+    }
+
+    .welcometexttopage {
+        font-size: 15px;  
+        padding:1em;
+    }
+
+
+    .btncontainer {
+        flex-direction: column;  
+    }
+
+}
