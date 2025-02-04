@@ -13,10 +13,10 @@ export const Frontpage = () => {
   const navigate = useNavigate();
 
 const handleRegisterClick = () => {
-  navigate('/register'); // Navigera till /register när knappen klickas
+  navigate('/register'); 
 };
 const handleLoginClick = () => {
-  navigate('/account');
+  navigate('/login');
 }
 
 

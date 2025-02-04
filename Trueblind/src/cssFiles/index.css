@@ -2,3 +2,13 @@
   color: rgba(255, 255, 255, 0.87);
   background-color: aliceblue;
 }
+
+p{
+  color:black;
+}
+
+.columndiv{
+  display: flex;
+  flex-direction: column;
+}
+

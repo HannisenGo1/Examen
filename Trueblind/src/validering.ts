@@ -3,6 +3,16 @@ export const validateFormData = (step: number, formData: any) => {
 
   if (step >= 1) {  
     if (!formData.firstName) errors.firstName = 'Förnamn är obligatoriskt.';
+    if (!formData.password) {
+      errors.password = 'Lösenord är obligatoriskt.';
+    } else {
+      const passwordRegex = /^(?=.*[A-Z])(?=.*\d|[^a-zA-Z\d]).{8,}$/;
+      if (!passwordRegex.test(formData.password)) {
+        errors.password = 'Lösenordet måste vara minst 8 tecken långt, innehålla minst en stor bokstav och ett nummer eller specialtecken.';
+      }
+    }
+
+
     if (!formData.age || formData.age < 18) errors.age = 'Ålder måste vara minst 18.';
     if (!formData.city) errors.city = 'Stad är obligatoriskt.';
     if (!formData.email) errors.email = 'Epost är obligatoriskt';

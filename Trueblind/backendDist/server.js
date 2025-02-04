@@ -2,16 +2,17 @@ import express from "express";
 import { GetUser, AddUser } from "./data/getData.js";
 const app = express();
 const port = process.env.PORT || 3000;
-app.use(express.json()); // För att kunna läsa JSON-requests
-// Middleware för att logga alla requests
+app.use(express.json());
+import cors from 'cors';
+app.use(cors());
 app.use('/', (req, _, next) => {
     console.log(`${req.method} ${req.url}`, req.body);
     next();
 });
 app.get("/users", async (_, res) => {
     try {
-        const users = await GetUser(); // Hämta användare
-        res.json(users); // Skicka tillbaka användarna i JSON-format
+        const users = await GetUser();
+        res.json(users);
     }
     catch (error) {
         console.error("Fel vid hämtning av användare:", error);

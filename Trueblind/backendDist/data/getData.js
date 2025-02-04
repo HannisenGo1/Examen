@@ -1,4 +1,4 @@
-import { collection, getDocs, addDoc, deleteDoc, updateDoc, doc } from "firebase/firestore/lite";
+import { collection, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore/lite";
 import { db } from "./firebase.js";
 const userCollection = collection(db, "users");
 export async function GetUser() {
@@ -21,22 +21,11 @@ export async function AddUser(data) {
         throw error;
     }
 }
-// Uppdatera en jobbannons
-export async function UpdateUser(userId, data) {
-    try {
-        const assignmentDoc = doc(db, "users", userId);
-        await updateDoc(assignmentDoc, data);
-    }
-    catch (error) {
-        console.error("Fel vid uppdatering av jobbannons:", error);
-        throw error;
-    }
-}
-// Ta bort en jobbannons
+// Ta bort en användare
 export async function DeleteUser(usersId) {
     try {
-        const assignmentDoc = doc(db, "users", usersId);
-        await deleteDoc(assignmentDoc);
+        const user = doc(db, "users", usersId);
+        await deleteDoc(user);
     }
     catch (error) {
         console.error("Fel vid borttagning av jobbannons:", error);

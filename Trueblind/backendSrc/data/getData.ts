@@ -32,6 +32,8 @@ export async function AddUser(data: {
     email: string;
     lifeStatement1: string;
     lifeStatement2:string;
+    id?: string;
+    password:string;
 }): Promise<string> {
     try {
         const docRef = await addDoc(userCollection, data);

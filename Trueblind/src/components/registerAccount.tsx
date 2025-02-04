@@ -2,27 +2,7 @@ import React, { useState } from 'react';
 import logga from '../img/logga.png'
 import { useNavigate } from 'react-router-dom'; 
 import {validateFormData, intresseLista} from '../validering'
-
-type FormData = {
-    firstName: string;
-    age: string;
-    city: string;
-    gender: string;
-    sexualOrientation: string;
-    religion: string;
-    interests: string[];
-    hasChildren: boolean;
-    wantsChildren: boolean;
-    smokes: string;
-    relationshipStatus: string;
-    education: string;
-    photo: File | null;
-    favoriteSong: string | '';
-    favoriteMovie: string |'';
-    email: string;
-    lifeStatement1: string;
-    lifeStatement2:string;
-};
+import { FormData } from '../interface/interfaceUser';
 
 export const Register = () => {
     const navigate = useNavigate();
@@ -44,7 +24,8 @@ export const Register = () => {
         favoriteMovie: '',
         email: '',
         lifeStatement1: '',
-        lifeStatement2:''
+        lifeStatement2:'',
+        password:''
     });
     
   
@@ -107,17 +88,41 @@ export const Register = () => {
         setStep((prev) => Math.max(prev - 1, 1));
     };
     
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const validationErrors = validateFormData(6, formData);  
- 
+        const validationErrors = validateFormData(6, formData);
+    
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
             return; 
         }
     
-        console.log(formData);
-        setIsRegistered(true);
+        try {
+            const response = await fetch('http://localhost:3000/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData), 
+            });
+            const text = await response.text(); 
+    
+            if (response.ok) {
+                try {
+                    setIsRegistered(true);  
+                } catch (error) {
+                    console.error('Svar från servern var inte giltig JSON:', error);
+                    console.error('Rått svar från servern:', text);
+                    setErrors({ general: 'Något gick fel vid registreringen.' });
+                }
+            } else {
+                console.error('Fel vid registrering:', text);
+                setErrors({ general: text || 'Något gick fel vid registreringen.' });
+            }
+        } catch (error) {
+            console.error('Fel vid begäran:', error);
+            setErrors({ general: 'Ett fel vid registreringen.' });
+        }
     };
     
     const goBackToHome = () => {
@@ -156,7 +161,11 @@ export const Register = () => {
           name="email" value={formData.email}
           onChange={handleChange} placeholder="Skriv din e-post" />
            {errors.email && <span className="error">{errors.email}</span>}
-
+        <label htmlFor="password">Lösenord </label>
+        <input type="password" id="password" name="password" value={formData.password}
+        onChange={handleChange} placeholder="Skriv in lösenord" />
+        <p className="ptext"> Minst 8 tecken långt,En stor bokstav och ett tecken</p>
+        {errors.password && <span className="error">{errors.password}</span>}
 
             <label htmlFor="firstName">Förnamn</label>
             <input
@@ -368,7 +377,7 @@ export const Register = () => {
             onChange={handleChange}
             />
             </label>
-            {/* Favorit Låt*/}
+
             <label htmlFor="favoriteSong">Favorit låt:</label>
             <input
             type="text"
@@ -377,8 +386,7 @@ export const Register = () => {
             value={formData.favoriteSong || ''}
             onChange={handleChange}
             />
-            
-            {/* Favorit Film */}
+
             <label htmlFor="favoriteMovie">Favorit film:</label>
             <input
             type="text"
@@ -406,7 +414,6 @@ export const Register = () => {
             </>
         )}
         
-        
         <div className="buttoncontainerinRegister">
         {step > 1 && <button className="buttonbk" onClick={handlePrevious}>Tillbaka</button>}
         {step < 6 && <button className="buttonnext" onClick={handleNext}>Nästa</button>}
@@ -418,4 +425,4 @@ export const Register = () => {
         </>
     );
 };
-export default FormData
+

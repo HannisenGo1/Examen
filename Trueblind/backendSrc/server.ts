@@ -5,7 +5,10 @@ const app: Express = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json()); 
+import cors from 'cors';
 
+
+app.use(cors());
 
 app.use('/', (req: Request, _, next: NextFunction) => {
     console.log(`${req.method} ${req.url}`, req.body);
