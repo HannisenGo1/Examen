@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import logga from '../img/logga.png'
 import { useNavigate } from 'react-router-dom'; 
 import {validateFormData, intresseLista} from '../validering'
+
 type FormData = {
     firstName: string;
     age: string;
@@ -18,8 +19,11 @@ type FormData = {
     photo: File | null;
     favoriteSong: string | '';
     favoriteMovie: string |'';
-    email: string
+    email: string;
+    lifeStatement1: string;
+    lifeStatement2:string;
 };
+
 export const Register = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState<FormData>({
@@ -39,9 +43,11 @@ export const Register = () => {
         favoriteSong: '',
         favoriteMovie: '',
         email: '',
+        lifeStatement1: '',
+        lifeStatement2:''
     });
     
-    // Vid intresse, måste ha 5 i klickade.
+  
     const handleInterestClick = (interest: string) => {
         setFormData((prev: FormData) => {
             const newInterests = [...prev.interests];
@@ -232,6 +238,7 @@ export const Register = () => {
             <option value="jude">Jude</option>
             <option value="hinduism">Hindu</option>
             <option value="other">Annat</option>
+            <option value="nothing">Ingen</option>
             </select>
             {errors.religion && <span className="error">{errors.religion}</span>}
             <label htmlFor="interests">Välj 5 intressen:</label>
@@ -343,6 +350,7 @@ export const Register = () => {
             <option value="primary">Grundskola</option>
             <option value="highschool">Gymnasium</option>
             <option value="university">Universitet</option>
+            <option value="bachelor"> kandidatexamen </option>
             </select>
             {errors.education && <span className="error">{errors.education}</span>}
             </>
@@ -379,7 +387,22 @@ export const Register = () => {
             value={formData.favoriteMovie || ''}
             onChange={handleChange}
             />
-            
+            <p> Avsluta meningen </p>
+            <label>Jag skulle aldrig kunna leva utan...</label>
+<input
+    type="text"
+    name="lifeStatement1"
+    value={formData.lifeStatement1}
+    onChange={handleChange}
+/>
+
+<label>Jag blir mest inspirerad när...</label>
+<input
+    type="text"
+    name="lifeStatement2"
+    value={formData.lifeStatement2}
+    onChange={handleChange}
+/>
             </>
         )}
         
@@ -395,3 +418,4 @@ export const Register = () => {
         </>
     );
 };
+export default FormData

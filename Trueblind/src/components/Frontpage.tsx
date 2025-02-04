@@ -15,6 +15,9 @@ export const Frontpage = () => {
 const handleRegisterClick = () => {
   navigate('/register'); // Navigera till /register när knappen klickas
 };
+const handleLoginClick = () => {
+  navigate('/account');
+}
 
 
 
@@ -33,7 +36,7 @@ const handleRegisterClick = () => {
 </div>
        
         <div className="btncontainer"> 
-            <button > Logga in </button> 
+            <button onClick={handleLoginClick}> Logga in </button> 
             <button onClick={handleRegisterClick}> Registrera dig </button> 
             </div> 
           <div className="frontpagetextDiv"> 

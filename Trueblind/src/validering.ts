@@ -48,3 +48,4 @@ export const validateFormData = (step: number, formData: any) => {
      'Sociala aktiviteter',
      'Baka', 'Tennis'
   ];
+ 

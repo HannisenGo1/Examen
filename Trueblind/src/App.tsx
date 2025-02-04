@@ -1,13 +1,16 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Frontpage } from "./components/Frontpage";
 import { Register } from "./components/registerAccount";
+import { AccountPage } from "./components/Account";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Frontpage />} /> {/*  "/" */}
-        <Route path="/register" element={<Register />} /> {/* "/register" */}
+        <Route path="/" element={<Frontpage />} /> {/*  "Framsidan" */}
+        <Route path="/register" element={<Register />} /> {/* "Registreringssidan" */}
+        <Route path="/account" element={<AccountPage/> } /> 
+        
       </Routes>
     </Router>
   );
