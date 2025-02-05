@@ -8,7 +8,7 @@ export const Register = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState<FormData>({
         firstName: '',
-        age: '',
+        age: 18,
         city: '',
         gender: '',
         sexualOrientation: '',
@@ -225,7 +225,7 @@ export const Register = () => {
             <option value="">Välj sexuell läggning</option>
             <option value="hetero">Hetero</option>
             <option value="homo">Homo</option>
-            <option value="bi">Bi</option>
+            <option value="bi">Bisexuell</option>
             <option value="other">Annat</option>
             </select>
             {errors.sexualOrientation && <span className="error">{errors.sexualOrientation}</span>}

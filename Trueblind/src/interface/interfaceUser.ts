@@ -6,8 +6,10 @@ password: string;
 
 
 export type FormData = {
+    minAge?: 0,
+    maxAge?: 100,
     firstName: string;
-    age: string;
+    age: number;
     city: string;
     gender: string;
     sexualOrientation: string;
@@ -29,9 +31,26 @@ export type FormData = {
 };
 export interface User {
     firstName: string;
-    lastName: string;
-    age: string;
+    age: number;
     city: string;
     gender: string;
     sexualOrientation: string;
+    religion: string;
+    lifeStatement1?: string;
+    lifeStatement2?:string;
+    id?:string;
+    interests: string[];
+    hasChildren: boolean;
+    wantsChildren: boolean;
+    smokes: string;
+    relationshipStatus: string;
+    education: string;
+    photo?:string;
   }
+  export interface SearchResult {
+      age: number;
+      gender: string;
+      distance: string;
+      religion:string;
+      
+    }

@@ -3,12 +3,53 @@
   background-color: aliceblue;
 }
 
+h2{ 
+  color:black;
+}
 p{
   color:black;
 }
 
-.columndiv{
-  display: flex;
-  flex-direction: column;
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+.arrow {
+  cursor: pointer;
+  font-size: 24px; 
+  transition: transform 0.3s ease;
+  display: inline-block;
+  margin-top: 10px;
+  color: #867e02; 
+  text-align: center;
 }
 
+
+.arrow.open {
+  transform: rotate(180deg); 
+}
+
+
+.columndiv {
+  display: flex;
+  flex-direction: column;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  text-align: center; 
+}
+
+.columndiv p {
+  font-size: 1.1em;
+  margin: 10px 0;
+  color: #333;
+}
+
+.columndiv strong {
+  color: #000000; 
+}

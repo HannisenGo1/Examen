@@ -44,9 +44,6 @@ export async function AddUser(data: {
     }
 }
 
-
-
-// Ta bort en användare
 export async function DeleteUser(usersId: string): Promise<void> {
     try {
         const user = doc(db, "users", usersId);
@@ -57,7 +54,7 @@ export async function DeleteUser(usersId: string): Promise<void> {
     }
 }
 
-// Inkludera dokument-ID som nyckel
+
 export function withKey(doc: any): any {
     const data = doc.data();
     return { ...data, id: doc.id };

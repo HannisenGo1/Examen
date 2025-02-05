@@ -21,7 +21,6 @@ export async function AddUser(data) {
         throw error;
     }
 }
-// Ta bort en användare
 export async function DeleteUser(usersId) {
     try {
         const user = doc(db, "users", usersId);
@@ -32,7 +31,6 @@ export async function DeleteUser(usersId) {
         throw error;
     }
 }
-// Inkludera dokument-ID som nyckel
 export function withKey(doc) {
     const data = doc.data();
     return { ...data, id: doc.id };
