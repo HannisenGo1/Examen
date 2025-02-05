@@ -1,7 +1,7 @@
 import { useUserStore } from '../storage/storage';
 import { useNavigate } from 'react-router-dom';
 import { User } from '../interface/interfaceUser';
-
+import logga from '../img/logga.png';
 export const MatchList = () => {
   const { user, likedUsers } = useUserStore();
   const navigate = useNavigate();
@@ -31,8 +31,18 @@ export const MatchList = () => {
   };
 
   return (
-    <div>
-      <button onClick={backtoaccount}>Tillbaka till kontot</button>
+<> 
+<div className="logga">
+        <img src={logga} alt="picture" className="img" />
+      </div>
+
+    <div className="rowdivbtn"> 
+    <button onClick={backtoaccount}>Tillbaka till kontot</button> 
+    <button> Meddelanden </button>
+    
+    </div> 
+    <div className='columndiv2'>
+      
 
       <h3>De användare du har gillat:</h3>
       <ul>
@@ -44,15 +54,14 @@ export const MatchList = () => {
 
             return (
               <li key={likedUser.id}>
-                <img src={likedUser.photo || "/defaultProfilePicture.png"} alt={`${likedUser.firstName}'s profile`} />
-                <h4>{likedUser.firstName}</h4>
-                <p>Matchprocent: {matchPercentage.toFixed(2)}%</p>
+                 <h4>{likedUser.firstName}</h4>
+                <p>Matchning: {matchPercentage.toFixed(2)}%</p>
                 <p><strong>Kön:</strong> {likedUser.gender}</p>
                 <p><strong>Religion:</strong> {likedUser.religion}</p>
                 <p>{likedUser.lifeStatement1}</p>
                 <p>{likedUser.lifeStatement2}</p>
                 {matchPercentage > 75 && (
-                  <p>Starta chatt med varandra! 📨</p>
+                  <p>Starta chatt med varandra! <button>📨 </button></p>
                 )}
               </li>
             );
@@ -60,5 +69,6 @@ export const MatchList = () => {
         )}
       </ul>
     </div>
+   </> 
   );
 };

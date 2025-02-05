@@ -127,7 +127,7 @@ export const SearchPartners = () => {
                     <p><strong>Kön:</strong> {result.gender}</p>
                     <p><strong>Religion:</strong> {result.religion}</p>
 
-                    {checkForMatch(result.id!) && <p>Det är en match! 🎉</p>}
+                    {checkForMatch(result.id!) && <p> Sparad i dina likes! </p>}
                   </div>
                   <div className="life-statements">
                     <p>{result.lifeStatement1}</p>

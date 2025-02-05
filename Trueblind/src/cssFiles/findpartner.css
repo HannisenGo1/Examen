@@ -3,6 +3,36 @@ h4{
     font-size: 28px;
     margin-bottom: 20px;
 }
+.rowdivbtn {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between; 
+  
+  margin-top: 3em;
+  gap: 10px;
+}
+
+.rowdivbtn button {
+  padding: 10px 20px; 
+  font-size: 1rem; 
+  cursor: pointer; 
+ align-items: center;
+  border-radius: 5px; 
+  background-color: #996A30;
+  border: 1px solid #996A30; ;
+  color: black;
+  transition: background-color 0.3s ease, transform 0.3s ease; 
+}
+
+.rowdivbtn button:hover {
+  background-color: #775021; 
+  transform: translateY(-2px); 
+}
+
+.rowdivbtn button:active {
+  background-color: #775021; 
+  transform: translateY(0); 
+}
 
 .columndiv2 {
     display: flex;
@@ -119,7 +149,7 @@ h4{
     display: flex;
     flex-direction: column;
   }
-  /* För hela resultatsektionen */
+
 .results-container {
     max-width: 1200px;
     margin: 20px auto;
@@ -161,8 +191,8 @@ h4{
   .result-info {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centrerar horisontellt */
-    justify-content: center; /* Centrerar vertikalt */
+    align-items: center; 
+    justify-content: center; 
     text-align: center; 
     margin-bottom: 10px;
     
@@ -171,7 +201,7 @@ h4{
   .result-info h4 {
     color: #333;
     font-size: 20px;
-    margin-bottom: 10px; /* Space between name and other info */
+    margin-bottom: 10px; 
   }
   
   .result-info p {
