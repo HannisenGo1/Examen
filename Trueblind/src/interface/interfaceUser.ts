@@ -54,3 +54,8 @@ export interface User {
       religion:string;
       
     }
+    export interface Message  {
+      senderId: string;
+      senderName: string;
+      text: string;
+    };

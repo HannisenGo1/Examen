@@ -5,13 +5,15 @@ import logga from '../img/logga.png';
 import { useState } from 'react';
 
 export const MatchList = () => {
-  const { user, likedUsers, removeLikedUser } = useUserStore();
+  const { user, likedUsers, removeLikedUser, sendMessageRequest, requests} = useUserStore();
   const navigate = useNavigate();
 
   const backtoaccount = () => {
     navigate('/account');
   };
-
+  const tomessages = () => {
+    navigate('/messages');
+  };
   const [selectedRange, setSelectedRange] = useState('all');
 
   const calculateMatch = (likedUser: User) => {
@@ -61,21 +63,32 @@ export const MatchList = () => {
     }
   };
 
+  const handleSendRequest = (likedUserId: string | undefined) => {
+    if (likedUserId) {
+      
+      sendMessageRequest(likedUserId); 
+console.log('sending request to' ,likedUserId)
+
+    } else {
+      console.error('Liked User ID is undefined');
+    }
+  };
+
   return (
     <>
       <div className="logga">
-        <img src={logga} alt="picture" className="img" />
+        <img src={logga} alt="logo" className="img" />
       </div>
 
       <div className="rowdivbtn">
         <button onClick={backtoaccount}>Tillbaka till kontot</button>
-        <button> Meddelanden </button>
+        <button onClick={tomessages}> Meddelanden </button>
       </div>
 
       <div className="columndiv2">
         <h3>De användare du har gillat:</h3>
 
-        {/* Dropdown  */}
+        {/* Dropdown */}
         <label htmlFor="matchRange">Filtrera efter matchning:</label>
         <select id="matchRange" value={selectedRange} onChange={handleRangeChange}>
           <option value="all">Alla</option>
@@ -93,20 +106,27 @@ export const MatchList = () => {
               .filter(filterUsersByMatch)
               .map((likedUser) => {
                 const matchPercentage = calculateMatch(likedUser);
+                const hasRequest = requests.some(request => request.receiverId === likedUser.id && request.status === 'pending');
 
                 return (
                   <li key={likedUser.id}>
-                  
-                    <h4>{likedUser.firstName}  <button className="deletebtn"onClick={() => handleRemoveUser(likedUser.id)}>
-                      X
-                    </button></h4>
+                    <h4>{likedUser.firstName}  
+                      <button className="deletebtn" onClick={() => handleRemoveUser(likedUser.id)}>
+                        X
+                      </button>
+                    </h4>
                     <p>Matchning: {matchPercentage}%</p>
-                     <p><strong>Ålder:</strong> {likedUser.age}</p>
+                    <p><strong>Ålder:</strong> {likedUser.age}</p>
                     <p>{likedUser.lifeStatement1}</p>
                     <p>{likedUser.lifeStatement2}</p>
-                    {matchPercentage > 75 && (
-                      <p>Starta chatt med varandra! <button className="sendmessagebtn">📨 </button></p>
+
+                    {matchPercentage > 10 && !hasRequest && (
+                      <button onClick={() => handleSendRequest(likedUser.id)} className="sendmessagebtn">
+                        Skicka meddelande förfrågan 📨
+                      </button>
                     )}
+
+                    {hasRequest && <p>Förfrågan skickad, vänta på svar!</p>}
                   </li>
                 );
               })

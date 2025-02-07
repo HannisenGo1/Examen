@@ -1,0 +1,126 @@
+.btnback {
+    margin-top: 2em;
+    width: 40px; 
+    height: 40px; 
+    background-color: transparent; 
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 24px; 
+  }
+  
+  .buttondivforback {
+    display: flex;
+    justify-content: flex-start; 
+    padding: 1px;
+  }
+  
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #f4f4f9;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+/* Chat-top (titel, etc.) */
+.chat-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.chat-header h2 {
+  font-size: 24px;
+  color: #333;
+}
+
+.chat-header h3 {
+  font-size: 18px;
+  color: #777;
+}
+
+/* Meddelande listan */
+.chat-messages-container {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px;
+  border-bottom: 2px solid #ddd;
+  margin-bottom: 20px;
+}
+
+/* Enskilda meddelanden */
+.chat-message {
+  display: flex;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.chat-message p {
+  margin: 0;
+  padding: 5px;
+  border-radius: 15px;
+  max-width: 70%;
+  font-size: 16px;
+}
+
+/* meddelande från användaren */
+.chat-message.sent {
+  background-color: #b3d7ff;
+  align-self: flex-end;
+  border-radius: 15px 15px 0 15px;
+}
+
+/* Stil för meddelande från den andra personen */
+.chat-message.received {
+  background-color: #e3e3e3;
+  align-self: flex-start;
+  border-radius: 15px 15px 15px 0;
+}
+
+.chat-message .sender {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+/* Textarea och skicka knapp */
+.chat-message-input-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-message-input-container textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  resize: none;
+  min-height: 80px;
+}
+
+.chat-message-input-container button {
+  padding: 10px;
+  background-color: #4caf50;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.chat-message-input-container button:hover {
+  background-color: #45a049;
+}
+
+.chat-message-input-container button:disabled {
+  background-color: #c7c7c7;
+  cursor: not-allowed;
+}

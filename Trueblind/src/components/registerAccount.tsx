@@ -3,7 +3,7 @@ import logga from '../img/logga.png'
 import { useNavigate } from 'react-router-dom'; 
 import {validateFormData, intresseLista} from '../validering'
 import { FormData } from '../interface/interfaceUser';
-
+// sätta in en " berätta lite om dig själv"
 export const Register = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState<FormData>({

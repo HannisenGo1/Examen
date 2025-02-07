@@ -27,6 +27,12 @@ export const AccountPage = () => {
 const matchsite = () => {
   navigate('/match')
 }
+const messagesite = () => {
+  navigate ('/messages')
+}
+const logout = () => {
+  navigate ('/')
+}
   
   return (
     <>
@@ -41,9 +47,10 @@ const matchsite = () => {
     </h1> 
   
     <div className="result-info"> 
-      <button onClick={matchsite} className="btnmatchsite">kom till matchsidan</button> 
-    </div> 
-    
+      <button onClick={matchsite} className="btnmatchsite">Matchsidan</button> 
+    <button onClick={messagesite} className="btnmatchsite">Meddelanden</button> 
+    <button onClick={logout} className="btnmatchsite">Logga ut</button> 
+       </div> 
     <h2 className="confirmation-message">
       Dina uppgifter: 
       <span className={`arrow ${isOpen ? 'open' : ''}`} onClick={toggleOpenInfo}>&#9660;</span>

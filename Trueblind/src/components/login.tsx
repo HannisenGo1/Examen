@@ -2,13 +2,22 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import { useUserStore } from '../storage/storage';
 import logga from '../img/logga.png';
-export const Login = () => {
+
+
+
+export const Login= () => {
+//  useUserStore.getState().setUser(userData);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [users, setUsers] = useState<any[]>([]); 
   const navigate = useNavigate(); 
 
+  useEffect(() => {
+    if (useUserStore.getState().user) {
+      useUserStore.getState().loadChatsFromStorage();
+    }
+  }, [useUserStore.getState().user]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -33,12 +42,16 @@ export const Login = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     const foundUser = users.find(user => user.email === email && user.password === password);
-
+  
     if (foundUser) {
-      useUserStore.getState().setUser(foundUser);
       console.log('Inloggad:', foundUser);
+  
+      useUserStore.getState().setUser(foundUser);
+      useUserStore.getState().loadRequestsFromStorage();
+      useUserStore.getState().loadChatsFromStorage();
+  
       setError('');
       navigate('/account');
     
