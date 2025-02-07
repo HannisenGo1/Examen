@@ -1,0 +1,27 @@
+@media (max-width: 320px) {
+
+    .login-container {
+        padding: 1em;
+        max-width: 90%;
+    }
+
+    .login-header {
+        font-size: 18px; 
+        margin-bottom: 1em;
+    }
+
+    .input-group input {
+        padding: 8px; 
+        font-size: 12px; 
+    }
+
+    .login-button {
+        padding: 10px; 
+        font-size: 14px; 
+    }
+
+    .justtextbtn {
+        font-size: 12px; 
+    }
+
+}

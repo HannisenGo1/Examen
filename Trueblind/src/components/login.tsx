@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import { useUserStore } from '../storage/storage';
+import logga from '../img/logga.png';
 export const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -47,33 +48,42 @@ export const Login = () => {
   };
 
   return (
-    <div>
-      <h2>Logga in</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">E-post</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Lösenord</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Logga in</button>
-      </form>
+    <> 
+      <div className="logga">
+        <img src={logga} alt="picture" className="img" />
+      </div>
+      <h2 className="login-header">Logga in</h2>   
+      <div className="login-container">
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-    </div>
+        
+        <form className="form-login"onSubmit={handleSubmit}>
+          <div className="input-group">
+            <label htmlFor="email">E-post</label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label htmlFor="password">Lösenord</label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button className="justtextbtn">Glömt lösenord</button>
+          <button type="submit" className="login-button">Logga in</button>
+        </form>
+  
+        {error && <p className="login-error">{error}</p>}
+      </div>
+    </>
   );
+  
 };

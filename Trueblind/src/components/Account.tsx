@@ -30,37 +30,45 @@ const matchsite = () => {
   
   return (
     <>
-   
-      <div className="logga">
-        <img src={logga} alt="picture" className="img" />
-      </div>
-       
-      <h1 className="Rubriktext"> 
+    <div className="logga">
+      <img src={logga} alt="picture" className="img" />
+    </div>
+     
+    <h1 className="Rubriktext"> 
       <span className="firstPart">KO</span>
-    <span className="secondPart">NT</span>
-    <span className="firstPart">O</span>
-      </h1> 
-<button onClick={matchsite}>   klicka för att komma till matchsidan </button> 
-      <h2 className='confirmation-message'> Dina uppgifter: 
-      <span className={`arrow ${isOpen ? 'open' : ''}`} 
-      onClick={toggleOpenInfo}>&#9660;</span></h2>
- {isOpen && (   <div className="columndiv2">
-        <p><strong>Ditt namn: {user.firstName}</strong></p>
-        <p><strong>Ålder: {user.age}</strong></p>
-        <p><strong>Stad: {user.city}</strong></p>
-        <p><strong>Kön: {user.gender}</strong></p>
-        <p><strong>Sexuell läggning: {user.sexualOrientation}</strong></p>
-      </div>   
-     )}
-
-
-<h2 className='confirmation-message'> Vilken partner söker du? <span className={`arrow ${isClosed  ? 'open' : ''}`} onClick={toggleOpenSearch}>&#9660;</span></h2>
-
-  {isClosed && (   
-< SearchPartners/> 
- 
-  )}
+      <span className="secondPart">NT</span>
+      <span className="firstPart">O</span>
+    </h1> 
   
-    </>
+    <div className="result-info"> 
+      <button onClick={matchsite} className="btnmatchsite">kom till matchsidan</button> 
+    </div> 
+    
+    <h2 className="confirmation-message">
+      Dina uppgifter: 
+      <span className={`arrow ${isOpen ? 'open' : ''}`} onClick={toggleOpenInfo}>&#9660;</span>
+    </h2>
+    {isOpen && (
+      <div className="container"> 
+        <div className="columndiv2">
+          <p><strong>Ditt namn: {user.firstName}</strong></p>
+          <p><strong>Ålder: {user.age}</strong></p>
+          <p><strong>Stad: {user.city}</strong></p>
+          <p><strong>Kön: {user.gender}</strong></p>
+          <p><strong>Sexuell läggning: {user.sexualOrientation}</strong></p>
+        </div>
+      </div>
+    )}
+  
+    <h2 className="confirmation-message">
+      Vilken partner söker du? 
+      <span className={`arrow ${isClosed  ? 'open' : ''}`} onClick={toggleOpenSearch}>&#9660;</span>
+    </h2>
+  
+    {isClosed && (   
+      <SearchPartners/> 
+    )}
+  </>
+  
   );
 };

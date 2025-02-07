@@ -117,7 +117,7 @@ form > div > label {
     padding: 30px;
     background-color: #f0f8ff; 
     border-radius: 15px;
-    border: 1px solid #996A30; ; 
+ 
     max-width: 320px;
     margin-left: auto;
     margin-right: auto;
@@ -129,7 +129,6 @@ form > div > label {
     font-weight: bold;
     color: #5c5b2c; 
     margin-bottom: 20px;
-
   }
   
   

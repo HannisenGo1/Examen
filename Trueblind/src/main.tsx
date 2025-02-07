@@ -5,6 +5,7 @@ import App from './App.tsx'
 import './cssFiles/App.css'
 import './cssFiles/front.css'
 import './cssFiles/mediaQ.css'
+import './cssFiles/mediaQ320.css'
 import './cssFiles/registerAccount.css'
 import './cssFiles/findpartner.css'
 

@@ -23,7 +23,7 @@
         margin-bottom: 15px;
     }
     .frontpagetextDiv {
-        width:20em;
+        width:19em;
         margin-top:2em;
     }
     .confirmation-message button {
@@ -46,6 +46,30 @@
     }
     form {
         width: 75%;
+    }
+    .login-container {
+        padding: 0.5em;
+        max-width: 100%; 
+        
+    }
+
+    .login-header {
+        font-size: 20px; 
+        margin-bottom: 1.2em;
+    }
+
+    .input-group input {
+        padding: 10px; 
+        font-size: 14px; 
+    }
+
+    .login-button {
+        padding: 10px; 
+        font-size: 14px; 
+    }
+
+    .justtextbtn {
+        font-size: 14px; 
     }
 }
 
@@ -74,5 +98,4 @@
         margin: 0; 
 
     }
-
 }
