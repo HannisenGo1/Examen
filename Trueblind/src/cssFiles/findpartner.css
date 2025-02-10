@@ -56,13 +56,14 @@ select {
   width:2em;
   height: 2em;
   border-radius: 15%;
+  margin-left:1em;
 }
 .deletebtn :hover{
   background-color: rgb(141, 9, 9);
 }
 .sendmessagebtn{
-  height: 2em;
-  width: 3em;
+  height: 4em;
+  width: 8em;
 }
 
 .columndiv2 {
@@ -259,3 +260,28 @@ select {
 
 
 
+.age-filter-container {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.age-filter-container label {
+  font-weight: 600;
+  color: #444;
+}
+
+.age-filter-container input {
+  width: 120px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-align: center;
+  transition: border-color 0.3s;
+}
+
+.age-filter-container input:focus {
+  border-color: #007BFF;
+  outline: none;
+}

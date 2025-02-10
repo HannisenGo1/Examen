@@ -38,30 +38,40 @@ export const Messages = () => {
       console.log("Användare inte inloggad.");
       return;
     }
-
+  
     const userId = user.id;
     acceptMessageRequest(senderId); 
-
+  
+    // Skapa chatRoomId baserat på sorterade ID:n
     const chatRoomId = [userId, senderId].sort().join('-');
     console.log("ChatRoomId:", chatRoomId);
+  
 
-    // Uppdatera requests för båda användare
     const updatedRequests = requests.map((request) => {
       if (request.senderId === senderId || request.receiverId === senderId) {
         return { ...request, status: 'accepted' };
       }
       return request;
     });
-
+  
     const userStorageKey = `${userId}-requests`;
     localStorage.setItem(userStorageKey, JSON.stringify(updatedRequests));
+  
 
-    // Uppdatera chattar
-    const updatedChats = [...activeChats];
-    localStorage.setItem(`${userId}-activeChats`, JSON.stringify(updatedChats));
-
-
-    navigate(`/chat/${chatRoomId}`);
+    const existingChat = activeChats.find((chat) => chat.chatRoomId === chatRoomId);
+    if (!existingChat) {
+      const newChat = {
+        chatRoomId,
+        userIds: [userId, senderId],
+        messages: [],  
+        userNames: [user.firstName, likedUsers.find((user) => user.id === senderId)?.firstName || "Okänd"],
+      };
+  
+      const updatedChats = [...activeChats, newChat];  
+      localStorage.setItem(`${userId}-activeChats`, JSON.stringify(updatedChats)); 
+    }
+  
+    navigate(`/chat/${chatRoomId}`); 
   };
 
   const handleReject = (senderId: string) => {
@@ -71,8 +81,6 @@ export const Messages = () => {
 
     const userId = user?.id || '';
     const userStorageKey = `${userId}-requests`;
-
-    // Uppdatera requests i localStorage
     localStorage.setItem(userStorageKey, JSON.stringify(updatedRequests));
   };
 
@@ -122,7 +130,7 @@ export const Messages = () => {
            
               const userNames = chat.userNames || [];
               return (
-                <div key={chat.chatRoomId}>
+                <div className="divForallChats" key={chat.chatRoomId}>
                   <button onClick={() => navigate(`/chat/${chat.chatRoomId}`)}>
                     Chatta med {userNames.join(', ')}
                   </button>

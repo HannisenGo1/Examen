@@ -6,6 +6,9 @@ import { Login } from "./components/login";
 import {MatchList} from "./components/MatchParter";
 import { Messages } from "./components/Messages";
 import { Chat } from "./components/Chat";
+import { Afterlogin } from "./components/Afterlogin";
+import { SearchHere } from "./components/SearchPartner";
+
 function App() {
   return (
     <Router>
@@ -17,7 +20,9 @@ function App() {
         <Route path="/match"element={<MatchList/> } /> 
         <Route path="/messages"element={<Messages /> } /> 
         <Route path="/chat" element={<Chat /> } /> 
-        <Route path="/chat/:chatRoomId" element={<Chat />} /> {/* enskild chatt */}
+      {/**/ }<Route path="/homepage" element ={<Afterlogin /> } />   
+      <Route path="/Findpartner" element ={ <SearchHere /> } /> 
+        <Route path="/chat/:chatRoomId" element={<Chat />} /> {/* enskilda chatten */}
       </Routes>
     </Router>
   );

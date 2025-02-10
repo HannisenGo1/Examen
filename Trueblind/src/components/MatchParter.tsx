@@ -81,7 +81,9 @@ console.log('sending request to' ,likedUserId)
       </div>
 
       <div className="rowdivbtn">
-        <button onClick={backtoaccount}>Tillbaka till kontot</button>
+        <button onClick={backtoaccount}>
+        <i className="fas fa-arrow-left"></i>
+        </button>
         <button onClick={tomessages}> Meddelanden </button>
       </div>
 
@@ -116,9 +118,8 @@ console.log('sending request to' ,likedUserId)
                       </button>
                     </h4>
                     <p>Matchning: {matchPercentage}%</p>
-                    <p><strong>Ålder:</strong> {likedUser.age}</p>
-                    <p>{likedUser.lifeStatement1}</p>
-                    <p>{likedUser.lifeStatement2}</p>
+                    <p>Är <strong>{likedUser.age}</strong> år gammal </p>
+
 
                     {matchPercentage > 10 && !hasRequest && (
                       <button onClick={() => handleSendRequest(likedUser.id)} className="sendmessagebtn">

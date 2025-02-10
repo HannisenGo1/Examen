@@ -1,77 +1,99 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useUserStore } from '../storage/storage';
-
+import { useNavigate } from 'react-router-dom';
+import logga from '../img/logga.png';
 export const Chat = () => {
     const { chatRoomId } = useParams();
-    const { activeChats, addMessageToChat, user } = useUserStore();
+    const { activeChats, addMessageToChat, removeMessageFromChat, user } = useUserStore(); 
     const [newMessage, setNewMessage] = useState('');
   
     const currentChat = activeChats.find((chat) => chat.chatRoomId === chatRoomId);
-  
+    const navigate = useNavigate();
+    const messagesite = () => { navigate('/messages'); };
+
     useEffect(() => {
       if (!currentChat) {
         console.log('Chatten finns inte.');
       }
     }, [currentChat]);
-  
+
     if (!currentChat) {
       return <p>Ingen chatthistorik finns än. Vänta på att användaren accepterar din förfrågan.</p>;
     }
-  
+
     const handleSendMessage = () => {
-      if (newMessage.trim()) {
-        if (chatRoomId) {
-          addMessageToChat(chatRoomId, newMessage);
-          setNewMessage('');
-        }
+      if (newMessage.trim() && chatRoomId && user?.id) {
+        addMessageToChat(chatRoomId, newMessage, user.id); 
+        setNewMessage('');
+      } else {
+        console.error('Användar-ID saknas eller meddelandet är tomt');
       }
     };
+
+    const handleDeleteMessage = (messageId: string) => {
+      const chatRoomId = currentChat?.chatRoomId; 
+    
+      if (!chatRoomId) {
+        console.error('ChatRoomId finns inte!');
+        return; 
+      }
+      removeMessageFromChat(chatRoomId, messageId);
+    };
   
-    // För att visa partnerns namn
-    const chatPartnerNames = currentChat.userIds
-      .filter((id) => id !== user?.id)
-      .map((id) => {
-        const userChat = activeChats.find((chat) => chat.userIds && chat.userIds.includes(id));
-        return userChat ? id : "Unknown User";
-      });
+
   
     return (
-      <div className="chat-container">
-        <div className="chat-header">
-          <h2>Chatta med {chatPartnerNames.join(', ')}</h2>
-          <h3>Din konversation med {chatPartnerNames.join(', ')}</h3>
-        </div>
-  
-        <div className="chat-messages-container">
-          {currentChat.messages.length === 0 ? (
-            <p>Inga meddelanden än.</p>
-          ) : (
-            currentChat.messages.map((msg, index) => (
-              <div
-                key={index}
-                className={`chat-message ${msg.senderId === user?.id ? 'sent' : 'received'}`}
-              >
-                <div>
-                  <p className="sender">{msg.senderId === user?.id ? 'Du' : msg.senderName}</p>
-                  <p>{msg.text}</p>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-  
-        <div className="chat-message-input-container">
-          <textarea
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Skriv ditt meddelande..."
-          />
-          <button onClick={handleSendMessage} disabled={!newMessage.trim()}>
-            Skicka
-          </button>
-        </div>
+      <> 
+      <div className="logga">
+        <img src={logga} alt="logo" className="img" />
       </div>
+      <div className="rowdivbtn">
+        <button onClick={messagesite}>
+        <i className="fas fa-arrow-left"></i>
+          </button>  </div>
+        <div className="chat-container">
+
+          <div className="chat-messages-container">
+            {currentChat.messages.length === 0 ? (
+              <p>Inga meddelanden än.</p>
+            ) : (
+              
+              currentChat.messages.map((msg) => (
+                <div
+                  key={msg.id}  
+                  className={`chat-message ${msg.senderId === user?.id ? 'sent' : 'received'}`}
+                >
+                  <div>
+                    <p className="sender">{msg.senderId === user?.id ? 'Du' : msg.senderName}</p>
+                    <p>{msg.message}</p>
+                    
+             
+                    {msg.senderId === user?.id && (
+                      <button
+                        className="delete-message"
+                        onClick={() => handleDeleteMessage(msg.id)} 
+                      >
+                        X
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+ </div>
+          <div className="chat-message-input-container">
+            <textarea
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Skriv ditt meddelande..."
+            />
+            <button className='sendBtn' onClick={handleSendMessage} disabled={!newMessage.trim()}>
+              Skicka
+            </button>
+          </div>
+       
+      </>
     );
-  };
-  
+};

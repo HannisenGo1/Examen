@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import logga from '../img/logga.png';
 import { useUserStore } from '../storage/storage';
-import { SearchPartners } from './AccountFindParter';
+
 import { useNavigate } from 'react-router-dom';
 // CSS finns i index.css
 export const AccountPage = () => {
@@ -10,7 +10,7 @@ export const AccountPage = () => {
 
   const user = useUserStore((state) => state.user);
       const [isOpen,setIsOpen] = useState(false);
-      const [isClosed,setIsClosed] = useState(false)
+
 
   useEffect(() => {
     console.log("Användardata har uppdaterats:", user);
@@ -21,9 +21,7 @@ export const AccountPage = () => {
   const toggleOpenInfo = () => {
     setIsOpen(!isOpen);
   };
-  const toggleOpenSearch = () => {
-    setIsClosed(!isClosed)
-  }
+
 const matchsite = () => {
   navigate('/match')
 }
@@ -32,6 +30,10 @@ const messagesite = () => {
 }
 const logout = () => {
   navigate ('/')
+}
+
+const backToFindPartner = () => {
+  navigate ('/homepage')
 }
   
   return (
@@ -45,13 +47,10 @@ const logout = () => {
       <span className="secondPart">NT</span>
       <span className="firstPart">O</span>
     </h1> 
-  
-    <div className="result-info"> 
-      <button onClick={matchsite} className="btnmatchsite">Matchsidan</button> 
-    <button onClick={messagesite} className="btnmatchsite">Meddelanden</button> 
-    <button onClick={logout} className="btnmatchsite">Logga ut</button> 
-       </div> 
-    <h2 className="confirmation-message">
+  <button className="btnback" onClick={backToFindPartner}> 
+     <i className="fas fa-arrow-left"></i>
+  </button> 
+  <h2 className="confirmation-message">
       Dina uppgifter: 
       <span className={`arrow ${isOpen ? 'open' : ''}`} onClick={toggleOpenInfo}>&#9660;</span>
     </h2>
@@ -66,15 +65,13 @@ const logout = () => {
         </div>
       </div>
     )}
-  
-    <h2 className="confirmation-message">
-      Vilken partner söker du? 
-      <span className={`arrow ${isClosed  ? 'open' : ''}`} onClick={toggleOpenSearch}>&#9660;</span>
-    </h2>
-  
-    {isClosed && (   
-      <SearchPartners/> 
-    )}
+    <div className="result-info"> 
+      <button onClick={matchsite} className="btnmatchsite">Matchsidan</button> 
+    <button onClick={messagesite} className="btnmatchsite">Meddelanden</button> 
+    <button onClick={logout} className="btnmatchsite">Logga ut</button> 
+       </div> 
+
+
   </>
   
   );

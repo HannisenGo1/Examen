@@ -53,7 +53,7 @@ export const Login= () => {
       useUserStore.getState().loadChatsFromStorage();
   
       setError('');
-      navigate('/account');
+      navigate('/homepage');
     
     } else {
       setError('Fel e-post eller lösenord.');

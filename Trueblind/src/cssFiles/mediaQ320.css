@@ -23,5 +23,27 @@
     .justtextbtn {
         font-size: 12px; 
     }
+ 
 
-}
+        .chat-container {
+          width: 95%;
+          padding: 10px;
+        }
+      
+        .chat-message {
+          font-size: 14px;
+          max-width: 80%;
+        }
+      
+        .sendBtn {
+          width: 3em;
+          height: 2.5em;
+          font-size: 14px;
+        }
+      
+        .btnback {
+          width: 35px;
+          height: 35px;
+          font-size: 20px;
+        }
+    }
