@@ -7,6 +7,8 @@ import { FaPen } from 'react-icons/fa'; // Importera penna-ikonen
 export const AccountPage = () => {
   const navigate = useNavigate();
   const user = useUserStore((state) => state.user);
+  const { setUser } = useUserStore();
+
   const [isOpen, setIsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState({ 
     firstName: false,
@@ -16,7 +18,6 @@ export const AccountPage = () => {
     interests: false
   });
   const [updatedUserData, setUpdatedUserData] = useState({
-    firstName: user ? user.firstName : '',
     age: user ? user.age : '',
     city: user ? user.city : '',
     sexualOrientation: user ? user.sexualOrientation : '',
@@ -26,7 +27,6 @@ export const AccountPage = () => {
   useEffect(() => {
     if (user) {
       setUpdatedUserData({
-        firstName: user.firstName,
         age: user.age,
         city: user.city,
         sexualOrientation: user.sexualOrientation,
@@ -53,37 +53,35 @@ export const AccountPage = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    
     setUpdatedUserData((prevData) => ({
-      ...prevData,
-      [name]: value,
+        ...prevData,
+        [name]: name === "interests" ? value.split(",") : value, 
     }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+};
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`http://localhost:3000/users/${user.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedUserData),
-      });
+        const response = await fetch(`http://localhost:3000/users/${user.id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedUserData),
+        });
 
-      if (response.ok) {
-        const updatedUser = await response.json();
-        console.log("Användardata uppdaterad:", updatedUser);
-        console.log("Uppdatering lyckades!");
-      } else {
-        console.error("Uppdatering misslyckades");
-        console.log("Det gick inte att uppdatera användardata.");
-      }
+        if (response.ok) {
+            const updatedUser = await response.json(); 
+            setUser(updatedUser); 
+            console.log("Användardata uppdaterad:", updatedUser);
+        } else {
+            console.error("Uppdatering misslyckades");
+        }
     } catch (error) {
-      console.error("Fel vid uppdatering:", error);
-      console.log("Ett fel uppstod vid uppdatering av användardata.");
+        console.error("Fel vid uppdatering:", error);
     }
-  };
+};
 
   return (
     <>

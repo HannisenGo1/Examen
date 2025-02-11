@@ -1,4 +1,3 @@
-
 export interface User {
     firstName: string;
     age: number;
@@ -17,4 +16,3 @@ export interface User {
     education: string;
     photo?:string;
   }
-  

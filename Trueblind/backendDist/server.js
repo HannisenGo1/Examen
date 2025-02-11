@@ -1,5 +1,5 @@
 import express from "express";
-import { GetUser, AddUser } from "./data/getData.js";
+import { GetUser, AddUser, UpdateUser, GetUserById } from "./data/getData.js";
 const app = express();
 const port = process.env.PORT || 3000;
 app.use(express.json());
@@ -28,6 +28,19 @@ app.post("/users", async (req, res) => {
     catch (error) {
         console.error("Fel vid skapande av användare:", error);
         res.status(500).json({ error: "Ett fel uppstod vid skapande av användare." });
+    }
+});
+app.patch('/users/:id', async (req, res) => {
+    const userId = req.params.id;
+    const partialData = req.body;
+    try {
+        await UpdateUser(userId, partialData);
+        const updatedUser = await GetUserById(userId);
+        res.status(200).json(updatedUser);
+    }
+    catch (error) {
+        console.error("Fel vid uppdatering av användare:", error);
+        res.status(500).json({ error: "Ett fel uppstod vid uppdatering av användardata." });
     }
 });
 // 404 Middleware (om ingen route matchar)

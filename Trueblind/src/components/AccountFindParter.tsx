@@ -8,20 +8,16 @@ export const SearchPartners = () => {
   const [city, setCity] = useState('');
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState(false);
-  const [minAge, setMinAge] = useState(18);  
-  const [maxAge, setMaxAge] = useState(100); 
-
+  const [minAge, setMinAge] = useState(18);
+  const [maxAge, setMaxAge] = useState(100);
   const { user, likedUsers, addLikedUser } = useUserStore();
 
   if (!user) {
     return <p>Du måste vara inloggad för att söka efter partners.</p>;
   }
 
-  const { gender: yourGender, 
-    sexualOrientation: yourSexualOrientation,
-     religion: yourReligion, id:yourId } = user;
+  const { gender: yourGender, sexualOrientation: yourSexualOrientation, id: yourId } = user;
 
-  // Fetch användare från API
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -40,10 +36,8 @@ export const SearchPartners = () => {
 
   const calculateMatch = (likedUser: User) => {
     if (!user) return 0;
-
     let matchScore = 0;
     const totalCriteria = 7;
-
     if ((user.interests || "") === (likedUser.interests || "")) matchScore++;
     if (user.smokes === likedUser.smokes) matchScore++;
     if (user.religion === likedUser.religion) matchScore++;
@@ -51,71 +45,56 @@ export const SearchPartners = () => {
     if (user.hasChildren === likedUser.hasChildren) matchScore++;
     if (user.education === likedUser.education) matchScore++;
     if (user.relationshipStatus === likedUser.relationshipStatus) matchScore++;
-
     const matchPercentage = (matchScore / totalCriteria) * 100;
-    return Math.round(matchPercentage); 
+    return Math.round(matchPercentage);
   };
 
-
   const filterUsers = () => {
-    const normalizedSexualOrientation = yourSexualOrientation.toLowerCase().trim();
-  
-    const filteredUsers = users.filter((user: User) => {  
+    const normalizedSexualOrientation = yourSexualOrientation;
+
+    const filteredUsers = users.filter((user: User) => {
       if (user.id === yourId) {
-        return false; 
+        return false;
       }
-
-      const isCityMatch = city ? user.city.toLowerCase().trim() === city.toLowerCase().trim() : true;
-
+      const isCityMatch = city ? user.city === city : true;
       let isGenderMatch = false;
-      const userSexualOrientation = user.sexualOrientation.toLowerCase().trim();
-      const yourGenderLower = yourGender.toLowerCase().trim();
-      const userGenderLower = user.gender.toLowerCase().trim();
-  
-      console.log("Din sexuella läggning: ", normalizedSexualOrientation);
-      console.log("Jämförd användares sexuella läggning: ", userSexualOrientation);
-  
-      // Heterosexuell
+      const userSexualOrientation = user.sexualOrientation;
+      const yourGenderLower = yourGender;
+      const userGenderLower = user.gender;
+
       if (normalizedSexualOrientation === 'hetero') {
         if (yourGenderLower === 'male' && userGenderLower === 'female') {
           if (userSexualOrientation === 'hetero') {
             isGenderMatch = true;
           }
-        }
-        else if (yourGenderLower === 'female' && userGenderLower === 'male') {
+        } else if (yourGenderLower === 'female' && userGenderLower === 'male') {
           if (userSexualOrientation === 'hetero') {
             isGenderMatch = true;
           }
         }
-      }
-  
-      // Bisexuell
-      else if (normalizedSexualOrientation === 'bi') {
-
+      } else if (normalizedSexualOrientation === 'bi') {
         if (userSexualOrientation === 'bi') {
-          isGenderMatch = true; 
+          isGenderMatch = true;
         }
-      }
-  
-      // Homosexuell
-      else if (normalizedSexualOrientation === 'homo') {
+      } else if (normalizedSexualOrientation === 'homo') {
         if (yourGenderLower === userGenderLower && userSexualOrientation === 'homo') {
           isGenderMatch = true;
         }
       }
-  
-      console.log("Könsmatchning:", isGenderMatch);
-  
-      return  isCityMatch && isGenderMatch;
+
+      return isCityMatch && isGenderMatch;
     });
-  
-    console.log("Filtrerade användare:", filteredUsers);
-  
+
+
     setMatchingResults(filteredUsers);
   };
-  
-  
-  
+
+
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
 
   const handleMinAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMinAge(parseInt(e.target.value, 10));
@@ -125,15 +104,11 @@ export const SearchPartners = () => {
     setMaxAge(parseInt(e.target.value, 10));
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   const handleLike = (userId: string) => {
-    const likedUser = users.find((user) => user.id === userId);  
+    const likedUser = users.find((user) => user.id === userId);
     if (likedUser) {
-      if (!likedUsers.some((user) => user.id === likedUser.id)) { 
-        addLikedUser(likedUser);  
+      if (!likedUsers.some((user) => user.id === likedUser.id)) {
+        addLikedUser(likedUser);
       } else {
         console.log("User already liked.");
       }
@@ -143,27 +118,27 @@ export const SearchPartners = () => {
   return (
     <div className="columndiv3">
       <h2>Hitta en partner</h2>
-      
+
       <div className="age-filter-container">
-  <label htmlFor="minAge">Från ålder:</label>
-  <input
-    type="number"
-    id="minAge"
-    value={minAge}
-    onChange={handleMinAgeChange}
-    min="0"
-    max="120"
-  />
-  <label htmlFor="maxAge">Till ålder:</label>
-  <input
-    type="number"
-    id="maxAge"
-    value={maxAge}
-    onChange={handleMaxAgeChange}
-    min="0"
-    max="120"
-  />
-</div>
+        <label htmlFor="minAge">Från ålder:</label>
+        <input
+          type="number"
+          id="minAge"
+          value={minAge}
+          onChange={handleMinAgeChange}
+          min="0"
+          max="120"
+        />
+        <label htmlFor="maxAge">Till ålder:</label>
+        <input
+          type="number"
+          id="maxAge"
+          value={maxAge}
+          onChange={handleMaxAgeChange}
+          min="0"
+          max="120"
+        />
+      </div>
 
       <div className="search-form">
         <label htmlFor="city">Stad:</label>
@@ -184,6 +159,9 @@ export const SearchPartners = () => {
         {matchingResults.length > 0 ? (
           <div className="results">
             <h3 className="results-heading">Matchande resultat:</h3>
+   
+        
+
             <ul className="results-list">
               {matchingResults.map((result) => {
                 const matchPercentage = calculateMatch(result);

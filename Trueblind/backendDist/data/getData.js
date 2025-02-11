@@ -1,4 +1,4 @@
-import { collection, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore/lite";
+import { collection, getDocs, getDoc, addDoc, deleteDoc, updateDoc, doc } from "firebase/firestore/lite";
 import { db } from "./firebase.js";
 const userCollection = collection(db, "users");
 export async function GetUser() {
@@ -20,6 +20,29 @@ export async function AddUser(data) {
         console.error("Fel vid skapande av användare:", error);
         throw error;
     }
+}
+export async function UpdateUser(userId, updatedData) {
+    try {
+        const userDoc = doc(db, "users", userId);
+        const userSnap = await getDoc(userDoc);
+        if (!userSnap.exists()) {
+            throw new Error("Användaren hittades inte.");
+        }
+        await updateDoc(userDoc, updatedData);
+        console.log("Användardata uppdaterad!");
+    }
+    catch (error) {
+        console.error("Fel vid uppdatering av användare:", error);
+        throw error;
+    }
+}
+export async function GetUserById(userId) {
+    const userDoc = doc(db, "users", userId);
+    const snapshot = await getDoc(userDoc);
+    if (!snapshot.exists()) {
+        throw new Error("Användaren hittades inte.");
+    }
+    return { id: snapshot.id, ...snapshot.data() };
 }
 export async function DeleteUser(usersId) {
     try {

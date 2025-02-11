@@ -1,7 +1,5 @@
-import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore/lite";
+import { collection, getDocs, addDoc, deleteDoc, updateDoc, doc } from "firebase/firestore/lite";
 import { db } from "./firebase.js";
-import { User } from "./interface.js"; 
-
 const userCollection = collection(db, "users");
 export async function GetUser() {
     try {
@@ -13,7 +11,7 @@ export async function GetUser() {
         return [];
     }
 }
-export async function AddUser(data:User): Promise<string> {
+export async function AddUser(data) {
     try {
         const docRef = await addDoc(userCollection, data);
         return docRef.id;
@@ -23,7 +21,18 @@ export async function AddUser(data:User): Promise<string> {
         throw error;
     }
 }
-export async function DeleteUser(usersId: string): Promise<void> {
+export async function UpdateUser(usersId, updatedData) {
+    try {
+        const userDoc = doc(db, 'users', usersId);
+        await updateDoc(userDoc, updatedData);
+        console.log('Användardata uppdaterad!');
+    }
+    catch (error) {
+        console.error('Fel vid uppdatering av användare:', error);
+        throw error;
+    }
+}
+export async function DeleteUser(usersId) {
     try {
         const user = doc(db, "users", usersId);
         await deleteDoc(user);
@@ -33,18 +42,7 @@ export async function DeleteUser(usersId: string): Promise<void> {
         throw error;
     }
 }
-export async function UpdateUser(usersId: string, updatedData: Partial<User>): Promise<void> {
-    try {
-      const userDoc = doc(db, 'users', usersId);
-      await updateDoc(userDoc, updatedData);
-      console.log('Användardata uppdaterad!');
-    } catch (error) {
-      console.error('Fel vid uppdatering av användare:', error);
-      throw error;
-    }
-  }
-  
-export function withKey(doc: any): User{
+export function withKey(doc) {
     const data = doc.data();
     return { ...data, id: doc.id };
 }
