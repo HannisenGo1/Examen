@@ -147,11 +147,11 @@ export const Register = () => {
         </div>
 
         {isRegistered && (
-        <div className="confirmation-message">
-          <h2>Du har registrerat dig!</h2>
-          <button className="allowedTohomebtn"onClick={goBackToHome}>Till startsidan</button>
-        </div>
-      )}
+  <div className="confirmation-message">
+    <h2>Du har blivit registrerad!</h2>
+    <button className="accountBtn" onClick={goBackToHome}>Till startsidan</button>
+  </div>
+)}
         <form onSubmit={handleSubmit}>
         
         {step === 1 && (
@@ -415,11 +415,11 @@ export const Register = () => {
         )}
         
         <div className="buttoncontainerinRegister">
-        {step > 1 && <button className="buttonbk" onClick={handlePrevious}>Tillbaka</button>}
-        {step < 6 && <button className="buttonnext" onClick={handleNext}>Nästa</button>}
-        {step === 6 && <button className="buttonnext" type="submit">Registrera</button>}
+        {step > 1 && <button className="accountBtn" onClick={handlePrevious}>Tillbaka</button>}
+        {step < 6 && <button className="accountBtn" onClick={handleNext}>Nästa</button>}
+        {step === 6 && <button className="accountBtn" type="submit">Registrera</button>}
         </div>
-        
+
         </form> 
 
         </>

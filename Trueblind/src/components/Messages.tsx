@@ -121,17 +121,16 @@ export const Messages = () => {
         )}
   
 
-        <div>
+        <div className="columndiv2">
           <h2>Aktiva Chattar</h2>
           {activeChats.length === 0 ? (
             <p>Du har inga aktiva chattar.</p>
           ) : (
             activeChats.map((chat) => {
-           
-              const userNames = chat.userNames || [];
+              const userNames = chat.userNames?.filter(name => name !== user?.firstName) || [];
               return (
                 <div className="divForallChats" key={chat.chatRoomId}>
-                  <button onClick={() => navigate(`/chat/${chat.chatRoomId}`)}>
+                  <button className="ToChatBtn" onClick={() => navigate(`/chat/${chat.chatRoomId}`)}>
                     Chatta med {userNames.join(', ')}
                   </button>
                 </div>

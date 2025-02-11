@@ -108,8 +108,8 @@ console.log('sending request to' ,likedUserId)
               .filter(filterUsersByMatch)
               .map((likedUser) => {
                 const matchPercentage = calculateMatch(likedUser);
-                const hasRequest = requests.some(request => request.receiverId === likedUser.id && request.status === 'pending');
-
+                const requestStatus = requests.find(request => request.receiverId === likedUser.id);
+               
                 return (
                   <li key={likedUser.id}>
                     <h4>{likedUser.firstName}  
@@ -121,13 +121,20 @@ console.log('sending request to' ,likedUserId)
                     <p>Är <strong>{likedUser.age}</strong> år gammal </p>
 
 
-                    {matchPercentage > 10 && !hasRequest && (
-                      <button onClick={() => handleSendRequest(likedUser.id)} className="sendmessagebtn">
-                        Skicka meddelande förfrågan 📨
-                      </button>
-                    )}
+                    {matchPercentage > 10 && !requestStatus && (
+  <button onClick={() => handleSendRequest(likedUser.id)} className="sendmessagebtn">
+    Skicka meddelandeförfrågan 📨
+  </button>
+)}
 
-                    {hasRequest && <p>Förfrågan skickad, vänta på svar!</p>}
+// Visa endast ett meddelande åt gången
+{requestStatus && (
+  requestStatus.status === 'pending' ? (
+    <p>Förfrågan skickad, vänta på svar!</p>
+  ) : requestStatus.status === 'accepted' ? (
+    <p>Ni är nu matchade! 🎉</p>
+  ) : null
+)}
                   </li>
                 );
               })

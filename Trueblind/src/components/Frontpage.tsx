@@ -29,15 +29,15 @@ return (
 
     <div className="DivforRubrik">  
       <h1 className="Rubriktext">
-        <span className="firstPart">Find yo</span>
-        <span className="secondPart">ur tru</span>
-        <span className="firstPart">e match</span>
+        <span className="firstPart">Find your</span>
+        <span className="secondPart">true</span>
+        <span className="firstPart"> match</span>
       </h1>
     </div>
         
     <div className="btncontainer"> 
-      <button onClick={handleLoginClick}> Logga in </button> 
-      <button onClick={handleRegisterClick}> Registrera dig </button> 
+      <button className="accountBtn"onClick={handleLoginClick}> Logga in </button> 
+      <button className="accountBtn"onClick={handleRegisterClick}> Registrera dig </button> 
     </div> 
 
     <div className="frontpagetextDiv"> 

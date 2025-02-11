@@ -23,7 +23,7 @@ h4{
   transition: background-color 0.3s ease, transform 0.3s ease; 
 }
 
-.rowdivbtn button:hover {
+.rowdivbtn button:hover{
   background-color: #775021; 
   transform: translateY(-2px); 
 }
@@ -32,18 +32,27 @@ h4{
   background-color: #775021; 
   transform: translateY(0); 
 }
-.btnmatchsite{
+.btnmatchsite, .ToChatBtn{
   padding: 10px 20px; 
-  font-size: 1rem; 
+  font-size: 1em; 
   cursor: pointer; 
+  margin-bottom: 1em;
   align-items: center;
   border-radius: 5px; 
-  background-color: #996A30;
+  background: linear-gradient(145deg, #d4af37, #e8cba7); 
+  color: black; 
   border: 1px solid #996A30; ;
-  color: black;
   transition: background-color 0.3s ease, transform 0.3s ease; 
-  width:9em;
+  width:10em;
 }
+
+
+.btnmatchsite:hover {
+  transform: translateY(-5px);
+  background: linear-gradient(145deg, #e8cba7, #d4af37); 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 select {
   padding: 8px;
   margin: 1em 0;
@@ -74,7 +83,7 @@ select {
   background-color: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width:100%;
+
   text-align: center; 
 }
 
@@ -85,13 +94,17 @@ select {
 }
 .container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center; 
   height: 100%; 
-  margin-top: -1.2em;
 }
 .columndiv2 strong {
   color: #000000; 
+}
+.edit-icon {
+  margin-left: 10px;
+  align-self: flex-start;  
 }
 .columndiv3 {
   display: flex;
@@ -230,7 +243,7 @@ select {
   align-items: center; 
   justify-content: center; 
   text-align: center; 
-  margin-bottom: 10px;
+  margin-bottom:20px;
 }
 
 .result-info h4 {

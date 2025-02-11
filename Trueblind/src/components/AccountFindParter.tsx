@@ -19,7 +19,7 @@ export const SearchPartners = () => {
 
   const { gender: yourGender, 
     sexualOrientation: yourSexualOrientation,
-     religion: yourReligion } = user;
+     religion: yourReligion, id:yourId } = user;
 
   // Fetch användare från API
   const fetchUsers = async () => {
@@ -38,7 +38,6 @@ export const SearchPartners = () => {
     }
   };
 
-  // Beräkna matchning mellan användare med deras egenskaper.
   const calculateMatch = (likedUser: User) => {
     if (!user) return 0;
 
@@ -59,38 +58,64 @@ export const SearchPartners = () => {
 
 
   const filterUsers = () => {
-    const filteredUsers = users.filter((user: User) => {
-      const userAge = typeof user.age === 'string' ? parseInt(user.age, 10) : user.age;
-
-      const isAgeMatch = userAge >= minAge && userAge <= maxAge;
-
+    const normalizedSexualOrientation = yourSexualOrientation.toLowerCase().trim();
+  
+    const filteredUsers = users.filter((user: User) => {  
+      if (user.id === yourId) {
+        return false; 
+      }
 
       const isCityMatch = city ? user.city.toLowerCase().trim() === city.toLowerCase().trim() : true;
 
       let isGenderMatch = false;
-      if (yourSexualOrientation.toLowerCase() === 'hetero') {
-        if ((yourGender.toLowerCase() === 'female' && user.gender.toLowerCase() === 'male') || 
-            (yourGender.toLowerCase() === 'male' && user.gender.toLowerCase() === 'female')) {
-          isGenderMatch = true;
+      const userSexualOrientation = user.sexualOrientation.toLowerCase().trim();
+      const yourGenderLower = yourGender.toLowerCase().trim();
+      const userGenderLower = user.gender.toLowerCase().trim();
+  
+      console.log("Din sexuella läggning: ", normalizedSexualOrientation);
+      console.log("Jämförd användares sexuella läggning: ", userSexualOrientation);
+  
+      // Heterosexuell
+      if (normalizedSexualOrientation === 'hetero') {
+        if (yourGenderLower === 'male' && userGenderLower === 'female') {
+          if (userSexualOrientation === 'hetero') {
+            isGenderMatch = true;
+          }
         }
-      } else if (yourSexualOrientation.toLowerCase() === 'bi') {
-        if ((user.gender.toLowerCase() === 'female' || user.gender.toLowerCase() === 'male') &&
-            user.sexualOrientation.toLowerCase() === 'bi') {
-          isGenderMatch = true;
+        else if (yourGenderLower === 'female' && userGenderLower === 'male') {
+          if (userSexualOrientation === 'hetero') {
+            isGenderMatch = true;
+          }
         }
-      } else if (yourSexualOrientation.toLowerCase() === 'homo') {
-        if (yourGender.toLowerCase() === user.gender.toLowerCase() &&
-            user.sexualOrientation.toLowerCase() === 'homo') {
+      }
+  
+      // Bisexuell
+      else if (normalizedSexualOrientation === 'bi') {
+
+        if (userSexualOrientation === 'bi') {
+          isGenderMatch = true; 
+        }
+      }
+  
+      // Homosexuell
+      else if (normalizedSexualOrientation === 'homo') {
+        if (yourGenderLower === userGenderLower && userSexualOrientation === 'homo') {
           isGenderMatch = true;
         }
       }
-      const isReligionMatch = user.religion ? user.religion.toLowerCase() === yourReligion.toLowerCase() : true;
-
-      return isAgeMatch && isCityMatch && isGenderMatch && isReligionMatch;
+  
+      console.log("Könsmatchning:", isGenderMatch);
+  
+      return  isCityMatch && isGenderMatch;
     });
-
+  
+    console.log("Filtrerade användare:", filteredUsers);
+  
     setMatchingResults(filteredUsers);
   };
+  
+  
+  
 
   const handleMinAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMinAge(parseInt(e.target.value, 10));
@@ -173,6 +198,7 @@ export const SearchPartners = () => {
                       <p><strong>Kön:</strong> {result.gender}</p>
                       <p><strong>Religion:</strong> {result.religion}</p>
                       <p><strong>Matchning:</strong> {matchPercentage}%</p>
+                      <p><strong>läggning:</strong> {result.sexualOrientation}</p>
                     </div>
                     <div className="life-statements">
                       <p>{result.lifeStatement1}</p>
