@@ -54,8 +54,14 @@ export const useUserStore = create<UserStore>((set, get) => {
       const userStorageKey = getUserStorageKey(userId, 'likedUsers');
       const storedLikedUsers = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
       const storedChats = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'activeChats')) || '[]');
-
-      set({ user: userData, likedUsers: storedLikedUsers, activeChats: storedChats });
+      const storedRequests = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'requests')) || '[]');
+    
+      set({ 
+        user: userData, 
+        likedUsers: storedLikedUsers, 
+        activeChats: storedChats, 
+        requests: storedRequests 
+      });
     },
 
     resetUser: () => {
@@ -93,81 +99,110 @@ export const useUserStore = create<UserStore>((set, get) => {
     },
 
     sendMessageRequest: (receiverId: string) => {
-      const senderId = get().user?.id || 'temp-user-id';
-      const newRequest: Request = {
-        senderId,
-        receiverId,
-        status: 'pending',
-      };
+      console.log("Skickar meddelandeförfrågan till:", receiverId);
+      set((state) => {
+          const senderId = state.user?.id || 'temp-user-id';
+  
+          // En ny förfrågan
+          const newRequest = {
+              senderId,
+              receiverId,
+              status: 'pending',
+          };
+  
+          const senderStorageKey = getUserStorageKey(senderId, 'requests');
+          const senderRequestsRaw = localStorage.getItem(senderStorageKey);
+          const senderRequests = senderRequestsRaw ? JSON.parse(senderRequestsRaw) : [];
+          senderRequests.push(newRequest);
+          localStorage.setItem(senderStorageKey, JSON.stringify(senderRequests));
+  
 
-      const userStorageKey = getUserStorageKey(receiverId, 'requests');
-      const existingRequests = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
-      const updatedRequests = [...existingRequests, newRequest];
-
-      localStorage.setItem(userStorageKey, JSON.stringify(updatedRequests));
-      set({ requests: updatedRequests });
-    },
-
+          const receiverStorageKey = getUserStorageKey(receiverId, 'requests');
+          const receiverRequestsRaw = localStorage.getItem(receiverStorageKey);
+          const receiverRequests = receiverRequestsRaw ? JSON.parse(receiverRequestsRaw) : [];
+          receiverRequests.push(newRequest);
+          localStorage.setItem(receiverStorageKey, JSON.stringify(receiverRequests));
+  
+          return { requests: senderRequests };
+      });
+  },
+  // Acceptera en chat request 
     acceptMessageRequest: (senderId: string) => {
       console.log("Accepterar förfrågan från:", senderId);
       set((state) => {
-        const userId = state.user?.id || 'temp-user-id';
+          const userId = state.user?.id || 'temp-user-id';
+  
         
-        // Förfrågan är accepted
-        const updatedRequests = state.requests.map((request) => {
-          if (
-            request.senderId === senderId &&
-            request.receiverId === userId &&
-            request.status === 'pending'
-          ) {
-            return { ...request, status: 'accepted' as 'accepted' };
-          }
-          return request;
-        });
-    
-        const chatRoomId = [userId, senderId].sort().join('-');
-        const currentUser = state.user;
-        const senderUser = state.likedUsers.find((user) => user.id === senderId);
-        
-        if (!currentUser || !senderUser) return { requests: updatedRequests };
-    
-        // Ett nytt chattrum
-        const newChat: Chat = {
-          chatRoomId,
-          userIds: [userId, senderId],
-          messages: [],
-          userNames: [
-            currentUser.firstName || 'Du',
-            senderUser.firstName || 'Användare'
-          ],
-        };
-    
-        const firstMessage = "Hej, trevligt att matcha!";
-        const newMessage: Message = {
-          id: new Date().toISOString(),
-          senderId: userId,
-          senderName: currentUser.firstName || 'Du',
-          message: firstMessage,
-          timestamp: new Date().toISOString(),
-        };
-    
-        newChat.messages.push(newMessage);
-    
-        const updatedChats = [...state.activeChats, newChat];
-        localStorage.setItem(getUserStorageKey(userId, 'activeChats'), JSON.stringify(updatedChats));
-    
-        const otherUserId = senderId;
-        const otherUserStorageKey = getUserStorageKey(otherUserId, 'activeChats');
-        const otherUserChats = JSON.parse(localStorage.getItem(otherUserStorageKey) || '[]');
-        const updatedOtherUserChats = [...otherUserChats, newChat]; 
-        localStorage.setItem(otherUserStorageKey, JSON.stringify(updatedOtherUserChats));
-    
-        return { requests: updatedRequests, activeChats: updatedChats };
+          const updatedRequests = state.requests.map((request) => {
+              if (
+                  request.senderId === senderId &&
+                  request.receiverId === userId &&
+                  request.status === 'pending'
+              ) {
+                  return { ...request, status: 'accepted' as 'accepted' };
+              }
+              return request;
+          });
+          const userStorageKey = getUserStorageKey(userId, 'requests');
+          localStorage.setItem(userStorageKey, JSON.stringify(updatedRequests));
+  
+          const otherUserStorageKey = getUserStorageKey(senderId, 'requests');
+          const otherUserRequestsRaw = localStorage.getItem(otherUserStorageKey);
+          const otherUserRequests = otherUserRequestsRaw ? JSON.parse(otherUserRequestsRaw) : [];
+  
+          const updatedOtherUserRequests = otherUserRequests.map((request: any) => {
+              if (
+                  request.senderId === userId &&
+                  request.receiverId === senderId &&
+                  request.status === 'pending'
+              ) {
+                  return { ...request, status: 'accepted' as 'accepted' };
+              }
+              return request;
+          });
+  
+          localStorage.setItem(otherUserStorageKey, JSON.stringify(updatedOtherUserRequests));
+  
+          //chatt om förfrågan accepterades
+          const chatRoomId = [userId, senderId].sort().join('-');
+          const currentUser = state.user;
+          const senderUser = state.likedUsers.find((user) => user.id === senderId);
+  
+          if (!currentUser || !senderUser) return { requests: updatedRequests };
+  
+          const newChat: Chat = {
+              chatRoomId,
+              userIds: [userId, senderId],
+              messages: [],
+              userNames: [
+                  currentUser.firstName || 'Du',
+                  senderUser.firstName || 'Användare'
+              ],
+          };
+  
+          const firstMessage = "Hej, trevligt att matcha!";
+          const newMessage: Message = {
+              id: new Date().toISOString(),
+              senderId: userId,
+              senderName: currentUser.firstName || 'Du',
+              message: firstMessage,
+              timestamp: new Date().toISOString(),
+          };
+  
+          newChat.messages.push(newMessage);
+  
+          // chattar för båda användarna
+          const updatedChats = [...state.activeChats, newChat];
+          localStorage.setItem(getUserStorageKey(userId, 'activeChats'), JSON.stringify(updatedChats));
+  
+          const otherUserChats = JSON.parse(localStorage.getItem(getUserStorageKey(senderId, 'activeChats')) || '[]');
+          const updatedOtherUserChats = [...otherUserChats, newChat]; 
+          localStorage.setItem(getUserStorageKey(senderId, 'activeChats'), JSON.stringify(updatedOtherUserChats));
+  
+          return { requests: updatedRequests, activeChats: updatedChats };
       });
-    },
-    
-    
-
+  },
+  
     addMessageToChat: (chatRoomId: string, message: string, senderId: string) => {
       set((state) => {
         const chat = state.activeChats.find((chat) => chat.chatRoomId === chatRoomId);
@@ -238,11 +273,21 @@ export const useUserStore = create<UserStore>((set, get) => {
 
     loadRequestsFromStorage: () => {
       const user = get().user;
-      if (user) {
-        const userStorageKey = getUserStorageKey(user.id!, 'requests');
-        const storedRequests = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
-        set({ requests: storedRequests });
+      if (!user) {
+        console.log("Ingen användare inloggad.");
+        return;
       }
+    
+      const userStorageKey = getUserStorageKey(user.id!, 'requests');
+      console.log("Förväntad localStorage-nyckel:", userStorageKey);
+    
+      const storedRequestsRaw = localStorage.getItem(userStorageKey);
+      console.log("Hämtade data från localStorage:", storedRequestsRaw);
+    
+      const storedRequests = storedRequestsRaw ? JSON.parse(storedRequestsRaw) : [];
+      set({ requests: storedRequests });
+    
+      console.log("State uppdaterad med requests:", storedRequests);
     },
 
     rejectMessageRequest: (senderId: string) => {

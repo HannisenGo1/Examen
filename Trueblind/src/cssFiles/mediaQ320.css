@@ -24,10 +24,8 @@
         font-size: 12px; 
     }
  
-
         .chat-container {
           width: 95%;
-          padding: 10px;
         }
       
         .chat-message {

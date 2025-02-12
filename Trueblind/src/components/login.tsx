@@ -13,11 +13,15 @@ export const Login= () => {
   const [users, setUsers] = useState<any[]>([]); 
   const navigate = useNavigate(); 
 
+  
+
   useEffect(() => {
-    if (useUserStore.getState().user) {
+    const user = useUserStore.getState().user;
+    if (user) {
       useUserStore.getState().loadChatsFromStorage();
+      useUserStore.getState().loadRequestsFromStorage();
     }
-  }, [useUserStore.getState().user]);
+  }, []);
 
   useEffect(() => {
     const fetchUsers = async () => {

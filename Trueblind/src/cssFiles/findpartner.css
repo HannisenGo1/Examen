@@ -72,7 +72,7 @@ select {
 }
 .sendmessagebtn{
   height: 4em;
-  width: 8em;
+  width: 9em;
 }
 
 .columndiv2 {
@@ -87,6 +87,10 @@ select {
   text-align: center; 
 }
 
+.center-button {
+  display: block; 
+  margin: 0 auto; 
+}
 .columndiv2 p {
   font-size: 1.1em;
   margin: 10px 0;

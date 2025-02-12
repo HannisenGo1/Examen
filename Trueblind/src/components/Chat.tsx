@@ -54,34 +54,34 @@ export const Chat = () => {
           </button>  </div>
         <div className="chat-container">
 
-          <div className="chat-messages-container">
-            {currentChat.messages.length === 0 ? (
-              <p>Inga meddelanden än.</p>
-            ) : (
-              
-              currentChat.messages.map((msg) => (
-                <div
-                  key={msg.id}  
-                  className={`chat-message ${msg.senderId === user?.id ? 'sent' : 'received'}`}
-                >
-                  <div>
-                    <p className="sender">{msg.senderId === user?.id ? 'Du' : msg.senderName}</p>
-                    <p>{msg.message}</p>
-                    
-             
-                    {msg.senderId === user?.id && (
-                      <button
-                        className="delete-message"
-                        onClick={() => handleDeleteMessage(msg.id)} 
-                      >
-                        X
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+        <div className="chat-messages-container">
+  {currentChat.messages.length === 0 ? (
+    <p>Inga meddelanden än.</p>
+  ) : (
+    currentChat.messages.map((msg) => (
+      <div
+        key={msg.id}
+        className={`chat-message ${msg.senderId === user?.id ? 'sent' : 'received'}`}
+      >
+        <div className="message-content">
+          <p className="sender">
+            {msg.senderId === user?.id ? 'Du' : msg.senderName}
+          </p>
+          <p className="message-text">{msg.message}</p>
+        </div>
+
+        {msg.senderId === user?.id && (
+          <button
+            className="delete-message"
+            onClick={() => handleDeleteMessage(msg.id)}
+          >
+            X
+          </button>
+        )}
+      </div>
+    ))
+  )}
+</div>
  </div>
           <div className="chat-message-input-container">
             <textarea

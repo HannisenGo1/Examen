@@ -40,38 +40,29 @@ export const Messages = () => {
     }
   
     const userId = user.id;
-    acceptMessageRequest(senderId); 
-  
-    // Skapa chatRoomId baserat på sorterade ID:n
+    acceptMessageRequest(senderId);
     const chatRoomId = [userId, senderId].sort().join('-');
-    console.log("ChatRoomId:", chatRoomId);
   
-
-    const updatedRequests = requests.map((request) => {
-      if (request.senderId === senderId || request.receiverId === senderId) {
-        return { ...request, status: 'accepted' };
-      }
-      return request;
-    });
-  
-    const userStorageKey = `${userId}-requests`;
-    localStorage.setItem(userStorageKey, JSON.stringify(updatedRequests));
-  
-
+    // Kolla om chat redan finns
     const existingChat = activeChats.find((chat) => chat.chatRoomId === chatRoomId);
-    if (!existingChat) {
-      const newChat = {
-        chatRoomId,
-        userIds: [userId, senderId],
-        messages: [],  
-        userNames: [user.firstName, likedUsers.find((user) => user.id === senderId)?.firstName || "Okänd"],
-      };
-  
-      const updatedChats = [...activeChats, newChat];  
-      localStorage.setItem(`${userId}-activeChats`, JSON.stringify(updatedChats)); 
+    if (existingChat) {
+      console.log("Chat redan existerar.");
+      navigate(`/chat/${chatRoomId}`);
+      return;
     }
   
-    navigate(`/chat/${chatRoomId}`); 
+    // Skapa en ny chatt om den inte finns
+    const newChat = {
+      chatRoomId,
+      userIds: [userId, senderId],
+      messages: [],
+      userNames: [user.firstName, likedUsers.find((user) => user.id === senderId)?.firstName || "Okänd"],
+    };
+  
+    const updatedChats = [...activeChats, newChat];
+    localStorage.setItem(`${userId}-activeChats`, JSON.stringify(updatedChats));
+  
+    navigate(`/chat/${chatRoomId}`);
   };
 
   const handleReject = (senderId: string) => {

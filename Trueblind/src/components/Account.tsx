@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import logga from '../img/logga.png';
 import { useUserStore } from '../storage/storage';
 import { useNavigate } from 'react-router-dom';
-import { FaPen } from 'react-icons/fa'; // Importera penna-ikonen
+import { FaPen } from 'react-icons/fa'; 
 
 export const AccountPage = () => {
   const navigate = useNavigate();
@@ -190,7 +190,7 @@ const handleSubmit = async (e: React.FormEvent) => {
    
 
       <div className="result-info">
-        <button onClick={() => navigate('/match')} className="btnmatchsite">Matchsidan</button>
+        <button onClick={() => navigate('/match')} className="btnmatchsite">Gillade</button>
         <button onClick={() => navigate('/messages')} className="btnmatchsite">Meddelanden</button>
         <button onClick={() => navigate('/')} className="btnmatchsite">Logga ut</button>
       </div>

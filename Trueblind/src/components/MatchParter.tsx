@@ -122,12 +122,12 @@ console.log('sending request to' ,likedUserId)
 
 
                     {matchPercentage > 10 && !requestStatus && (
-  <button onClick={() => handleSendRequest(likedUser.id)} className="sendmessagebtn">
-    Skicka meddelandeförfrågan 📨
-  </button>
-)}
+                      <button
+  onClick={() => handleSendRequest(likedUser.id)}
+  className="sendmessagebtn center-button"
+> Skicka förfrågan 📨 </button> )}
 
-// Visa endast ett meddelande åt gången
+
 {requestStatus && (
   requestStatus.status === 'pending' ? (
     <p>Förfrågan skickad, vänta på svar!</p>
