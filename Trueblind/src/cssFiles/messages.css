@@ -1,20 +1,16 @@
-.btnback {
-    margin-top: 2em;
-    width: 40px; 
-    height: 40px; 
-    background-color: transparent; 
-    border: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    font-size: 24px; 
-  }
-  
+
   .buttondivforback {
     display: flex;
     justify-content: flex-start; 
     padding: 1px;
+  }
+  .Rubriktext2 {
+    font-size: 40px; 
+    text-align: center; 
+    display: flex;
+    justify-content: center; 
+    gap: 5px; 
+    color:black;
   }
   .chat-container { 
     display: flex;
@@ -112,6 +108,37 @@
   .chat-messages-container::-webkit-scrollbar-thumb:hover {
     background-color: #555;
   }
+  .chat-message-input-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    position: sticky; 
+    bottom: 0;
+  }
+  
+  .chat-message-input-container textarea {
+    flex: 1;
+    width: 100%;
+    max-width: 600px;
+    min-height: 50px;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    resize: none;
+    outline: none;
+  }
+  
+  .chat-message-input-container textarea:focus {
+    border-color: #996A30;
+  }
   .sendBtn {
     display: flex;
     justify-content: center;
@@ -139,8 +166,11 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    font-size: 24px;
+    font-size: 34px;
+    padding-left: 1em;
+    color:#996A30; 
   }
+
   
  
   .buttondivforback {

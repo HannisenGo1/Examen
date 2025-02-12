@@ -3,35 +3,7 @@ h4{
   font-size: 28px;
   margin-bottom: 20px;
 }
-.rowdivbtn {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between; 
-  margin-top: 3em;
-  gap: 10px;
-}
 
-.rowdivbtn button {
-  padding: 10px 20px; 
-  font-size: 1rem; 
-  cursor: pointer; 
-  align-items: center;
-  border-radius: 5px; 
-  background-color: #996A30;
-  border: 1px solid #996A30; ;
-  color: black;
-  transition: background-color 0.3s ease, transform 0.3s ease; 
-}
-
-.rowdivbtn button:hover{
-  background-color: #775021; 
-  transform: translateY(-2px); 
-}
-
-.rowdivbtn button:active {
-  background-color: #775021; 
-  transform: translateY(0); 
-}
 .btnmatchsite, .ToChatBtn{
   padding: 10px 20px; 
   font-size: 1em; 
@@ -179,7 +151,9 @@ select {
 .search-button:hover {
   background-color: #45a049;
 }
-
+.columndiv2 .interests-list {
+  color: black; 
+}
 
 .like-button {
   background-color: transparent; 
@@ -191,7 +165,11 @@ select {
   align-items: center;
   width:2em;
 }
-
+form > .form2{
+  margin: 2rem auto;
+  padding: 2rem;
+  border-radius: 10px;
+}
 
 
 .search-results {
@@ -235,8 +213,6 @@ select {
   display: flex;
   flex-direction: column;
   background-color: #f7f7f7;
-  margin-bottom: 15px;
-  padding: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

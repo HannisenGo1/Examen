@@ -12,6 +12,11 @@ export const Chat = () => {
     const navigate = useNavigate();
     const messagesite = () => { navigate('/messages'); };
 
+    const otherUserName = currentChat && user?.id 
+    ? currentChat.userNames[currentChat.userIds.indexOf(user.id) === 0 ? 1 : 0] 
+    : "Okänd användare";
+  
+  
     useEffect(() => {
       if (!currentChat) {
         console.log('Chatten finns inte.');
@@ -48,12 +53,14 @@ export const Chat = () => {
       <div className="logga">
         <img src={logga} alt="logo" className="img" />
       </div>
-      <div className="rowdivbtn">
-        <button onClick={messagesite}>
+      <div className="buttondivforback ">
+        <button className="btnback"onClick={messagesite}>
         <i className="fas fa-arrow-left"></i>
           </button>  </div>
-        <div className="chat-container">
+            <h1 className='Rubriktext2'> Din chatt med {otherUserName}</h1>      
 
+        <div className="chat-container">
+   
         <div className="chat-messages-container">
   {currentChat.messages.length === 0 ? (
     <p>Inga meddelanden än.</p>
@@ -64,6 +71,7 @@ export const Chat = () => {
         className={`chat-message ${msg.senderId === user?.id ? 'sent' : 'received'}`}
       >
         <div className="message-content">
+     
           <p className="sender">
             {msg.senderId === user?.id ? 'Du' : msg.senderName}
           </p>
@@ -84,6 +92,7 @@ export const Chat = () => {
 </div>
  </div>
           <div className="chat-message-input-container">
+           
             <textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}

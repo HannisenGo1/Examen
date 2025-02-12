@@ -8,6 +8,7 @@ import { Messages } from "./components/Messages";
 import { Chat } from "./components/Chat";
 import { Afterlogin } from "./components/Afterlogin";
 import { SearchHere } from "./components/SearchPartner";
+import { Shop } from "./components/Shop";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
       {/**/ }<Route path="/homepage" element ={<Afterlogin /> } />   
       <Route path="/Findpartner" element ={ <SearchHere /> } /> 
         <Route path="/chat/:chatRoomId" element={<Chat />} /> {/* enskilda chatten */}
+        <Route path="/shop" element={<Shop /> } /> 
       </Routes>
     </Router>
   );

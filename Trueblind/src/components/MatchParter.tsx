@@ -80,16 +80,16 @@ console.log('sending request to' ,likedUserId)
         <img src={logga} alt="logo" className="img" />
       </div>
 
-      <div className="rowdivbtn">
-        <button onClick={backtoaccount}>
+
+        <button className="btnback" onClick={backtoaccount}>
         <i className="fas fa-arrow-left"></i>
         </button>
-        <button onClick={tomessages}> Meddelanden </button>
-      </div>
+        
+    
 
       <div className="columndiv2">
         <h3>De användare du har gillat:</h3>
-
+<button className="accountBtn" onClick={tomessages}> Meddelanden </button>
         {/* Dropdown */}
         <label htmlFor="matchRange">Filtrera efter matchning:</label>
         <select id="matchRange" value={selectedRange} onChange={handleRangeChange}>
