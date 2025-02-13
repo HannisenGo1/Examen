@@ -60,23 +60,29 @@ export const Chat = () => {
   };
 
   const handleEmojiClick = (emojiName: string) => {
-    console.log('emojiName', emojiName);
-    // Ta bort filändelsen
+    console.log("emojiName", emojiName);
+  
+    // Ta bort filändelsen och eventuella parametrar
     const emojiBaseName = emojiName.split('/').pop()?.split('?')[0].replace('.png', '') || ""; 
+    console.log("emojiBaseName:", emojiBaseName);
   
-    console.log('emojiBaseName:', emojiBaseName); 
-  
-    const purchasedEmojis = useUserStore.getState().purchasedEmojis;
+    const { purchasedEmojis, updatePurchasedEmojis } = useUserStore.getState();
     const emojiItem = purchasedEmojis.find((emoji) => emoji.emoji === emojiBaseName);
   
     if (emojiItem) {
-      console.log('Emoji hittad:', emojiItem);
+      console.log("Emoji hittad:", emojiItem);
   
       if (emojiItem.count > 0) {
         sendEmoji(`<img src="${emojiName}" alt="emoji" class="sent-emoji"/>`);
         setShowEmojis(false);
-        useUserStore.getState().useEmoji(emojiBaseName); 
-        useUserStore.getState().purchaseEmoji(emojiBaseName, 0); 
+
+        const updatedEmojis = purchasedEmojis.map((e) =>
+          e.emoji === emojiBaseName ? { ...e, count: e.count - 1 } : e
+        ).filter(e => e.count > 0); 
+  
+        updatePurchasedEmojis(updatedEmojis);
+  
+        console.log("Uppdaterad emoji-lista:", useUserStore.getState().purchasedEmojis);
       } else {
         console.log("Du har inga kvar av denna emoji.");
       }
@@ -84,6 +90,7 @@ export const Chat = () => {
       console.log("Emoji inte hittad i purchasedEmojis.");
     }
   };
+  
   
   
     return (

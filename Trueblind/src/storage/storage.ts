@@ -39,6 +39,7 @@ interface UserStore {
   credits: number;
   purchasedEmojis: Emoji[];
   purchaseEmoji: (emoji: string, cost: number) => void;
+  updatePurchasedEmojis: (newEmojis: Emoji[]) => void;
   addCredits: (amount: number) => void;
   useEmoji: (emoji: string) => void;
   loadPurchasedEmojisFromStorage:() => void;
@@ -346,7 +347,8 @@ export const useUserStore = create<UserStore>((set, get) => {
         return state;
       }
     }),
-    
+    updatePurchasedEmojis: (newEmojis: Emoji[]) => set({ purchasedEmojis: newEmojis }),
+
     
     addCredits: (amount) => set((state) => ({
       credits: state.credits + amount
@@ -356,7 +358,7 @@ export const useUserStore = create<UserStore>((set, get) => {
         const updatedEmojis = state.purchasedEmojis.map((emoji) =>
           emoji.emoji === emojiSrc ? { ...emoji, count: emoji.count - 1 } : emoji
         );
-        localStorage.setItem('purchasedEmojis', JSON.stringify(updatedEmojis)); 
+        localStorage.setItem('purchasedEmojis', JSON.stringify(updatedEmojis)); // Uppdatera localStorage
         return { purchasedEmojis: updatedEmojis };
       });
     },
