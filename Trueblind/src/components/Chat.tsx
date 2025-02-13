@@ -19,8 +19,12 @@ export const Chat = () => {
     const otherUserName = currentChat && user?.id 
     ? currentChat.userNames[currentChat.userIds.indexOf(user.id) === 0 ? 1 : 0] 
     : "Okänd användare";
-  
-  
+
+    useEffect(() => {
+      const currentPurchasedEmojis = useUserStore.getState().purchasedEmojis;
+      console.log('Laddade emojis i chatten:', currentPurchasedEmojis); 
+    }, [useUserStore.getState().purchasedEmojis]);
+
     useEffect(() => {
       if (!currentChat) {
         console.log('Chatten finns inte.');
@@ -54,12 +58,33 @@ export const Chat = () => {
           addMessageToChat(chatRoomId, emojiHtml, user.id);
       }
   };
-  
-  const handleEmojiClick = (emojiSrc: string) => {
-    sendEmoji(`<img src="${emojiSrc}" alt="emoji" class="sent-emoji"/>`);
-    setShowEmojis(false);
-};
 
+  const handleEmojiClick = (emojiName: string) => {
+    console.log('emojiName', emojiName);
+    // Ta bort filändelsen
+    const emojiBaseName = emojiName.split('/').pop()?.split('?')[0].replace('.png', '') || ""; 
+  
+    console.log('emojiBaseName:', emojiBaseName); 
+  
+    const purchasedEmojis = useUserStore.getState().purchasedEmojis;
+    const emojiItem = purchasedEmojis.find((emoji) => emoji.emoji === emojiBaseName);
+  
+    if (emojiItem) {
+      console.log('Emoji hittad:', emojiItem);
+  
+      if (emojiItem.count > 0) {
+        sendEmoji(`<img src="${emojiName}" alt="emoji" class="sent-emoji"/>`);
+        setShowEmojis(false);
+        useUserStore.getState().useEmoji(emojiBaseName); 
+        useUserStore.getState().purchaseEmoji(emojiBaseName, 0); 
+      } else {
+        console.log("Du har inga kvar av denna emoji.");
+      }
+    } else {
+      console.log("Emoji inte hittad i purchasedEmojis.");
+    }
+  };
+  
   
     return (
       <> 

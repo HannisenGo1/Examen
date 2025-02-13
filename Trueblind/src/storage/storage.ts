@@ -41,7 +41,7 @@ interface UserStore {
   purchaseEmoji: (emoji: string, cost: number) => void;
   addCredits: (amount: number) => void;
   useEmoji: (emoji: string) => void;
-  
+  loadPurchasedEmojisFromStorage:() => void;
 }
 
 export const useUserStore = create<UserStore>((set, get) => {
@@ -324,32 +324,47 @@ export const useUserStore = create<UserStore>((set, get) => {
     setAllUsers: (users: User[]) => {
       set({ users });
     },
-    credits: 100,
-    purchasedEmojis: [
-      { emoji: 'nalle1', count: 0 },
-      { emoji: 'nalle2', count: 0 },
-      { emoji: 'bukett', count: 0 }
-    ],
+
+    /* Emoji storen */
+    credits: 0,
+    purchasedEmojis: [],
     purchaseEmoji: (emoji, cost) => set((state) => {
       if (state.credits >= cost) {
-        return {
-          credits: state.credits - cost,
-          purchasedEmojis: state.purchasedEmojis.map((item) =>
-            item.emoji === emoji ? { ...item, count: item.count + 1 } : item
-          ),
-        };
+        const existingEmoji = state.purchasedEmojis.find(e => e.emoji === emoji);
+        let updatedEmojis = [...state.purchasedEmojis]; 
+    
+        if (existingEmoji) {
+          const index = updatedEmojis.findIndex(e => e.emoji === emoji);
+          updatedEmojis[index].count += 1;
+        } else {
+
+          updatedEmojis.push({ emoji, count: 1 });
+        }
+        return { purchasedEmojis: updatedEmojis, credits: state.credits - cost };
+      } else {
+        console.log('Not enough credits!');
+        return state;
       }
-      console.log("Inte tillräckligt med krediter!");
-      return state;
     }),
+    
+    
     addCredits: (amount) => set((state) => ({
       credits: state.credits + amount
     })),
-    useEmoji: (emoji) => set((state) => ({
-      purchasedEmojis: state.purchasedEmojis.map((item) =>
-        item.emoji === emoji && item.count > 0 ? { ...item, count: item.count - 1 } : item
-      ),
-    })),
+    useEmoji: (emojiSrc: string) => {
+      set((state) => {
+        const updatedEmojis = state.purchasedEmojis.map((emoji) =>
+          emoji.emoji === emojiSrc ? { ...emoji, count: emoji.count - 1 } : emoji
+        );
+        localStorage.setItem('purchasedEmojis', JSON.stringify(updatedEmojis)); 
+        return { purchasedEmojis: updatedEmojis };
+      });
+    },
+    loadPurchasedEmojisFromStorage: () => {
+      const emojis = JSON.parse(localStorage.getItem('purchasedEmojis') || '[]');
+      set({ purchasedEmojis: emojis });
+     
+    }
+
   };
-  
 });

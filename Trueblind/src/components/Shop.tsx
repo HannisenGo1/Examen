@@ -30,6 +30,7 @@ console.log('köpt emoji', purchasedEmojis)
         <img src={nalle1} alt="nalle1" className="emoji" onClick={() => purchaseEmoji("nalle1", 3)} />
         <img src={nalle2} alt="nalle2" className="emoji" onClick={() => purchaseEmoji("nalle2", 3)} />
         <img src={bukett} alt="bukett" className="emoji" onClick={() => purchaseEmoji("bukett", 3)} />
+        <p>Price: 3 credits</p>
       </div>
 
       <div className="credit-options">
