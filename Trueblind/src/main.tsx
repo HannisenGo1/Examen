@@ -9,6 +9,7 @@ import './cssFiles/mediaQ320.css'
 import './cssFiles/registerAccount.css'
 import './cssFiles/findpartner.css'
 import './cssFiles/messages.css'
+import './cssFiles/shop.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

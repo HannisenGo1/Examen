@@ -13,6 +13,7 @@ interface Chat {
   messages: Message[];
   userNames: string[];
 }
+type Emoji = { emoji:string; count:number}
 
 interface UserStore {
   user: User | null;
@@ -35,7 +36,12 @@ interface UserStore {
   addMessageToChat: (chatRoomId: string, message: string, senderId: string) => void;
   loadChatsFromStorage: () => void;
   removeMessageFromChat: (chatRoomId: string, messageId: string) => void;
-
+  credits: number;
+  purchasedEmojis: Emoji[];
+  purchaseEmoji: (emoji: string, cost: number) => void;
+  addCredits: (amount: number) => void;
+  useEmoji: (emoji: string) => void;
+  
 }
 
 export const useUserStore = create<UserStore>((set, get) => {
@@ -318,5 +324,32 @@ export const useUserStore = create<UserStore>((set, get) => {
     setAllUsers: (users: User[]) => {
       set({ users });
     },
+    credits: 100,
+    purchasedEmojis: [
+      { emoji: 'nalle1', count: 0 },
+      { emoji: 'nalle2', count: 0 },
+      { emoji: 'bukett', count: 0 }
+    ],
+    purchaseEmoji: (emoji, cost) => set((state) => {
+      if (state.credits >= cost) {
+        return {
+          credits: state.credits - cost,
+          purchasedEmojis: state.purchasedEmojis.map((item) =>
+            item.emoji === emoji ? { ...item, count: item.count + 1 } : item
+          ),
+        };
+      }
+      console.log("Inte tillräckligt med krediter!");
+      return state;
+    }),
+    addCredits: (amount) => set((state) => ({
+      credits: state.credits + amount
+    })),
+    useEmoji: (emoji) => set((state) => ({
+      purchasedEmojis: state.purchasedEmojis.map((item) =>
+        item.emoji === emoji && item.count > 0 ? { ...item, count: item.count - 1 } : item
+      ),
+    })),
   };
+  
 });
