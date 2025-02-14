@@ -13,7 +13,7 @@ interface Chat {
   messages: Message[];
   userNames: string[];
 }
-type Emoji = { emoji:string; count:number}
+
 
 interface UserStore {
   user: User | null;
@@ -26,6 +26,7 @@ interface UserStore {
   likedUsers: User[];
   requests: Request[];
   addLikedUser: (user: User) => void;
+  updateUser: (updatedFields: Partial<User>) => void;
   removeLikedUser: (userId: string) => void;
   setAllUsers: (users: User[]) => void;
   sendMessageRequest: (receiverId: string) => void;
@@ -36,13 +37,6 @@ interface UserStore {
   addMessageToChat: (chatRoomId: string, message: string, senderId: string) => void;
   loadChatsFromStorage: () => void;
   removeMessageFromChat: (chatRoomId: string, messageId: string) => void;
-  credits: number;
-  purchasedEmojis: Emoji[];
-  purchaseEmoji: (emoji: string, cost: number) => void;
-  updatePurchasedEmojis: (newEmojis: Emoji[]) => void;
-  addCredits: (amount: number) => void;
-  useEmoji: (emoji: string) => void;
-  loadPurchasedEmojisFromStorage:() => void;
 }
 
 export const useUserStore = create<UserStore>((set, get) => {
@@ -62,15 +56,34 @@ export const useUserStore = create<UserStore>((set, get) => {
       const storedLikedUsers = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
       const storedChats = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'activeChats')) || '[]');
       const storedRequests = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'requests')) || '[]');
-    
+      const storedCredits = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'credits')) || '0');
+      const storedPurchasedEmojis = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'purchasedEmojis')) || '[]');
+
       set({ 
-        user: userData, 
+        user: { 
+          ...userData,
+          credits: storedCredits || 0,  
+          purchasedEmojis: storedPurchasedEmojis || [] // Om purchasedEmojis inte finns, sätt till tom array
+        }, 
         likedUsers: storedLikedUsers, 
         activeChats: storedChats, 
         requests: storedRequests 
       });
     },
+    updateUser: (updatedFields: Partial<User>) => {
+      set((state) => {
+        if (!state.user) return state;
 
+        const updatedUser = { ...state.user, ...updatedFields };
+
+        // Uppdatera localStorage med nya värden för credits och purchasedEmojis
+        const userId = updatedUser.id || '';
+        localStorage.setItem(getUserStorageKey(userId, 'credits'), JSON.stringify(updatedUser.credits));
+        localStorage.setItem(getUserStorageKey(userId, 'purchasedEmojis'), JSON.stringify(updatedUser.purchasedEmojis));
+
+        return { user: updatedUser };
+      });
+    },
     resetUser: () => {
       set({ user: null, likedUsers: [], activeChats: [] });
     },
@@ -326,47 +339,48 @@ export const useUserStore = create<UserStore>((set, get) => {
       set({ users });
     },
 
-    /* Emoji storen */
-    credits: 0,
-    purchasedEmojis: [],
-    purchaseEmoji: (emoji, cost) => set((state) => {
-      if (state.credits >= cost) {
-        const existingEmoji = state.purchasedEmojis.find(e => e.emoji === emoji);
-        let updatedEmojis = [...state.purchasedEmojis]; 
+    purchaseEmoji: (emoji: string, price: number) => {
+      const currentUser = get().user;
+      if (!currentUser) return;
     
-        if (existingEmoji) {
-          const index = updatedEmojis.findIndex(e => e.emoji === emoji);
-          updatedEmojis[index].count += 1;
-        } else {
-
-          updatedEmojis.push({ emoji, count: 1 });
-        }
-        return { purchasedEmojis: updatedEmojis, credits: state.credits - cost };
-      } else {
-        console.log('Not enough credits!');
-        return state;
+      if (currentUser.credits < price) {
+        console.log('Inte tillräckligt med krediter!');
+        return;
       }
-    }),
-    updatePurchasedEmojis: (newEmojis: Emoji[]) => set({ purchasedEmojis: newEmojis }),
-
     
-    addCredits: (amount) => set((state) => ({
-      credits: state.credits + amount
-    })),
-    useEmoji: (emojiSrc: string) => {
-      set((state) => {
-        const updatedEmojis = state.purchasedEmojis.map((emoji) =>
-          emoji.emoji === emojiSrc ? { ...emoji, count: emoji.count - 1 } : emoji
-        );
-        localStorage.setItem('purchasedEmojis', JSON.stringify(updatedEmojis)); // Uppdatera localStorage
-        return { purchasedEmojis: updatedEmojis };
-      });
+      const updatedCredits = currentUser.credits - price;
+    
+      // Kontrollera om emojin redan finns
+      const emojiIndex = currentUser.purchasedEmojis.findIndex((e) => e.emoji === emoji);
+      let updatedPurchasedEmojis = [...currentUser.purchasedEmojis];
+    
+      if (emojiIndex !== -1) {
+        // Om emojin redan finns, öka count med 1
+        updatedPurchasedEmojis[emojiIndex].count += 1;
+      } else {
+        // Om emojin inte finns, lägg till den med count 1
+        updatedPurchasedEmojis.push({ emoji, count: 1 });
+      }
+    
+      const updatedUser = { ...currentUser, credits: updatedCredits, purchasedEmojis: updatedPurchasedEmojis };
+      set({ user: updatedUser });
+    
+      const userId = updatedUser.id || '';
+      localStorage.setItem(getUserStorageKey(userId, 'credits'), JSON.stringify(updatedCredits));
+      localStorage.setItem(getUserStorageKey(userId, 'purchasedEmojis'), JSON.stringify(updatedPurchasedEmojis));
     },
-    loadPurchasedEmojisFromStorage: () => {
-      const emojis = JSON.parse(localStorage.getItem('purchasedEmojis') || '[]');
-      set({ purchasedEmojis: emojis });
-     
-    }
 
+addCredits: (amount: number) => {
+  const currentUser = get().user;
+  if (!currentUser) return;
+
+  const updatedCredits = currentUser.credits + amount;
+  const updatedUser = { ...currentUser, credits: updatedCredits };
+  set({ user: updatedUser });
+
+  const userId = updatedUser.id || '';
+  localStorage.setItem(getUserStorageKey(userId, 'credits'), JSON.stringify(updatedCredits));
+},
+ 
   };
 });

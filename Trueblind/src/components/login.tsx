@@ -22,12 +22,7 @@ export const Login= () => {
       useUserStore.getState().loadRequestsFromStorage();
     }
   }, []);
-  useEffect(() => {
-    const user = useUserStore.getState().user;
-    if (user) {
-      useUserStore.getState().loadPurchasedEmojisFromStorage();
-    }
-  }, []);
+
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -61,7 +56,7 @@ export const Login= () => {
       useUserStore.getState().setUser(foundUser);
       useUserStore.getState().loadRequestsFromStorage();
       useUserStore.getState().loadChatsFromStorage();
-      useUserStore.getState().loadPurchasedEmojisFromStorage()
+    
   
       setError('');
       navigate('/homepage');

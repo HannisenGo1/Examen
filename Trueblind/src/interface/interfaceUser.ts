@@ -29,6 +29,7 @@ export type FormData = {
     id?:string;
     password: string;
 };
+type Emoji = { emoji:string; count:number}
 export interface User {
     firstName: string;
     age: number;
@@ -46,6 +47,11 @@ export interface User {
     relationshipStatus: string;
     education: string;
     photo?:string;
+    credits: number;
+    purchasedEmojis: Emoji[];
+    purchaseEmoji: (emoji: string, cost: number) => void;
+    updateUser: (updatedFields: Partial<User>) => void;
+    addCredits: (amount: number) => void;
   }
   export interface SearchResult {
       age: number;
