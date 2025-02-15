@@ -25,7 +25,8 @@ export const Register = () => {
         email: '',
         lifeStatement1: '',
         lifeStatement2:'',
-        password:''
+        password:'',
+        ommig:''
     });
     
   
@@ -409,6 +410,13 @@ export const Register = () => {
     type="text"
     name="lifeStatement2"
     value={formData.lifeStatement2}
+    onChange={handleChange}
+/>
+<label> Berätta något om dig själv </label>
+<input
+    type="text"
+    name="ommig"
+    value={formData.ommig}
     onChange={handleChange}
 />
             </>

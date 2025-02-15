@@ -1,4 +1,4 @@
-import { SearchPartners } from './AccountFindParter';
+import { FindPartners } from './AccountFindParter';
 import logga from '../img/logga.png';
 import { useNavigate } from 'react-router-dom';
 export const SearchHere = () => {
@@ -21,7 +21,7 @@ const backTochoices = () => (
 Vilken partner söker du? 
 
 </h2>
-<SearchPartners/> 
+<FindPartners/> 
 </>
 
     )

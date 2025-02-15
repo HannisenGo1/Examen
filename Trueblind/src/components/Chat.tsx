@@ -8,7 +8,7 @@ import nalle1 from '../img/imgProdukter/nalle1.png'
 import nalle2 from '../img/imgProdukter/nalle2.png'
 export const Chat = () => {
     const { chatRoomId } = useParams();
-    const { activeChats, addMessageToChat, removeMessageFromChat, user, setUser } = useUserStore(); 
+    const { activeChats, addMessageToChat, removeMessageFromChat, user} = useUserStore(); 
     const [errormessage, setErrorMessage]= useState('')
     const [newMessage, setNewMessage] = useState('');
     const [showEmojis, setShowEmojis] = useState(false);

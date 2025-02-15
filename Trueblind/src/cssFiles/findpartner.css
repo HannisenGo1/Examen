@@ -17,7 +17,16 @@ h4{
   transition: background-color 0.3s ease, transform 0.3s ease; 
   width:10em;
 }
+.life-statements p {
+  margin-bottom: 10px;  
+  word-wrap: break-word;  
+}
 
+.life-statements {
+  display: flex;
+  flex-direction: column;  
+  gap: 10px; 
+}
 
 .btnmatchsite:hover {
   transform: translateY(-5px);
@@ -155,16 +164,44 @@ select {
   color: black; 
 }
 
-.like-button {
-  background-color: transparent; 
-  border: none; 
-  padding: 0; 
-  cursor: pointer; 
+.result-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 15px;
+  padding-bottom: 60px; 
+  margin-bottom: 10px;
+  border-radius: 10px;
+  width: 300px;
+  position: relative; 
+}
+
+.button-container {
   display: flex;
   justify-content: center;
-  align-items: center;
   width:2em;
+  gap: 30px; 
+  position: absolute;
+  bottom: -10px; 
+  left: 50%;
+  transform: translateX(-50%);
+
 }
+.likeheart{
+  width:1em;
+}
+.like-button, .deny-button {
+  font-size: 24px;
+  padding: 10px 20px;
+  cursor: pointer;
+  border: none; 
+  background: none; 
+  outline: none; 
+}
+.restore-button{
+  width:1em;
+}
+
 form > .form2{
   margin: 2rem auto;
   padding: 2rem;
@@ -212,9 +249,14 @@ form > .form2{
 .result-item {
   display: flex;
   flex-direction: column;
-  background-color: #f7f7f7;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  justify-content: space-between;
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  width: 300px;
+  background-color: #ffffff;
+
 }
 
 .result-info {
@@ -255,19 +297,26 @@ form > .form2{
 
 .age-filter-container {
   display: flex;
-  gap: 15px;
+  gap: 10px; 
   align-items: center;
+  flex-wrap: wrap; 
+  justify-content: center; 
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .age-filter-container label {
   font-weight: 600;
   color: #444;
+  white-space: nowrap;
 }
 
 .age-filter-container input {
-  width: 120px;
-  padding: 10px;
-  font-size: 16px;
+  width: 70px; 
+  max-width: 30%; 
+  padding: 8px;
+  font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 5px;
   text-align: center;

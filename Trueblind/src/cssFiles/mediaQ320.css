@@ -43,6 +43,32 @@
           width: 35px;
           height: 35px;
           font-size: 20px;
-        
         }
+        .result-item {
+          width: 100%;
+          padding: 10px;
+        }
+      
+        .button-container {
+          flex-direction: row; 
+          gap: 5px; 
+        }
+      
+        .like-button, .deny-button {
+          font-size: 18px;
+        }
+    }
+    @media (max-width: 320px) {
+      .result-item {
+        width: 100%; /* Se till att kortet aldrig är större än skärmen */
+      }
+    
+      .button-container {
+        flex-direction: row;
+        gap: 5px;
+      }
+    
+      .like-button, .deny-button {
+        font-size: 16px;
+      }
     }

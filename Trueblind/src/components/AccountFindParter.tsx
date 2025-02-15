@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useUserStore } from '../storage/storage';
 import { User } from '../interface/interfaceUser';
 
-export const SearchPartners = () => {
+
+export const FindPartners = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [matchingResults, setMatchingResults] = useState<User[]>([]);
   const [city, setCity] = useState('');
@@ -10,6 +11,8 @@ export const SearchPartners = () => {
   const [loading, setLoading] = useState(false);
   const [minAge, setMinAge] = useState(18);
   const [maxAge, setMaxAge] = useState(100);
+const [currentUser,setCurrentUser]= useState(0)
+  const [nekadUser, setNekadUser] = useState<User[]>([]);
   const { user, likedUsers, addLikedUser } = useUserStore();
 
   if (!user) {
@@ -87,6 +90,7 @@ export const SearchPartners = () => {
 
 
     setMatchingResults(filteredUsers);
+    setCurrentUser(0); 
   };
 
 
@@ -109,18 +113,39 @@ export const SearchPartners = () => {
     if (likedUser) {
       if (!likedUsers.some((user) => user.id === likedUser.id)) {
         addLikedUser(likedUser);
+        nextUser();
       } else {
         console.log("User already liked.");
       }
     }
   };
+  const handleDeny = (userId: string) => {
+    const deniedUser = matchingResults.find((user) => user.id === userId);
+    if (deniedUser) {
+      setMatchingResults(matchingResults.filter((user) => user.id !== userId));
+      setNekadUser([...nekadUser, deniedUser]); 
+      nextUser();
+    }
+  };
+  const nextUser = () => {
+    if (currentUser< matchingResults.length - 1) {
+      setCurrentUser (currentUser + 1)
+    } else {
+      setCurrentUser(0) 
+    }
+  };
 
+// Töm nekade listan
+  const restoreDeniedUsers = () => {
+    setMatchingResults([...matchingResults, ...nekadUser]); 
+    setNekadUser([]); 
+  };
   return (
     <div className="columndiv3">
       <h2>Hitta en partner</h2>
-
+ <label htmlFor="minAge">Ålder mellan:</label>
       <div className="age-filter-container">
-        <label htmlFor="minAge">Från ålder:</label>
+       
         <input
           type="number"
           id="minAge"
@@ -129,7 +154,7 @@ export const SearchPartners = () => {
           min="0"
           max="120"
         />
-        <label htmlFor="maxAge">Till ålder:</label>
+
         <input
           type="number"
           id="maxAge"
@@ -153,25 +178,26 @@ export const SearchPartners = () => {
         <button onClick={filterUsers} disabled={loading} className="search-button">
           {loading ? 'Laddar...' : 'Sök partners'}
         </button>
+        {nekadUser.length > 0 && (
+              <button onClick={restoreDeniedUsers} className="restore-button">
+                Återställ nekade användare
+              </button>
+            )}
       </div>
 
-      <div className="results-container">
         {matchingResults.length > 0 ? (
-          <div className="results">
-            <h3 className="results-heading">Matchande resultat:</h3>
-   
-        
+          <div className="results-item">
 
             <ul className="results-list">
               {matchingResults.map((result) => {
                 const matchPercentage = calculateMatch(result);
 
                 return (
+
+
                   <li key={result.id} className="result-item">
+
                     <div className="result-info">
-                      <button onClick={() => handleLike(result.id!)} className="like-button">
-                        ❤️
-                      </button>
                       <h4>{result.firstName} <span className="age">, {result.age}</span></h4>
                       <p><strong>Kön:</strong> {result.gender}</p>
                       <p><strong>Religion:</strong> {result.religion}</p>
@@ -181,20 +207,29 @@ export const SearchPartners = () => {
                     <div className="life-statements">
                       <p>{result.lifeStatement1}</p>
                       <p>{result.lifeStatement2}</p>
+                      <p>{result.ommig}</p>
+                      <div className="button-container">
+                        <button onClick={() => handleDeny(result.id!)} className="deny-button">
+                        ❌</button>
+   <button onClick={() => handleLike(result.id!)} className="like-button">
+                        ❤️
+                      </button>
+            
+                      </div>
                     </div>
                   </li>
                 );
               })}
             </ul>
+
           </div>
         ) : (
           <p className="no-results">Inga matchande resultat</p>
         )}
+         {error && <p className="error-message">{error}</p>}
       </div>
 
-      {error && <p className="error-message">{error}</p>}
-    </div>
   );
 };
 
-export default SearchPartners;
+

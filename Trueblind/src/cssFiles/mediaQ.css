@@ -47,7 +47,6 @@
     .login-container {
         padding: 0.5em;
         max-width: 100%; 
-        
     }
 
     .login-header {
@@ -68,6 +67,50 @@
     .justtextbtn {
         font-size: 14px; 
     }
+      .result-item {
+        width: 95%; 
+        padding: 10px;
+      }
+      
+      .button-container {
+        gap: 10px; 
+      }
+    
+      .like-button, .deny-button {
+        font-size: 20px; 
+      }
+      .chat-container {
+        padding: 10px;
+      }
+    
+      .chat-header h2 {
+        font-size: 22px;
+      }
+    
+      .chat-header h3 {
+        font-size: 16px;
+      }
+    
+      .chat-message p {
+        font-size: 14px;
+        padding: 4px;
+      }
+    
+      .chat-message-input-container textarea {
+        font-size: 14px;
+        padding: 10px;
+     
+      }
+    
+      .chat-message-input-container button {
+        font-size: 14px;
+        padding: 5px;
+      }
+    
+      .chat-message button.delete-message {
+        font-size: 12px;
+        padding: 3px 8px;
+      }
 }
 
 @media (max-width: 350px) {
@@ -96,41 +139,35 @@
 
     }
 }
-
-@media (max-width: 480px) {
-    .chat-container {
-      padding: 10px;
-    }
-  
-    .chat-header h2 {
-      font-size: 22px;
-    }
-  
-    .chat-header h3 {
-      font-size: 16px;
-    }
-  
-    .chat-message p {
-      font-size: 14px;
-      padding: 4px;
-    }
-  
-    .chat-message-input-container textarea {
-      font-size: 14px;
-      padding: 10px;
-   
-    }
-  
-    .chat-message-input-container button {
-      font-size: 14px;
-      padding: 5px;
-    }
-  
-    .chat-message button.delete-message {
-      font-size: 12px;
-      padding: 3px 8px;
-    }
+@media (max-width: 425px) {
+  .result-item {
+    width: 90%; /* Anpassar sig till mindre skärmar */
+    padding: 10px;
   }
+  
+  .button-container {
+    gap: 10px; /* Minska avståndet mellan knappar */
+  }
+
+  .like-button, .deny-button {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 375px) {
+  .result-item {
+    width: 95%;
+  }
+
+  .button-container {
+    gap: 8px;
+  }
+
+  .like-button, .deny-button {
+    font-size: 18px;
+  }
+}
+
   @media screen and (max-width: 359px) {
     .chat-message {
       flex-direction: column; 
