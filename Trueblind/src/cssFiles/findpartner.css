@@ -27,7 +27,15 @@ h4{
   flex-direction: column;  
   gap: 10px; 
 }
-
+.like-message {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #e0f7fa;
+  color: #00796b;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: bold;
+}
 .btnmatchsite:hover {
   transform: translateY(-5px);
   background: linear-gradient(145deg, #e8cba7, #d4af37); 

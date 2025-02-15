@@ -37,6 +37,7 @@ const [currentUser,setCurrentUser]= useState(0)
     }
   };
 
+
   const calculateMatch = (likedUser: User) => {
     if (!user) return 0;
     let matchScore = 0;
@@ -107,18 +108,20 @@ const [currentUser,setCurrentUser]= useState(0)
   const handleMaxAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMaxAge(parseInt(e.target.value, 10));
   };
-
+// Lägg till användaren i gillalistan <3
   const handleLike = (userId: string) => {
-    const likedUser = users.find((user) => user.id === userId);
+    const likedUser = matchingResults.find((user) => user.id === userId);
     if (likedUser) {
       if (!likedUsers.some((user) => user.id === likedUser.id)) {
-        addLikedUser(likedUser);
+        addLikedUser(likedUser); 
+        setMatchingResults(matchingResults.filter((user) => user.id !== likedUser.id)); 
         nextUser();
       } else {
         console.log("User already liked.");
       }
     }
   };
+// lägg till användaren i neka listan X 
   const handleDeny = (userId: string) => {
     const deniedUser = matchingResults.find((user) => user.id === userId);
     if (deniedUser) {
@@ -128,14 +131,12 @@ const [currentUser,setCurrentUser]= useState(0)
     }
   };
   const nextUser = () => {
-    if (currentUser< matchingResults.length - 1) {
-      setCurrentUser (currentUser + 1)
-    } else {
-      setCurrentUser(0) 
-    }
+    if (matchingResults.length > 0) {
+      setCurrentUser((prevUser) => (prevUser + 1) % matchingResults.length); 
+    } 
   };
 
-// Töm nekade listan
+// tömmer nekade listan & renderar igen när man klickar på " återställ "
   const restoreDeniedUsers = () => {
     setMatchingResults([...matchingResults, ...nekadUser]); 
     setNekadUser([]); 
@@ -214,8 +215,9 @@ const [currentUser,setCurrentUser]= useState(0)
    <button onClick={() => handleLike(result.id!)} className="like-button">
                         ❤️
                       </button>
-            
+                   
                       </div>
+
                     </div>
                   </li>
                 );
