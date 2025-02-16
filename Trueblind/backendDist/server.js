@@ -1,7 +1,7 @@
 import express from "express";
 import { GetUser, AddUser, UpdateUser, GetUserById } from "./data/getData.js";
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 app.use(express.json());
 import cors from 'cors';
 app.use(cors());

@@ -4,33 +4,37 @@ import logga from '../img/logga.png';
 import bukett from '../img/imgProdukter/bukett.png';
 import nalle1 from '../img/imgProdukter/nalle1.png';
 import nalle2 from '../img/imgProdukter/nalle2.png';
+import heart from '../img/imgProdukter/heart.png'
 
 export const Shop = () => {
   const navigate = useNavigate();
   
-  // Hämta användaren från store eller från localStorage
   const { user, updateUser } = useUserStore(); 
 
-  // Om användaren inte finns, hämta användardata från localStorage
   if (!user) {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
-      updateUser(parsedUser); // Uppdatera store med lagrad data
+      updateUser(parsedUser); 
     }
   }
 
-  if (!user) return <p>Laddar...</p>; // Om ingen användare är inloggad, visa en loading state
+  if (!user) return <p>Laddar...</p>;
 
-  // Se till att user.credits är definierad
   const credits = user.credits || 0;
 
-  // Emoji-data
+
+
   const emojis = [
     { name: "nalle1", src: nalle1, price: 3 },
     { name: "nalle2", src: nalle2, price: 3 },
     { name: "bukett", src: bukett, price: 3 },
+    { name: "heart", src:heart, price: 1},
   ];
+
+const emojisFor1Credit = emojis.filter((emoji) => emoji.price === 1);
+const emojisFor3Credits = emojis.filter((emoji) => emoji.price === 3)
+
 
   // Hantera köp av emoji
   const handlePurchase = (emojiName: string, price: number) => {
@@ -39,6 +43,7 @@ export const Shop = () => {
       return;
     }
 
+
     const existingEmoji = user.purchasedEmojis?.find((e) => e.emoji === emojiName);
     const updatedEmojis = existingEmoji
       ? user.purchasedEmojis.map((e) =>
@@ -46,32 +51,23 @@ export const Shop = () => {
         )
       : [...(user.purchasedEmojis || []), { emoji: emojiName, count: 1 }];
 
-    // Uppdatera användardatan i store och spara den till localStorage
+
     const updatedUser = { 
       credits: credits - price,
       purchasedEmojis: updatedEmojis 
     };
     updateUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser)); // Spara till localStorage
+    localStorage.setItem('user', JSON.stringify(updatedUser)); 
   };
 
-  // Hantera köp av gratis krediter
-  const handleAddCredits = () => {
-    const newCredits = credits + 10; // Lägger till 10 gratis krediter
+  //  köp av gratis krediter
+  const handleAddCredits = (amount: number) => {
+    const newCredits = credits + amount; 
     const updatedUser = { ...user, credits: newCredits };
     updateUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser)); // Spara till localStorage
+    localStorage.setItem('user', JSON.stringify(updatedUser)); 
   };
 
-  // Hantera utloggning
-  const handleLogout = () => {
-    // Ta bort användardata från localStorage
-    localStorage.removeItem('user');
-    // Uppdatera användaren i store
-    updateUser({ credits: 0, purchasedEmojis: [] });
-    // Navigera till login-sidan eller någon annan sida
-    navigate('/login');
-  };
 
   return (
     <>
@@ -84,56 +80,90 @@ export const Shop = () => {
       </button>
 
       <h1 className="Rubriktext">
-        <span className="firstPart">SHO</span>
-        <span className="secondPart">PEN</span>
+        <span className="firstPart">SHOPEN</span>
+       
       </h1>
 
-      <p>Kredit: {credits}</p>
 
-      {/* Lägg till gratis krediter */}
-      <button onClick={handleAddCredits} className="btn-add-credits">
-        Lägg till 10 gratis krediter
-      </button>
 
-      {/* Emoji-shop */}
-      <div className="emoji-shop">
-        <p>Pris: 3 krediter per emoji</p>
-        <div className="emoji-picker2">
-          {emojis.map((emoji) => (
-            <div key={emoji.name} className="emoji-item">
-              <img 
-                src={emoji.src} 
-                alt={emoji.name} 
-                className={`emoji ${credits < emoji.price ? "disabled" : ""}`} 
-                onClick={() => handlePurchase(emoji.name, emoji.price)} 
-              />
-            </div>
-          ))}
-        </div>
-      </div>
+   {/* Lägg till olika " kreditpaket"  */}
+   <div className="emoji-purchased">
+      <p > Din kredit: {credits}</p>
+      </div> 
 
-      {/* Visa köpta emojis */}
+   <div className="buybtncontainer"> 
+         
+<button onClick={() => handleAddCredits(10)} className="shopBtn">
+      10 krediter, 22.90 kronor
+    </button>
+    <button onClick={() => handleAddCredits(30)} className="shopBtn">
+     30 krediter, 64.90 kronor
+    </button>
+    <button onClick={() => handleAddCredits(60)} className="shopBtn">
+      60 krediter, 119.90 kronor
+    </button>
+    <button onClick={() => handleAddCredits(100)} className="shopBtn">
+       100 krediter, 189.90 kronor
+    </button>
+</div> 
+    {/* Emoji-shop */}
+    <div className="emoji-shop">
+  {emojisFor1Credit.length > 0 && (
+    <div className="emoji-group">
+      <p className="price-text">Pris: 1 kredit per emoji</p>
       <div className="emoji-picker2">
-        <p>Du har köpt:</p>
-        <div className="emoji-picker2">
-          {user.purchasedEmojis?.length > 0 ? (
-            user.purchasedEmojis.map((emoji) => {
-              const emojiData = emojis.find((e) => e.name === emoji.emoji);
-              return emojiData ? (
-                <div key={emoji.emoji} className="emoji-item">
-                  <img src={emojiData.src} alt={emoji.emoji} className="emoji" />
-                  <p>{emoji.count} st</p>
-                </div>
-              ) : null;
-            })
-          ) : (
-            <p>Du har inte köpt några emojis än.</p>
-          )}
-        </div>
+        {emojisFor1Credit.map((emoji) => (
+          <div key={emoji.name} className="emoji-item">
+            <img 
+              src={emoji.src} 
+              alt={emoji.name} 
+              className={`emoji ${credits < emoji.price ? "disabled" : ""}`} 
+              onClick={() => handlePurchase(emoji.name, emoji.price)} 
+            />
+          </div>
+        ))}
       </div>
+    </div>
+  )}
 
-      {/* Logga ut knapp */}
-      <button onClick={handleLogout} className="btn-logout">Logga ut</button>
+  {emojisFor3Credits.length > 0 && (
+    <div className="emoji-group">
+      <p className="price-text">Pris: 3 krediter per emoji</p>
+      <div className="emoji-picker2">
+        {emojisFor3Credits.map((emoji) => (
+          <div key={emoji.name} className="emoji-item">
+            <img 
+              src={emoji.src} 
+              alt={emoji.name} 
+              className={`emoji ${credits < emoji.price ? "disabled" : ""}`} 
+              onClick={() => handlePurchase(emoji.name, emoji.price)} 
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
+
+{/* Visa köpta emojis */}
+<div className="emoji-purchased">
+  <p>Du har köpt:</p>
+  <div className="emoji-picker2">
+    {user.purchasedEmojis?.length > 0 ? (
+      user.purchasedEmojis.map((emoji) => {
+        const emojiData = emojis.find((e) => e.name === emoji.emoji);
+        return emojiData ? (
+          <div key={emoji.emoji} className="emoji-item">
+            <img src={emojiData.src} alt={emoji.emoji} className="emoji" />
+            <p>{emoji.count} st</p>
+          </div>
+        ) : null;
+      })
+    ) : (
+      <p>Du har inte köpt några emojis än.</p>
+    )}
+  </div>
+</div>
     </>
   );
 };

@@ -17,6 +17,7 @@
 .emoji-picker img {
     width: 30px;  
     gap: 10px; 
+    
 }
 
 .sent-emoji {
@@ -28,12 +29,94 @@
 }
 .emoji-pickershop img {
     width: 30px;  
-
+    height:46px;
 }
 .emoji-picker2{
 display:flex;
 }
+.emoji-shop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto; 
+  }
+  
+  .emoji-group {
+
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+  }
+  
+  .disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .price-text {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    margin-top: 0; 
+  }
+  
+  .emoji-picker2 {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+   
+  }
+
 .emoji-picker2 img {
-    width: 30px;  
+    width: 40px;  
     gap: 10px; 
+    height:61px;
 }
+
+.buybtncontainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%; 
+    max-width: 300px; 
+    margin: 0 auto; 
+    gap: 10px; 
+
+  }
+
+.shopBtn{
+    background-color: #996A30; 
+    color: rgb(0, 0, 0);
+    border: none;
+    padding: 6px 8px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+
+}
+
+.shopBtn:hover{
+    background-color: #6d4c24;
+  transform: scale(1.05);
+
+}
+/* Köpta emojis */
+.emoji-purchased {
+    margin-top: 30px;
+    text-align: center;
+  }
+  
+  .emoji-purchased p {
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .emoji-purchased .emoji-picker2 {
+    justify-content: center;
+    gap: 10px;
+  }

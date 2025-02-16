@@ -3,36 +3,33 @@ import logga from '../img/logga.png';
 import { useUserStore } from '../storage/storage';
 import { useNavigate } from 'react-router-dom';
 import { FaPen } from 'react-icons/fa';
-import { EditInterests } from './Editintresse';
-import { intresseLista } from '../validering';
+
 
 export const AccountPage = () => {
   const navigate = useNavigate();
   const user = useUserStore((state) => state.user);
   const { setUser } = useUserStore();
+const [message,setMessage] = useState('')
 
   const [isOpen, setIsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState({
     firstName: false,
-    age: false,
     city: false,
     sexualOrientation: false,
-    interests: false,
+
   });
   const [updatedUserData, setUpdatedUserData] = useState({
-    age: user ? user.age : '',
     city: user ? user.city : '',
     sexualOrientation: user ? user.sexualOrientation : '',
-    interests: user ? user.interests : [],
+
   });
 
   useEffect(() => {
     if (user) {
       setUpdatedUserData({
-        age: user.age,
         city: user.city,
         sexualOrientation: user.sexualOrientation,
-        interests: user.interests,
+ 
       });
     }
     console.log('Användardata har uppdaterats:', user);
@@ -53,12 +50,6 @@ export const AccountPage = () => {
     }));
   };
 
-  const handleInterestUpdate = (updatedInterests: string[]) => {
-    setUpdatedUserData((prevData) => ({
-      ...prevData,
-      interests: updatedInterests,
-    }));
-  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -70,7 +61,7 @@ export const AccountPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setMessage("Ändringarna har sparats!"); 
     try {
       const response = await fetch(`http://localhost:3000/users/${user.id}`, {
         method: 'PATCH',
@@ -103,13 +94,16 @@ export const AccountPage = () => {
         <span className="secondPart">NT</span>
         <span className="firstPart">O</span>
       </h1>
+      <div className="buttondivforback">
+    <button className="btnback" onClick={() => navigate('/homepage')}>
+        <i className="fas fa-arrow-left"></i>
+      </button> </div> 
+
       <div className="result-info"> 
   <button onClick={() => navigate('/')} className="btnmatchsite">
           Logga ut
-        </button></div> 
-      <button className="btnback" onClick={() => navigate('/homepage')}>
-        <i className="fas fa-arrow-left"></i>
-      </button>
+        </button> </div> 
+  
 
       <div className="result-info">
         <button onClick={() => navigate('/match')} className="btnmatchsite">
@@ -136,21 +130,8 @@ export const AccountPage = () => {
           </p>
 
           <p>
-            <strong>Ålder:</strong>
-            {isEditing.age ? (
-              <input
-                type="number"
-                name="age"
-                value={updatedUserData.age}
-                onChange={handleChange}
-                onBlur={() => setIsEditing((prev) => ({ ...prev, age: false }))}
-              />
-            ) : (
-              <>
-                {updatedUserData.age}
-                <FaPen className="edit-icon" onClick={() => handleEditClick('age')} />
-              </>
-            )}
+            <strong>Ålder: {user.age} </strong>
+ 
           </p>
 
           <p>
@@ -189,33 +170,10 @@ export const AccountPage = () => {
             )}
           </p>
 
-          <div className="columdiv2">
-  <strong>Dina intressen:</strong>
-  {isEditing.interests ? (
-    <>
-      <EditInterests
-        intresseLista={intresseLista}
-        initialInterests={updatedUserData.interests}
-        handleInterestUpdate={handleInterestUpdate}
-      />
-      <button onClick={() => setIsEditing((prev) => ({ ...prev, interests: false }))}>
-        Spara
-      </button>
-    </>
-  ) : (
-    <>
-      <div className="interests-list">
-          <span>Inga intressen valda än.</span>
-      </div>
-    </>
-  )}
-</div>
-
-          <form className="form2" onSubmit={handleSubmit}>
-            <button type="submit" className="accountBtn">
+            <button type="submit" className="accountBtn"onClick={handleSubmit} >
             Spara
             </button>
-          </form>
+            {message && <p>{message}</p>} 
         </div>
       )}
 

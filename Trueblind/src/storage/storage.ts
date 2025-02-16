@@ -14,7 +14,6 @@ interface Chat {
   userNames: string[];
 }
 
-
 interface UserStore {
   user: User | null;
   setUser: (userData: User) => void;
@@ -63,7 +62,7 @@ export const useUserStore = create<UserStore>((set, get) => {
         user: { 
           ...userData,
           credits: storedCredits || 0,  
-          purchasedEmojis: storedPurchasedEmojis || [] // Om purchasedEmojis inte finns, sätt till tom array
+          purchasedEmojis: storedPurchasedEmojis || []
         }, 
         likedUsers: storedLikedUsers, 
         activeChats: storedChats, 

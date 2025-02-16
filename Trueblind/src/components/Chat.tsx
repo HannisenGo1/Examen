@@ -6,6 +6,7 @@ import logga from '../img/logga.png';
 import bukett from '../img/imgProdukter/bukett.png'
 import nalle1 from '../img/imgProdukter/nalle1.png'
 import nalle2 from '../img/imgProdukter/nalle2.png'
+import heart from '../img/imgProdukter/heart.png'
 export const Chat = () => {
     const { chatRoomId } = useParams();
     const { activeChats, addMessageToChat, removeMessageFromChat, user} = useUserStore(); 
@@ -70,30 +71,39 @@ export const Chat = () => {
     const emojiBaseName = emojiName.split('/').pop()?.split('?')[0].replace('.png', '') || ""; 
     console.log("emojiBaseName:", emojiBaseName);
   
-    const emojiItem = user.purchasedEmojis.find((emoji) => emoji.emoji === emojiBaseName);
+    // Hämta senaste versionen av user
+    const currentUser = useUserStore.getState().user;
+  
+    if (!currentUser) {
+      console.error("Ingen användare inloggad!");
+      return;
+    }
+  
+    const emojiItem = currentUser.purchasedEmojis.find((emoji) => emoji.emoji === emojiBaseName);
   
     if (emojiItem) {
       console.log("Emoji hittad:", emojiItem);
   
- 
       if (emojiItem.count > 0) {
-        sendEmoji(`<img src="${emojiName}" alt="emoji" class="sent-emoji"/>`);
-        setShowEmojis(false);
-  
-        //  ta bort emojis med count 0
-        const updatedEmojis = user.purchasedEmojis
-          .map((e) =>
-            e.emoji === emojiBaseName ? { ...e, count: e.count - 1 } : e
-          )
+        const updatedEmojis = currentUser.purchasedEmojis
+          .map((e) => e.emoji === emojiBaseName ? { ...e, count: e.count - 1 } : e)
           .filter(e => e.count > 0); 
-
-        const updatedUser = { ...user, purchasedEmojis: updatedEmojis };
-        useUserStore.getState().setUser(updatedUser); 
   
-        const userId = user.id || '';
+        // Uppdatera localStorage FÖRST
+        const userId = currentUser.id || '';
         localStorage.setItem(getUserStorageKey(userId, 'purchasedEmojis'), JSON.stringify(updatedEmojis));
   
+        // Uppdatera användaren i store
+        const updatedUser = { ...currentUser, purchasedEmojis: updatedEmojis };
+        useUserStore.getState().setUser(updatedUser);
+  
         console.log("Uppdaterad emoji-lista:", updatedEmojis);
+  
+        // timer för att skicka så att den känner av att listan minskar.
+        setTimeout(() => {
+          sendEmoji(`<img src="${emojiName}" alt="emoji" class="sent-emoji"/>`);
+          setShowEmojis(false);
+        }, 50);
       } else {
         console.log("Du har inga kvar av denna emoji.");
       }
@@ -101,6 +111,7 @@ export const Chat = () => {
       setErrorMessage("Emoji inte hittad i purchasedEmojis.");
     }
   };
+  
   
 
   
@@ -170,6 +181,7 @@ export const Chat = () => {
         <img src={nalle1} alt="nalle1" className="emoji" onClick={() => handleEmojiClick(nalle1)} />
         <img src={nalle2} alt="nalle2" className="emoji" onClick={() => handleEmojiClick(nalle2)} />
         <img src={bukett} alt="bukett" className="emoji" onClick={() => handleEmojiClick(bukett)} />
+        <img src={heart} alt="heart" className="emoji" onClick={() => handleEmojiClick(heart)} />
                     </div>
                 )}
           </div>

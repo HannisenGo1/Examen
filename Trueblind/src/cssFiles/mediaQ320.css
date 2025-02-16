@@ -60,7 +60,7 @@
     }
     @media (max-width: 320px) {
       .result-item {
-        width: 100%; /* Se till att kortet aldrig är större än skärmen */
+        width: 100%; 
       }
     
       .button-container {
@@ -71,4 +71,15 @@
       .like-button, .deny-button {
         font-size: 16px;
       }
+ 
+        .buybtncontainer {
+          width: 80%; 
+          max-width: none;
+        }
+      
+        .shopBtn {
+          font-size: 14px;
+          padding: 8px 8px;
+        }
+      
     }
