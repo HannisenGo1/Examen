@@ -6,20 +6,20 @@ import logga from '../img/logga.png';
 
 
 export const Login= () => {
-//  useUserStore.getState().setUser(userData);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [users, setUsers] = useState<any[]>([]); 
   const navigate = useNavigate(); 
 
-  
+  const getUserStorageKey = (userId: string, key: string) => `${key}-${userId}`;
 
   useEffect(() => {
     const user = useUserStore.getState().user;
     if (user) {
       useUserStore.getState().loadChatsFromStorage();
       useUserStore.getState().loadRequestsFromStorage();
+      useUserStore.getState().loadUserFromStorage(); 
     }
   }, []);
 
@@ -44,7 +44,6 @@ export const Login= () => {
 
     fetchUsers();
   }, []); 
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
   
@@ -53,14 +52,24 @@ export const Login= () => {
     if (foundUser) {
       console.log('Inloggad:', foundUser);
   
-      useUserStore.getState().setUser(foundUser);
+      const userId = foundUser.id;
+  
+      const storedVIPStatus = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'vipStatus')) || 'false');
+      const storedVIPExpiryString = localStorage.getItem(getUserStorageKey(userId, 'vipExpiry'));
+      const storedVIPExpiry = storedVIPExpiryString ? Number(storedVIPExpiryString) : null;
+  
+      const updatedUser = {
+        ...foundUser,
+        vipStatus: storedVIPStatus,
+        vipExpiry: storedVIPExpiry,
+      };
+  
+      useUserStore.getState().setUser(updatedUser);
       useUserStore.getState().loadRequestsFromStorage();
       useUserStore.getState().loadChatsFromStorage();
-    
   
       setError('');
       navigate('/homepage');
-    
     } else {
       setError('Fel e-post eller lösenord.');
     }

@@ -36,6 +36,8 @@ interface UserStore {
   addMessageToChat: (chatRoomId: string, message: string, senderId: string) => void;
   loadChatsFromStorage: () => void;
   removeMessageFromChat: (chatRoomId: string, messageId: string) => void;
+
+  loadUserFromStorage: () => void;
 }
 
 export const useUserStore = create<UserStore>((set, get) => {
@@ -57,12 +59,17 @@ export const useUserStore = create<UserStore>((set, get) => {
       const storedRequests = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'requests')) || '[]');
       const storedCredits = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'credits')) || '0');
       const storedPurchasedEmojis = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'purchasedEmojis')) || '[]');
-
+      const storedVIPStatus = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'vipStatus')) || 'false');
+      const storedVIPExpiryString = localStorage.getItem(getUserStorageKey(userId, 'vipExpiry'));
+      const storedVIPExpiry = storedVIPExpiryString ? Number(storedVIPExpiryString) : null;
+    
       set({ 
         user: { 
           ...userData,
           credits: storedCredits || 0,  
-          purchasedEmojis: storedPurchasedEmojis || []
+          purchasedEmojis: storedPurchasedEmojis || [],
+          vipStatus: storedVIPStatus || false,
+          vipExpiry: storedVIPExpiry,
         }, 
         likedUsers: storedLikedUsers, 
         activeChats: storedChats, 
@@ -79,13 +86,32 @@ export const useUserStore = create<UserStore>((set, get) => {
         const userId = updatedUser.id || '';
         localStorage.setItem(getUserStorageKey(userId, 'credits'), JSON.stringify(updatedUser.credits));
         localStorage.setItem(getUserStorageKey(userId, 'purchasedEmojis'), JSON.stringify(updatedUser.purchasedEmojis));
+        localStorage.setItem(getUserStorageKey(userId, 'vipStatus'), JSON.stringify(updatedUser.vipStatus));
 
+        if (updatedUser.vipExpiry !== undefined && updatedUser.vipExpiry !== null) {
+          localStorage.setItem(getUserStorageKey(userId, 'vipExpiry'), updatedUser.vipExpiry.toString());
+        }
+    
         return { user: updatedUser };
       });
     },
     resetUser: () => {
       set({ user: null, likedUsers: [], activeChats: [] });
+      localStorage.clear(); 
     },
+    setVIPStatus: (vipStatus: boolean) => {
+      set((state) => {
+        if (!state.user) return state;
+
+        const updatedUser = { ...state.user, vipStatus };
+        const userId = updatedUser.id || '';
+
+        localStorage.setItem(getUserStorageKey(userId, 'vipStatus'), JSON.stringify(updatedUser.vipStatus));
+
+        return { user: updatedUser };
+      });
+    },
+
 
     addLikedUser: (user) => {
       const currentUser = get().user;
@@ -280,7 +306,21 @@ export const useUserStore = create<UserStore>((set, get) => {
         return { activeChats: updatedChats };
       });
     },
+
+    loadUserFromStorage: () => {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        
+        // Kontrollera om VIP har gått ut
+        if (parsedUser.vipExpiry && new Date().getTime() > new Date(parsedUser.vipExpiry).getTime()) {
+          parsedUser.vipStatus = false;
+          parsedUser.vipExpiry = null;
+        }
     
+        set({ user: parsedUser });
+      }
+    }, 
     loadChatsFromStorage: () => {
       const user = get().user;
       if (user) {
@@ -354,7 +394,7 @@ export const useUserStore = create<UserStore>((set, get) => {
       let updatedPurchasedEmojis = [...currentUser.purchasedEmojis];
     
       if (emojiIndex !== -1) {
-        // Om emojin redan finns, öka count med 1
+        // öka count med 1
         updatedPurchasedEmojis[emojiIndex].count += 1;
       } else {
         // Om emojin inte finns, lägg till den med count 1

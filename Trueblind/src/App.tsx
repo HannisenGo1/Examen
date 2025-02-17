@@ -24,7 +24,7 @@ function App() {
       {/**/ }<Route path="/homepage" element ={<Afterlogin /> } />   
       <Route path="/Findpartner" element ={ <SearchHere /> } /> 
         <Route path="/chat/:chatRoomId" element={<Chat />} /> {/* enskilda chatten */}
-        <Route path="/shop" element={<Shop /> } /> 
+        <Route path="/shop" element={<Shop /> } /> {/* Affären */}
       </Routes>
     </Router>
   );

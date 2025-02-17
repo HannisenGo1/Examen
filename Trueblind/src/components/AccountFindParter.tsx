@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useUserStore } from '../storage/storage';
 import { User } from '../interface/interfaceUser';
-
+import {isVIPExpired}  from './VipUser'
 
 export const FindPartners = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -121,6 +121,8 @@ const [currentUser,setCurrentUser]= useState(0)
       }
     }
   };
+
+  
 // lägg till användaren i neka listan X 
   const handleDeny = (userId: string) => {
     const deniedUser = matchingResults.find((user) => user.id === userId);
@@ -136,7 +138,9 @@ const [currentUser,setCurrentUser]= useState(0)
     } 
   };
 
-// tömmer nekade listan & renderar igen när man klickar på " återställ "
+const showCurrentUser = matchingResults[currentUser];
+
+// " återställ listan om man är vip "
   const restoreDeniedUsers = () => {
     setMatchingResults([...matchingResults, ...nekadUser]); 
     setNekadUser([]); 
@@ -179,55 +183,43 @@ const [currentUser,setCurrentUser]= useState(0)
         <button onClick={filterUsers} disabled={loading} className="search-button">
           {loading ? 'Laddar...' : 'Sök partners'}
         </button>
-        {nekadUser.length > 0 && (
-              <button onClick={restoreDeniedUsers} className="restore-button">
-                Återställ nekade användare
-              </button>
-            )}
+        {user.vipStatus && nekadUser.length > 0 && (
+  <button 
+    onClick={restoreDeniedUsers} 
+    className="restore-button"
+    disabled={isVIPExpired(user)}
+  >
+    Återställ nekade användare
+  </button>
+)}
       </div>
 
-        {matchingResults.length > 0 ? (
-          <div className="results-item">
-
-            <ul className="results-list">
-              {matchingResults.map((result) => {
-                const matchPercentage = calculateMatch(result);
-
-                return (
-
-
-                  <li key={result.id} className="result-item">
-
-                    <div className="result-info">
-                      <h4>{result.firstName} <span className="age">, {result.age}</span></h4>
-                      <p><strong>Kön:</strong> {result.gender}</p>
-                      <p><strong>Religion:</strong> {result.religion}</p>
-                      <p><strong>Matchning:</strong> {matchPercentage}%</p>
-                      <p><strong>läggning:</strong> {result.sexualOrientation}</p>
-                    </div>
-                    <div className="life-statements">
-                      <p>{result.lifeStatement1}</p>
-                      <p>{result.lifeStatement2}</p>
-                      <p>{result.ommig}</p>
-                      <div className="button-container">
-                        <button onClick={() => handleDeny(result.id!)} className="deny-button">
-                        ❌</button>
-   <button onClick={() => handleLike(result.id!)} className="like-button">
-                        ❤️
-                      </button>
-                   
-                      </div>
-
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-
+      {matchingResults.length > 0 && showCurrentUser ? (
+  <div className="results-item">
+    <ul className="results-list">
+      <li key={showCurrentUser.id} className="result-item">
+        <div className="result-info">
+          <h4>{showCurrentUser.firstName} <span className="age">, {showCurrentUser.age}</span></h4>
+          <p><strong>Matchar: {calculateMatch(showCurrentUser)}%</strong> </p>
+          <p><strong>Kön:</strong> {showCurrentUser.gender}</p>
+          <p><strong>Religion:</strong> {showCurrentUser.religion}</p>
+          <p><strong>Läggning:</strong> {showCurrentUser.sexualOrientation}</p>
+        </div>
+        <div className="life-statements">
+          <p>{showCurrentUser.lifeStatement1}</p>
+          <p>{showCurrentUser.lifeStatement2}</p>
+          <p>{showCurrentUser.ommig}</p>
+          <div className="button-container">
+            <button onClick={() => handleDeny(showCurrentUser.id!)} className="deny-button">❌</button>
+            <button onClick={() => handleLike(showCurrentUser.id!)} className="like-button">❤️</button>
           </div>
-        ) : (
-          <p className="no-results">Inga matchande resultat</p>
-        )}
+        </div>
+      </li>
+    </ul>
+  </div>
+) : (
+  <p className="no-results">Inga matchande resultat</p>
+)}
          {error && <p className="error-message">{error}</p>}
       </div>
 

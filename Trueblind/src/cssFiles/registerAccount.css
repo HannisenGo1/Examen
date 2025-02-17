@@ -10,6 +10,22 @@ form {
 .ptext{
   color:black;
 }
+.accountBtn2{
+  width:2em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(145deg, #d4af37, #e8cba7); 
+  color: #3a3a3a; 
+  font-size: 18px;
+  font-weight: bold;
+  padding: 12px 30px;
+  border-radius: 15px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
 label {
     font-weight: bold;
     font-size: 16px;

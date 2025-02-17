@@ -20,7 +20,7 @@ export type FormData = {
     smokes: string;
     relationshipStatus: string;
     education: string;
-    photo: File | null;
+    photo?: File | null;
     favoriteSong: string | '';
     favoriteMovie: string |'';
     email: string;
@@ -54,6 +54,8 @@ export interface User {
     updateUser: (updatedFields: Partial<User>) => void;
     addCredits: (amount: number) => void;
     ommig?:string;
+    vipStatus: boolean;
+    vipExpiry?: number | null; 
   }
   export interface SearchResult {
       age: number;

@@ -36,7 +36,7 @@ h4{
   text-align: center;
   font-weight: bold;
 }
-.btnmatchsite:hover {
+.btnmatchsite:hover, .search-button:hover  {
   transform: translateY(-5px);
   background: linear-gradient(145deg, #e8cba7, #d4af37); 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -155,8 +155,8 @@ select {
 
 .search-button {
   padding: 10px 20px;
-  background-color: #4CAF50;
-  color: white;
+  background: linear-gradient(145deg, #d4af37, #e8cba7);
+  color: black;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -165,9 +165,6 @@ select {
   max-width: 400px;
 }
 
-.search-button:hover {
-  background-color: #45a049;
-}
 .columndiv2 .interests-list {
   color: black; 
 }
@@ -207,7 +204,21 @@ select {
   outline: none; 
 }
 .restore-button{
-  width:1em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(145deg, #d4af37, #e8cba7);
+  color: #3a3a3a;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 12px 30px;
+  border-radius: 15px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 10em;
+  height: 5em;
+  margin-top: 1em;
 }
 
 form > .form2{

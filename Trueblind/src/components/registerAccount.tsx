@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, {  useState } from 'react';
 import logga from '../img/logga.png'
 import { useNavigate } from 'react-router-dom'; 
 import {validateFormData, intresseLista} from '../validering'
 import { FormData } from '../interface/interfaceUser';
+import { Anvandarpolicy } from './UseInfo';
 // sätta in en " berätta lite om dig själv"
 export const Register = () => {
     const navigate = useNavigate();
@@ -19,7 +20,6 @@ export const Register = () => {
         smokes: '',
         relationshipStatus: '',
         education: '',
-        photo: null,
         favoriteSong: '',
         favoriteMovie: '',
         email: '',
@@ -48,7 +48,9 @@ export const Register = () => {
     const [errors, setErrors] = useState<any>({}); 
     const [step, setStep] = useState(1);
     const [isRegistered, setIsRegistered] = useState(false);
-
+    const [agreedToTerms, setAgreedToTerms] = useState(false);
+    const [isTermsVisible, setIsTermsVisible] = useState(false);
+    
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
@@ -73,7 +75,24 @@ export const Register = () => {
             }));
         }
     };
+    const handleCheckboxChange = (e:any) => {
+        setAgreedToTerms(e.target.checked);
+    };
     
+      const handleShowTerms = () => {
+        setIsTermsVisible(true); 
+    };
+
+    const handleAcceptTerms = () => {
+        setAgreedToTerms(true);  
+        setIsTermsVisible(false); 
+    };
+
+    const handleCloseTerms = () => {
+        setIsTermsVisible(false); 
+    };
+
+
     const handleNext = () => {
         const validationErrors = validateFormData(step, formData);
         
@@ -88,6 +107,7 @@ export const Register = () => {
     const handlePrevious = () => {
         setStep((prev) => Math.max(prev - 1, 1));
     };
+   
     
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -212,7 +232,7 @@ export const Register = () => {
             <option value="">Välj kön</option>
             <option value="male">Man</option>
             <option value="female">Kvinna</option>
-            <option value="other">Annat</option>
+    
             </select>
             {errors.gender && <span className="error">{errors.gender}</span>}
             
@@ -243,7 +263,7 @@ export const Register = () => {
             onChange={handleChange}
             >
             <option value="">Välj religion</option>
-            <option value="christianity">Kristen</option>
+            <option value="kristen">Kristen</option>
             <option value="islam">Muslim</option>
             <option value="jude">Jude</option>
             <option value="hinduism">Hindu</option>
@@ -368,16 +388,6 @@ export const Register = () => {
         
         {step === 6 && (
             <>
-            <label htmlFor="photo">
-            Ladda upp en bild på dig
-            <input
-            type="file"
-            id="photo"
-            name="photo"
-            accept="image/*"
-            onChange={handleChange}
-            />
-            </label>
 
             <label htmlFor="favoriteSong">Favorit låt:</label>
             <input
@@ -419,17 +429,38 @@ export const Register = () => {
     value={formData.ommig}
     onChange={handleChange}
 />
+
+<div className="register-terms-checkbox">
+                    <input
+                        type="checkbox"
+                        id="agreeTerms"
+                        checked={agreedToTerms}
+                        onChange={handleCheckboxChange}
+                    />
+                    <label htmlFor="agreeTerms">
+                        Jag godkänner{' '}
+                        <a href="#" onClick={handleShowTerms}>
+                            användarvillkoren
+                        </a>
+                    </label>
+                </div>
             </>
         )}
         
         <div className="buttoncontainerinRegister">
-        {step > 1 && <button className="accountBtn" onClick={handlePrevious}>Tillbaka</button>}
+        {step > 1 && <button className="accountBtn2" onClick={handlePrevious}> <i className="fas fa-arrow-left"></i></button>}
         {step < 6 && <button className="accountBtn" onClick={handleNext}>Nästa</button>}
-        {step === 6 && <button className="accountBtn" type="submit">Registrera</button>}
+
+        {step === 6 && <button className="accountBtn" type="submit" disabled={!agreedToTerms}>Registrera</button>}
         </div>
 
         </form> 
-
+        {isTermsVisible && (
+                <Anvandarpolicy
+                    onClose={handleCloseTerms}
+                    onAccept={handleAcceptTerms}
+                />
+            )}
         </>
     );
 };
