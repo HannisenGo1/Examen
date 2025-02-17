@@ -56,6 +56,7 @@ export interface User {
     ommig?:string;
     vipStatus: boolean;
     vipExpiry?: number | null; 
+    hasUsedPromoCode?:boolean;
   }
   export interface SearchResult {
       age: number;

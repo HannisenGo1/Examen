@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useUserStore } from '../storage/storage';
 import logga from '../img/logga.png';
 import bukett from '../img/imgProdukter/bukett.png';
@@ -11,6 +12,8 @@ export const Shop = () => {
   const navigate = useNavigate();
   const { user, updateUser } = useUserStore();
   const getUserStorageKey = (userId: string, key: string) => `${key}-${userId}`;
+  const [promoCode, setPromoCode] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   if (!user) {
     const storedUser = localStorage.getItem('user');
@@ -23,6 +26,32 @@ export const Shop = () => {
   if (!user) return <p>Laddar...</p>;
 
   const credits = user.credits || 0;
+
+  // använda för att få gratis 1000 krediter. 
+  const handlePromoCode = () => {
+    const promoCodeCorrect = import.meta.env.VITE_PROMO_CODE;
+    if (promoCode === promoCodeCorrect) {
+      if (user.hasUsedPromoCode) {
+        setErrorMessage("Du har redan använt din gratis kod.");
+        return;
+      }
+      const updatedUser = {
+        ...user,
+        credits: credits + 1000,  
+        hasUsedPromoCode: true, 
+      };
+      if (!user || !user.id) {
+        console.error("User or user.id is undefined");
+        return;
+      }
+      updateUser(updatedUser);
+      localStorage.setItem(getUserStorageKey(user.id, 'userData'), JSON.stringify(updatedUser));
+
+      setErrorMessage("");
+    } else {
+      setErrorMessage("Ogiltig kod. Försök igen.");
+    }
+  };
 
   // Hantering av köp -> VIP
   const handleVIPPurchase = () => {
@@ -132,7 +161,20 @@ export const Shop = () => {
           100 krediter, 189.90 kronor
         </button>
       </div>
-
+{/* Promo code section */}
+<div className="promo-code-section">
+        <input 
+          type="text" 
+          placeholder="Ange din kod här" 
+          value={promoCode}
+          onChange={(e) => setPromoCode(e.target.value)}
+          className="promo-code-input"
+        />
+        <button onClick={handlePromoCode} className="apply-code-btn">
+          Använd kod
+        </button>
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
+      </div>
       {/* Emoji-shop */}
       <div className="emoji-shop">
         {emojisFor1Credit.length > 0 && (
