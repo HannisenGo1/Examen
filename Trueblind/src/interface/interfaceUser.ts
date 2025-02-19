@@ -9,6 +9,7 @@ export type FormData = {
     minAge?: 0,
     maxAge?: 100,
     firstName: string;
+    lastName:string;
     age: number;
     city: string;
     gender: string;
@@ -31,8 +32,10 @@ export type FormData = {
     ommig?:string;
 };
 type Emoji = { emoji:string; count:number}
+
 export interface User {
     firstName: string;
+    lastName?:string;
     age: number;
     city: string;
     gender: string;
@@ -46,6 +49,8 @@ export interface User {
     wantsChildren: boolean;
     smokes: string;
     relationshipStatus: string;
+    favoriteSong: string; 
+    favoriteMovie: string;
     education: string;
     photo?:string;
     credits: number;
@@ -58,6 +63,7 @@ export interface User {
     vipExpiry?: number | null; 
     hasUsedPromoCode?:boolean;
   }
+  
   export interface SearchResult {
       age: number;
       gender: string;

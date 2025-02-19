@@ -4,11 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import {validateFormData, intresseLista} from '../validering'
 import { FormData } from '../interface/interfaceUser';
 import { Anvandarpolicy } from './UseInfo';
-// sätta in en " berätta lite om dig själv"
+
 export const Register = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState<FormData>({
         firstName: '',
+        lastName:'',
         age: 18,
         city: '',
         gender: '',
@@ -111,33 +112,30 @@ export const Register = () => {
     
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+    
         const validationErrors = validateFormData(6, formData);
     
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
-            return; 
+            return;
         }
     
         try {
+            console.log('Skickar till API:', JSON.stringify(formData));
+            
             const response = await fetch('http://localhost:3000/users', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData), 
+                body: JSON.stringify(formData),
             });
-            const text = await response.text(); 
+    
+            const text = await response.text();
     
             if (response.ok) {
-                try {
-                    setIsRegistered(true);  
-                } catch (error) {
-                    console.error('Svar från servern var inte giltig JSON:', error);
-                    console.error('Rått svar från servern:', text);
-                    setErrors({ general: 'Något gick fel vid registreringen.' });
-                }
+                setIsRegistered(true);
             } else {
-                console.error('Fel vid registrering:', text);
                 setErrors({ general: text || 'Något gick fel vid registreringen.' });
             }
         } catch (error) {
@@ -145,6 +143,7 @@ export const Register = () => {
             setErrors({ general: 'Ett fel vid registreringen.' });
         }
     };
+    
     
     const goBackToHome = () => {
         navigate('/');
@@ -197,6 +196,15 @@ export const Register = () => {
             onChange={handleChange}
             />
             {errors.firstName && <span className="error">{errors.firstName}</span>}
+            <label htmlFor="lastName">Efternamn</label>
+            <input
+            type="text"
+            id="lastName"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            />
+            {errors.lastName && <span className="error">{errors.lastName}</span>}
             
             <label htmlFor="age">Ålder</label>
             <input
@@ -230,8 +238,8 @@ export const Register = () => {
             value={formData.gender}
             onChange={handleChange}>
             <option value="">Välj kön</option>
-            <option value="male">Man</option>
-            <option value="female">Kvinna</option>
+            <option value="Man">Man</option>
+            <option value="Kvinna">Kvinna</option>
     
             </select>
             {errors.gender && <span className="error">{errors.gender}</span>}
@@ -244,9 +252,9 @@ export const Register = () => {
             onChange={handleChange}
             >
             <option value="">Välj sexuell läggning</option>
-            <option value="hetero">Hetero</option>
-            <option value="homo">Homo</option>
-            <option value="bi">Bisexuell</option>
+            <option value="Hetero">Hetero</option>
+            <option value="Homo">Homo</option>
+            <option value="Bi">Bisexuell</option>
             <option value="other">Annat</option>
             </select>
             {errors.sexualOrientation && <span className="error">{errors.sexualOrientation}</span>}
@@ -263,12 +271,12 @@ export const Register = () => {
             onChange={handleChange}
             >
             <option value="">Välj religion</option>
-            <option value="kristen">Kristen</option>
-            <option value="islam">Muslim</option>
-            <option value="jude">Jude</option>
-            <option value="hinduism">Hindu</option>
-            <option value="other">Annat</option>
-            <option value="nothing">Ingen</option>
+            <option value="Kristen">Kristen</option>
+            <option value="Islam">Muslim</option>
+            <option value="Jude">Jude</option>
+            <option value="Hinduism">Hindu</option>
+            <option value="Annat">Annat</option>
+            <option value="Ingen">Ingen</option>
             </select>
             {errors.religion && <span className="error">{errors.religion}</span>}
             <label htmlFor="interests">Välj 5 intressen:</label>
@@ -363,10 +371,11 @@ export const Register = () => {
             value={formData.relationshipStatus}
             onChange={handleChange}
             >
-            <option value="">Välj</option>
-            <option value="serious">Seriöst förhållande</option>
-            <option value="casual">Öppen för seriöst</option>
-            <option value="friends">Nya vänner</option>
+            <option value="">Välj vad du söker:</option>
+            <option value="Seriöst">Seriöst förhållande</option>
+            <option value="Öppet">Öppen för seriöst</option>
+            <option value="Vänner">Nya vänner</option>
+           
             </select>
             {errors.relationshipStatus && <span className="error">{errors.relationshipStatus}</span>}
             <label htmlFor="education">Utbildningsnivå</label>
@@ -377,10 +386,10 @@ export const Register = () => {
             onChange={handleChange}
             >
             <option value="">Välj utbildning</option>
-            <option value="primary">Grundskola</option>
-            <option value="highschool">Gymnasium</option>
-            <option value="university">Universitet</option>
-            <option value="bachelor"> kandidatexamen </option>
+            <option value="Grundskola">Grundskola</option>
+            <option value="Gymnasium">Gymnasium</option>
+            <option value="Universitet">Universitet</option>
+            <option value="Kandidatexamen"> kandidatexamen </option>
             </select>
             {errors.education && <span className="error">{errors.education}</span>}
             </>

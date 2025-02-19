@@ -10,6 +10,7 @@ import { Afterlogin } from "./components/Afterlogin";
 import { SearchHere } from "./components/SearchPartner";
 import { Shop } from "./components/Shop";
 
+
 function App() {
   return (
     <Router>
@@ -17,11 +18,12 @@ function App() {
         <Route path="/" element={<Frontpage />} /> {/*  "Framsidan" */}
         <Route path="/register" element={<Register />} /> {/* "Registreringssidan" */}
         <Route path="/login" element={<Login/> } /> {/*  "Log in " */}
-        <Route path="/account" element={<AccountPage/> } /> {/*  "Kontosidan" */}
-        <Route path="/match"element={<MatchList/> } /> 
-        <Route path="/messages"element={<Messages /> } /> 
-        <Route path="/chat" element={<Chat /> } /> 
-      {/**/ }<Route path="/homepage" element ={<Afterlogin /> } />   
+        <Route path="/homepage" element ={<Afterlogin /> }/>   {/*Val efter inloggning*/ }   
+        <Route path="/account" element={<AccountPage/> } /> {/* "Kontosidan"*/}
+        <Route path="/match"element={<MatchList/> } />  {/* Matchsidan*/ }
+        <Route path="/messages"element={<Messages /> } /> {/* Förfrågningar,chattoption*/ }
+        <Route path="/chat" element={<Chat /> } /> {/* "Chatt"*/}
+   
       <Route path="/Findpartner" element ={ <SearchHere /> } /> 
         <Route path="/chat/:chatRoomId" element={<Chat />} /> {/* enskilda chatten */}
         <Route path="/shop" element={<Shop /> } /> {/* Affären */}

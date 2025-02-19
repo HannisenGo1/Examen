@@ -40,7 +40,6 @@ export const validateFormData = (step: number, formData: any) => {
   }
 
   if (step >= 6) {  
-    if (!formData.photo) errors.photo = 'Du måste ladda upp en bild.';
     if (!formData.favoriteSong) errors.favoriteSong = 'Favorit låt är obligatoriskt.'; 
     if (!formData.favoriteMovie) errors.favoriteMovie = 'Favorit film är obligatoriskt.'; 
   }

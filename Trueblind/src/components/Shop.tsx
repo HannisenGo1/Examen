@@ -7,6 +7,7 @@ import nalle1 from '../img/imgProdukter/nalle1.png';
 import nalle2 from '../img/imgProdukter/nalle2.png';
 import heart from '../img/imgProdukter/heart.png';
 import { VipUser } from './VipUser';  
+import  {Vipinformation } from './Vipinfo';
 
 export const Shop = () => {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ export const Shop = () => {
   const getUserStorageKey = (userId: string, key: string) => `${key}-${userId}`;
   const [promoCode, setPromoCode] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
 
   if (!user) {
     const storedUser = localStorage.getItem('user');
@@ -26,6 +28,8 @@ export const Shop = () => {
   if (!user) return <p>Laddar...</p>;
 
   const credits = user.credits || 0;
+  
+
 
   // använda för att få gratis 1000 krediter. 
   const handlePromoCode = () => {
@@ -52,6 +56,11 @@ export const Shop = () => {
       setErrorMessage("Ogiltig kod. Försök igen.");
     }
   };
+
+  const toggleOpenInfo = () => {
+    setIsOpen(!isOpen);
+  };
+
 
   // Hantering av köp -> VIP
   const handleVIPPurchase = () => {
@@ -144,6 +153,15 @@ export const Shop = () => {
       <div className="emoji-purchased">
         <p>Din kredit: {credits}</p>
       </div>
+      <button className="vipinfobtn"onClick={toggleOpenInfo}> VIP information
+      <span className={`arrow ${isOpen ? 'open' : ''}`} onClick={toggleOpenInfo}>
+          &#9660;
+        </span>
+        </button>
+        {isOpen  && (
+  <Vipinformation />
+)}
+
  <div className="buybtncontainer">
       <VipUser user={user} onVIPPurchase={handleVIPPurchase} /> 
 
@@ -158,8 +176,9 @@ export const Shop = () => {
           60 krediter, 119.90 kronor
         </button>
         <button onClick={() => handleAddCredits(100)} className="shopBtn">
-          100 krediter, 189.90 kronor
+          100 krediter, 179.90 kronor
         </button>
+
       </div>
 {/* Promo code section */}
 <div className="promo-code-section">

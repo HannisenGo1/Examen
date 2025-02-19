@@ -125,7 +125,7 @@ const [message,setMessage] = useState('')
       </h2>
       {isOpen && (
         <div className="columndiv2">
-          <p>
+          <p className="capitalize-first-letter::first-letter">
             <strong>Ditt namn: {user.firstName}</strong>
           </p>
 
@@ -134,7 +134,7 @@ const [message,setMessage] = useState('')
  
           </p>
 
-          <p>
+          <p className="capitalize-first-letter::first-letter">
             <strong>Stad:</strong>
             {isEditing.city ? (
               <input
@@ -152,7 +152,7 @@ const [message,setMessage] = useState('')
             )}
           </p>
 
-          <p>
+          <p className="capitalize-first-letter::first-letter">
             <strong>Sexuell läggning:</strong>
             {isEditing.sexualOrientation ? (
               <input
@@ -169,6 +169,7 @@ const [message,setMessage] = useState('')
               </>
             )}
           </p>
+          <button className=""> Radera ditt konto </button> 
 
             <button type="submit" className="accountBtn"onClick={handleSubmit} >
             Spara

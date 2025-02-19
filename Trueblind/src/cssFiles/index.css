@@ -53,3 +53,7 @@ p{
 .columndiv strong {
   color: #000000; 
 }
+
+.capitalize-first-letter::first-letter {
+  text-transform: uppercase;
+}

@@ -1,13 +1,13 @@
 import logga from '../img/logga.png';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../storage/storage';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export const Messages = () => {
   const { requests, likedUsers, acceptMessageRequest, removeLikedUser, activeChats } = useUserStore();
   const navigate = useNavigate();
   const { user } = useUserStore();
-
+  const [filteredRequests, setFilteredRequests] = useState<any[]>([]);
   const backsite = () => {
     navigate('/account');
   };
@@ -18,18 +18,17 @@ export const Messages = () => {
       console.log("No user available.");
       return;
     }
-  
+
     const userStorageKey = `${userId}-requests`;
-    const storedRequests = localStorage.getItem(userStorageKey);
-    
-    if (storedRequests) {
-      const parsedRequests = JSON.parse(storedRequests);
-      const uniqueRequests = Array.from(new Set(parsedRequests.map((req: any) => req.senderId)))
-        .map((senderId) => parsedRequests.find((req: any) => req.senderId === senderId));
-      console.log('Unika förfrågningar:', uniqueRequests);
-    } else {
-      console.log("No requests found in localStorage");
-    }
+    const storedRequests = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
+
+    // Filtrera bort dubbletter baserat på senderId
+    const uniqueRequests = Array.from(new Set(storedRequests.map((req: any) => req.senderId)))
+      .map((senderId) => storedRequests.find((req: any) => req.senderId === senderId));
+
+    console.log('Unika förfrågningar:', uniqueRequests);
+
+    setFilteredRequests(uniqueRequests);
   }, [user]);
 
 
@@ -87,9 +86,10 @@ export const Messages = () => {
       </div>
   
       <div className="columndiv2">
+        
         <p> Meddelande förfrågningar </p>
-  
-        {(requests && requests.length === 0) ? (
+    {(requests && requests.length === 0) ? (
+      
           <p>Inga nya meddelanden.</p>
         ) : (
           requests && requests.filter(request => request.status === 'pending').map((request, index) => {
@@ -97,11 +97,11 @@ export const Messages = () => {
             if (!sender) return null;
   
             return (
-              <div key={`${request.senderId}-${index}`}>
+              <div className="columndiv2" key={`${request.senderId}-${index}`}>
                 <p>{sender.firstName} vill chatta med dig!</p>
-                <p>Status: {request.status}</p>
+               
                 {request.status === 'pending' && (
-                  <div>
+                  <div >
                     <button onClick={() => handleAccept(request.senderId)}>Acceptera</button>
                     <button onClick={() => handleReject(request.senderId)}>Neka</button>
                   </div>
@@ -113,7 +113,7 @@ export const Messages = () => {
   
 
         <div className="columndiv2">
-          <h2>Aktiva Chattar</h2>
+          <h2>Dina Chattar</h2>
           {activeChats.length === 0 ? (
             <p>Du har inga aktiva chattar.</p>
           ) : (
@@ -122,7 +122,7 @@ export const Messages = () => {
               return (
                 <div className="divForallChats" key={chat.chatRoomId}>
                   <button className="ToChatBtn" onClick={() => navigate(`/chat/${chat.chatRoomId}`)}>
-                    Chatta med {userNames.join(', ')}
+                    {userNames.join(', ')}
                   </button>
                 </div>
               );

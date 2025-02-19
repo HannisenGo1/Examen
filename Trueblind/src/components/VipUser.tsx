@@ -27,7 +27,7 @@ export const VipUser = ({ user, onVIPPurchase }: VipUserProps) => {
 
 
   return (
-    <div className="emoji-purchased">
+    <div className="VIP-purchased">
       {isVIPExpired(user) ? (
         <p>VIP har gått ut.</p>
       ) : (
@@ -40,7 +40,6 @@ export const VipUser = ({ user, onVIPPurchase }: VipUserProps) => {
         </button>
       )}
 
-      <p>VIP går endast att köpa en gång i månaden!</p>
     </div>
   );
 };

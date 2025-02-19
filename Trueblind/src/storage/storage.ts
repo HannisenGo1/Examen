@@ -36,8 +36,11 @@ interface UserStore {
   addMessageToChat: (chatRoomId: string, message: string, senderId: string) => void;
   loadChatsFromStorage: () => void;
   removeMessageFromChat: (chatRoomId: string, messageId: string) => void;
-
   loadUserFromStorage: () => void;
+  deniedUsers: User[];
+  addDenyUsers: (user:User) => void;
+  resetDenyUsers: () => void;
+  loadDeniedUsersFromStorage: () => void;
 }
 
 export const useUserStore = create<UserStore>((set, get) => {
@@ -50,9 +53,11 @@ export const useUserStore = create<UserStore>((set, get) => {
     requests: [],
     searchResults: [],
     activeChats: [],
+    seenUsers: [],
+   deniedUsers:[],
 
     setUser: (userData: User) => {
-      const userId = userData.id || '';
+      const userId = userData.id ?? 'temp-user-id';
       const userStorageKey = getUserStorageKey(userId, 'likedUsers');
       const storedLikedUsers = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
       const storedChats = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'activeChats')) || '[]');
@@ -62,7 +67,11 @@ export const useUserStore = create<UserStore>((set, get) => {
       const storedVIPStatus = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'vipStatus')) || 'false');
       const storedVIPExpiryString = localStorage.getItem(getUserStorageKey(userId, 'vipExpiry'));
       const storedVIPExpiry = storedVIPExpiryString ? Number(storedVIPExpiryString) : null;
+
+      const userDeniedKey = getUserStorageKey(userId, 'deniedUsers');
+      const storedDeniedUsers = JSON.parse(localStorage.getItem(userDeniedKey) || '[]');
     
+      
       set({ 
         user: { 
           ...userData,
@@ -71,11 +80,26 @@ export const useUserStore = create<UserStore>((set, get) => {
           vipStatus: storedVIPStatus || false,
           vipExpiry: storedVIPExpiry,
         }, 
+
         likedUsers: storedLikedUsers, 
         activeChats: storedChats, 
-        requests: storedRequests 
+        requests: storedRequests ,
+        deniedUsers: storedDeniedUsers,
       });
     },
+
+    // Återställ (rensa) listan med nekade användare
+    resetDenyUsers: () => {
+      console.log("Återställer nekade användare:", get().deniedUsers);
+    
+      set({ deniedUsers: [] });
+      const userId = get().user?.id ?? 'temp-user-id';
+      localStorage.removeItem(getUserStorageKey(userId, 'deniedUsers'));
+    
+      console.log("Nekade användare återställda och rensade från Zustand/localStorage.");
+    },
+
+ 
     updateUser: (updatedFields: Partial<User>) => {
       set((state) => {
         if (!state.user) return state;
@@ -111,7 +135,18 @@ export const useUserStore = create<UserStore>((set, get) => {
         return { user: updatedUser };
       });
     },
-
+    addDenyUsers: (user) => {
+      const currentUser = get().user;
+      if (!currentUser) return;
+      const userStorageKey = getUserStorageKey(currentUser.id!, 'deniedUsers');
+      
+      const updatedDeniedUsers = [...get().deniedUsers, user];
+      localStorage.setItem(userStorageKey, JSON.stringify(updatedDeniedUsers));
+      
+      set({ deniedUsers: updatedDeniedUsers });
+      console.log("Uppdaterade nekade användare:", updatedDeniedUsers);
+    },
+    
 
     addLikedUser: (user) => {
       const currentUser = get().user;
@@ -144,33 +179,28 @@ export const useUserStore = create<UserStore>((set, get) => {
     },
 
     sendMessageRequest: (receiverId: string) => {
-      console.log("Skickar meddelandeförfrågan till:", receiverId);
+      const senderId = get().user?.id || 'temp-user-id';
+      const newRequest: Request = {
+        senderId,
+        receiverId,
+        status: 'pending',
+      };
+    
+      const userStorageKey = getUserStorageKey(senderId, 'requests');
+      const storedRequests = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
+      storedRequests.push(newRequest);
+      localStorage.setItem(userStorageKey, JSON.stringify(storedRequests));
+    
+      const receiverStorageKey = getUserStorageKey(receiverId, 'requests');
+      const receiverRequests = JSON.parse(localStorage.getItem(receiverStorageKey) || '[]');
+      receiverRequests.push(newRequest);
+      localStorage.setItem(receiverStorageKey, JSON.stringify(receiverRequests));
+    
       set((state) => {
-          const senderId = state.user?.id || 'temp-user-id';
-  
-          // En ny förfrågan
-          const newRequest = {
-              senderId,
-              receiverId,
-              status: 'pending',
-          };
-  
-          const senderStorageKey = getUserStorageKey(senderId, 'requests');
-          const senderRequestsRaw = localStorage.getItem(senderStorageKey);
-          const senderRequests = senderRequestsRaw ? JSON.parse(senderRequestsRaw) : [];
-          senderRequests.push(newRequest);
-          localStorage.setItem(senderStorageKey, JSON.stringify(senderRequests));
-  
-
-          const receiverStorageKey = getUserStorageKey(receiverId, 'requests');
-          const receiverRequestsRaw = localStorage.getItem(receiverStorageKey);
-          const receiverRequests = receiverRequestsRaw ? JSON.parse(receiverRequestsRaw) : [];
-          receiverRequests.push(newRequest);
-          localStorage.setItem(receiverStorageKey, JSON.stringify(receiverRequests));
-  
-          return { requests: senderRequests };
+        const updatedRequests = [...state.requests, newRequest];
+        return { requests: updatedRequests };
       });
-  },
+    },
   // Acceptera en chat request 
     acceptMessageRequest: (senderId: string) => {
       console.log("Accepterar förfrågan från:", senderId);
@@ -343,10 +373,16 @@ export const useUserStore = create<UserStore>((set, get) => {
       const storedRequestsRaw = localStorage.getItem(userStorageKey);
       console.log("Hämtade data från localStorage:", storedRequestsRaw);
     
-      const storedRequests = storedRequestsRaw ? JSON.parse(storedRequestsRaw) : [];
-      set({ requests: storedRequests });
+      if (storedRequestsRaw) {
+        const storedRequests = JSON.parse(storedRequestsRaw);
+        console.log("Hämtade requests:", storedRequests);
+        set({ requests: storedRequests });
+      } else {
+        console.log("Inga requests hittades.");
+        set({ requests: [] });
+      }
     
-      console.log("State uppdaterad med requests:", storedRequests);
+      console.log("State uppdaterad med requests:", get().requests);
     },
 
     rejectMessageRequest: (senderId: string) => {
@@ -363,7 +399,18 @@ export const useUserStore = create<UserStore>((set, get) => {
   
       set({ requests: updatedRequests });
     },
-
+    loadDeniedUsersFromStorage: () => {
+      const currentUser = get().user;
+      if (!currentUser) return;
+    
+      const userStorageKey = getUserStorageKey(currentUser.id!, 'deniedUsers');
+      const storedDeniedUsers = JSON.parse(localStorage.getItem(userStorageKey) || "[]");
+    
+      console.log("Laddade nekade användare från localStorage vid inloggning:", storedDeniedUsers);
+    
+      set({ deniedUsers: storedDeniedUsers });
+    },
+    
     clearUserData: () => {
       const user = get().user;
       if (user) {
@@ -394,7 +441,7 @@ export const useUserStore = create<UserStore>((set, get) => {
       let updatedPurchasedEmojis = [...currentUser.purchasedEmojis];
     
       if (emojiIndex !== -1) {
-        // öka count med 1
+   
         updatedPurchasedEmojis[emojiIndex].count += 1;
       } else {
         // Om emojin inte finns, lägg till den med count 1

@@ -20,10 +20,11 @@ export const Login= () => {
       useUserStore.getState().loadChatsFromStorage();
       useUserStore.getState().loadRequestsFromStorage();
       useUserStore.getState().loadUserFromStorage(); 
+      useUserStore.getState().loadDeniedUsersFromStorage();
     }
   }, []);
 
-
+  
   useEffect(() => {
     const fetchUsers = async () => {
       try {

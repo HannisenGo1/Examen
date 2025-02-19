@@ -19,7 +19,16 @@
     gap: 10px; 
     
 }
+.vipinfobtn{
+  background-color: transparent;
+  color:black;
 
+  border:none;
+}
+.VIP-purchased{
+  display:flex;
+  flex-direction: column;
+}
 .sent-emoji {
     width: 60px; 
 }
@@ -119,4 +128,12 @@ display:flex;
   .emoji-purchased .emoji-picker2 {
     justify-content: center;
     gap: 10px;
+  }
+
+  .promo-code-section{
+    display:flex;
+    flex-direction: row;
+    width:18em;
+    align-items: center;
+    text-align: center;
   }

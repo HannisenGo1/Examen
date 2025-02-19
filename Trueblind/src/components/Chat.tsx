@@ -20,6 +20,12 @@ export const Chat = () => {
     ? currentChat.userNames[currentChat.userIds.indexOf(user.id) === 0 ? 1 : 0] 
     : "Okänd användare";
     const getUserStorageKey = (userId: string, key: string) => `${key}-${userId}`;
+ 
+
+    const isVip = user?.vipStatus;  
+
+
+
 
     if (!user) {
       return <p>Laddar användardata...</p>;
@@ -67,7 +73,7 @@ export const Chat = () => {
   const handleEmojiClick = (emojiName: string) => {
     console.log("emojiName", emojiName);
   
-    // Ta bort filändelsen och eventuella parametrar
+    // Ta bort filändelsen och  parametrar
     const emojiBaseName = emojiName.split('/').pop()?.split('?')[0].replace('.png', '') || ""; 
     console.log("emojiBaseName:", emojiBaseName);
   
@@ -111,9 +117,8 @@ export const Chat = () => {
       setErrorMessage("Emoji inte hittad i purchasedEmojis.");
     }
   };
-  
-  
 
+  
   
   
     return (
@@ -125,7 +130,9 @@ export const Chat = () => {
         <button className="btnback"onClick={messagesite}>
         <i className="fas fa-arrow-left"></i>
           </button>  </div>
-            <h1 className='Rubriktext2'> Din chatt med {otherUserName}</h1>      
+            <h1 className='Rubriktext2'> Din chatt med {otherUserName}</h1>   
+
+
 
         <div className="chat-container">
    

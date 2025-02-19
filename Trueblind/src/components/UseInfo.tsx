@@ -1,3 +1,5 @@
+
+
 export const Anvandarpolicy = ({ onClose, onAccept }: { onClose: () => void, onAccept: () => void }) => {
     return (
         <> 
@@ -58,6 +60,7 @@ export const Anvandarpolicy = ({ onClose, onAccept }: { onClose: () => void, onA
                         Genom att genomföra betalningar bekräftar 
                         du att du har rätt att använda den betalningsmetoden och att 
                         du accepterar de aktuella betalningsvillkoren.
+                        Ingen återbetalning av krediter.
                     </p>
                 </div>
 

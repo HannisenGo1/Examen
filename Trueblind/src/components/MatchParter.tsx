@@ -4,9 +4,13 @@ import { User } from '../interface/interfaceUser';
 import logga from '../img/logga.png';
 import { useState } from 'react';
 
+// Här är endast för alla man har gillat och kan se
+// sin matchprocent och filtrera genom  filterUsersByMatch!
 export const MatchList = () => {
   const { user, likedUsers, removeLikedUser, sendMessageRequest, requests} = useUserStore();
   const navigate = useNavigate();
+const [selectedRange, setSelectedRange] = useState('all');
+
 
   const backtoaccount = () => {
     navigate('/account');
@@ -14,7 +18,7 @@ export const MatchList = () => {
   const tomessages = () => {
     navigate('/messages');
   };
-  const [selectedRange, setSelectedRange] = useState('all');
+  
 
   const calculateMatch = (likedUser: User) => {
     if (!user) return 0;
