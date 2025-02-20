@@ -19,7 +19,7 @@ const [currentUser,setCurrentUser]= useState(0)
    } = useUserStore();
   const userId = useUserStore((state) => state.user?.id);
   const isVip = user?.vipStatus; 
-  
+
   if (!user) {
     return <p>Du måste vara inloggad för att söka efter partners.</p>;
   }
@@ -36,42 +36,38 @@ const [currentUser,setCurrentUser]= useState(0)
     );
   };
 
-
-
-// användaren ska inte se samma lista mer än en gång, och endast få
-// ut nya users och inte det som man har gjort ett val på.
-const fetchUsers = async (userId: string) => {
-  setLoading(true);
-  
-  if (!userId) {
-    console.error("No user ID found");
-    setLoading(false);
-    return;
-  }
-
-  try {
-    const response = await fetch('http://localhost:3000/users');
-    if (!response.ok) throw new Error('Något gick fel vid hämtning av användare');
-
-    const data = await response.json();
-    
-
-    // Filtrera bort de användare som är gillade eller nekade
-    const filteredUsers = filterLikedAndDeniedUsers(data, likedUsers, deniedUsers);
-
-    setUsers(filteredUsers);
-  } catch (err) {
-    setError('Fel vid hämtning av användare');
-  } finally {
-    setLoading(false);
-  }
-};
   useEffect(() => {
-    if (userId) {
-      fetchUsers(userId);
-    }
-  }, [userId]);
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/users');
+        if (!response.ok) {
+          throw new Error(`HTTP error! ${response.status}`);
+        }
+
+        const userData = await response.json();
+        console.log('Hämtade användare:', userData);
+        const filteredUsers = filterLikedAndDeniedUsers(userData, likedUsers, deniedUsers);
+        setUsers(filteredUsers);
+    } catch (error) {
+        console.error('Fel vid hämtning av användare:', error);
+        setError('Kunde inte hämta användardata.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []); 
   
+
+
+
+// SÖK PARNTER vid VAL.  X  |   <3
+// ut nya users och inte det som man har gjort ett val på,
+// tas det bort från gilla listan så kan man få ut dom igen.
+// Vip - Få ut neka listan 
+// INTE se sitt egna konto som val.   
+
 
   const calculateMatch = (likedUser: User) => {
     if (!user) return 0;
@@ -89,6 +85,11 @@ const fetchUsers = async (userId: string) => {
   };
 
   const filterUsers = () => {
+
+    if (!users || users.length === 0) {
+      console.log("Inga användare att filtrera.");
+      return;
+    }
 
     console.log("Alla användare:", users);
     const normalizedSexualOrientation = yourSexualOrientation;

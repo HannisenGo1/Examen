@@ -1,4 +1,4 @@
-import { FindPartners } from './AccountFindParter';
+import { FindPartners } from './FindParter';
 import logga from '../img/logga.png';
 import { useNavigate } from 'react-router-dom';
 export const SearchHere = () => {

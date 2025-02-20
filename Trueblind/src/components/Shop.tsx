@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUserStore } from '../storage/storage';
 import logga from '../img/logga.png';
 import bukett from '../img/imgProdukter/bukett.png';
@@ -17,18 +17,21 @@ export const Shop = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
-  if (!user) {
+
+  if (!user) return <p>Laddar...</p>;
+
+  useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
       updateUser(parsedUser);
     }
-  }
-
-  if (!user) return <p>Laddar...</p>;
+  }, []);
 
   const credits = user.credits || 0;
-  
+  if (!user || !user.id) {
+    return;
+  }
 
 
   // använda för att få gratis 1000 krediter. 

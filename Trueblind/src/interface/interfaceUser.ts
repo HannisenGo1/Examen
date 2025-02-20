@@ -28,6 +28,7 @@ export type FormData = {
     lifeStatement1: string;
     lifeStatement2:string;
     id?:string;
+
     password: string;
     ommig?:string;
 };
@@ -38,12 +39,13 @@ export interface User {
     lastName?:string;
     age: number;
     city: string;
+    email: string;
     gender: string;
     sexualOrientation: string;
     religion: string;
     lifeStatement1?: string;
     lifeStatement2?:string;
-    id?:string;
+    id:string;
     interests: string[];
     hasChildren: boolean;
     wantsChildren: boolean;

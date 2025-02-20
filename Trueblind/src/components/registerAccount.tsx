@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import {validateFormData, intresseLista} from '../validering'
 import { FormData } from '../interface/interfaceUser';
 import { Anvandarpolicy } from './UseInfo';
-import { doSignUpWithEmailAndPassword } from './data/getUser';
+import { doSignUpWithEmailAndPassword } from './data/UserAuth';
 
 export const Register = () => {
     const navigate = useNavigate();

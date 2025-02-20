@@ -3,6 +3,9 @@ import logga from '../img/logga.png';
 import { useUserStore } from '../storage/storage';
 import { useNavigate } from 'react-router-dom';
 import { FaPen } from 'react-icons/fa';
+import { auth } from "../data/firebase";
+import { DeleteUser } from './data/UserAuth';
+
 
 
 export const AccountPage = () => {
@@ -59,6 +62,28 @@ const [message,setMessage] = useState('')
     }));
   };
 
+  // lägga till en " är du säker innan, "
+  // JA / NEJ
+  // information: Om du raderar kontot så kommer allt att försvinna. 
+  const deleteAccount = async () => {
+    try {
+      if (!auth.currentUser) {
+        console.error("Ingen användare inloggad!");
+        return;
+      }
+      await DeleteUser(auth.currentUser.uid);
+      alert("Ditt konto har raderats");
+    } catch (error) {
+      console.error("Misslyckades att radera kontot:", error);
+    }
+  }
+
+  const doSignOut = async () => {
+    await auth.signOut();
+    useUserStore.getState().resetUser(); 
+    console.log("Har loggats ut!");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("Ändringarna har sparats!"); 
@@ -100,7 +125,7 @@ const [message,setMessage] = useState('')
       </button> </div> 
 
       <div className="result-info"> 
-  <button onClick={() => navigate('/')} className="btnmatchsite">
+  <button onClick={doSignOut} className="btnmatchsite">
           Logga ut
         </button> </div> 
   
@@ -169,7 +194,7 @@ const [message,setMessage] = useState('')
               </>
             )}
           </p>
-          <button className=""> Radera ditt konto </button> 
+          <button className="" onClick={deleteAccount}> Radera ditt konto </button> 
 
             <button type="submit" className="accountBtn"onClick={handleSubmit} >
             Spara

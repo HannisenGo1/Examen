@@ -1,13 +1,14 @@
-import { getDoc, doc, setDoc, getFirestore  } from "firebase/firestore";
+import { getDoc, doc, setDoc, getFirestore,deleteDoc  } from "firebase/firestore";
 import { auth } from "../../data/firebase";
 import { FirebaseError } from "firebase/app";
 import { createUserWithEmailAndPassword,
  sendEmailVerification, signInWithEmailAndPassword, updatePassword } from "firebase/auth";
+ import { deleteUser as deleteAuthUser } from "firebase/auth";
+import { useUserStore } from "../../storage/storage";
+import { User } from "../../interface/interfaceUser";
  const db = getFirestore()
 
- //Firebase Authentication
-
-  
+ //Firebase Authentication för registering av en användare
   export const doSignUpWithEmailAndPassword = async (formData: any) => {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
@@ -15,7 +16,7 @@ import { createUserWithEmailAndPassword,
         const userDocRef = doc(db, "users", user.uid);
 
         await setDoc(userDocRef, { 
-            uid: user.uid,
+            id: user.uid,
             email: formData.email,
             firstName: formData.firstName,
             lastName: formData.lastName,
@@ -46,30 +47,85 @@ import { createUserWithEmailAndPassword,
     }
 };
   
-    //  Logga in användaren med Firebase Authentication
-export const doSignInWithEmailAndPassword = async (email: string, password: string) => {
-    try {
-    
+    //  Logga in med Firebase Auth -> email och lösenord
+    export const doSignInWithEmailAndPassword = async (email: string, password: string) => {
+      try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-
+    
         const userDocRef = doc(db, "users", user.uid);
         const userDocSnap = await getDoc(userDocRef);
-
+    
         if (userDocSnap.exists()) {
-            const userData = userDocSnap.data();
-            console.log("✅ Inloggning lyckades! Användardata:", userData);
-            return { ...userData, uid: user.uid }; 
+          const userData = userDocSnap.data();
+          console.log("Inloggning lyckades! Användardata:", userData);
+    
+          useUserStore.getState().setUser({
+            id: user.uid,  
+            firstName: userData.firstName || "Okänd",
+            lastName: userData.lastName || "Ej angivet",
+            email: userData.email || "",
+            age: userData.age || 0,
+            city: userData.city || "Ej angivet",
+            gender: userData.gender || "Ej angivet",
+            sexualOrientation: userData.sexualOrientation || "Ej angivet",
+            religion: userData.religion || "Ej angivet",
+            interests: userData.interests || [],
+            hasChildren: userData.hasChildren || false,
+            wantsChildren: userData.wantsChildren || false,
+            smokes: userData.smokes || "Ej angivet",
+            relationshipStatus: userData.relationshipStatus || "Ej angivet",
+            education: userData.education || "Ej angivet",
+            favoriteSong: userData.favoriteSong || "Ej angivet",
+            favoriteMovie: userData.favoriteMovie || "Ej angivet",
+            lifeStatement1: userData.lifeStatement1 || "Ej angivet",
+            lifeStatement2: userData.lifeStatement2 || "Ej angivet",
+            ommig: userData.ommig || "Ej angivet",
+            credits: userData.credits || 0,
+            purchasedEmojis: userData.purchasedEmojis || [],
+            vipStatus: userData.vipStatus || false,
+            vipExpiry: userData.vipExpiry || null,
+    
+            purchaseEmoji: (emoji: string, cost: number) => {
+              console.log("Köp Emoji:", emoji, cost);
+            },
+            updateUser: (updatedFields: Partial<User>) => {
+    
+              console.log("Uppdatera användare:", updatedFields);
+            },
+            addCredits: (amount: number) => {
+              console.log("Lägg till krediter:", amount);
+            },
+          });
+    
+          return { ...userData, id: user.uid };  
         } else {
-            throw new Error("Användarens data finns inte i Firestore.");
+          console.error("Användardata finns inte i Firestore");
+          throw new Error("Användardata finns inte i Firestore.");
         }
-    } catch (error: any) {
-        console.error("❌ Inloggning misslyckades:", error.message);
+      } catch (error: any) {
+        console.error(" Inloggning misslyckades:", error.message);
         return error.message;
+      }
+    };
+    
+// Radera sitt konto 
+export async function DeleteUser(usersId: string): Promise<void> {
+  try {
+   
+    const userDoc = doc(db, "users", usersId);
+    await deleteDoc(userDoc);
+    console.log("Användare raderad från Firestore");
+    const user = auth.currentUser;
+    if (user && user.uid === usersId) {
+      await deleteAuthUser(user);
+      console.log("Användare raderad från Authentication");
     }
-};
-
-
+  } catch (error) {
+    console.error("Fel vid borttagning av användare:", error);
+    throw error;
+  }
+}
 
   export const doSignOut = (): Promise<void> => {
     return auth.signOut();

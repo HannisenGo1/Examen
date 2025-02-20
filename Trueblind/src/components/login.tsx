@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../storage/storage';
 import logga from '../img/logga.png';
 import ForgotPassword from './auth/ForgotPassword';
-import { doSignInWithEmailAndPassword } from './data/getUser';
+import { doSignInWithEmailAndPassword } from './data/UserAuth';
 
 
 export const Login= () => {
@@ -36,6 +36,7 @@ export const Login= () => {
 
         const userData = await response.json();
         setUsers(userData); 
+        useUserStore.getState().setUser(userData);
         console.log('Hämtade användare:', userData);
 
       } catch (error) {
@@ -65,6 +66,7 @@ export const Login= () => {
             vipStatus: storedVIPStatus,
             vipExpiry: storedVIPExpiry,
         };
+        useUserStore.getState().setUser(userData); 
 
         useUserStore.getState().setUser(updatedUser);
         useUserStore.getState().loadRequestsFromStorage();

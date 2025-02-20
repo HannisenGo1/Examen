@@ -57,6 +57,7 @@ export const useUserStore = create<UserStore>((set, get) => {
    deniedUsers:[],
 
     setUser: (userData: User) => {
+      console.log("Sätter användare:", userData);
       const userId = userData.id ?? 'temp-user-id';
       const userStorageKey = getUserStorageKey(userId, 'likedUsers');
       const storedLikedUsers = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
@@ -146,7 +147,7 @@ export const useUserStore = create<UserStore>((set, get) => {
       set({ deniedUsers: updatedDeniedUsers });
       console.log("Uppdaterade nekade användare:", updatedDeniedUsers);
     },
-    
+
 
     addLikedUser: (user) => {
       const currentUser = get().user;
@@ -339,6 +340,7 @@ export const useUserStore = create<UserStore>((set, get) => {
 
     loadUserFromStorage: () => {
       const storedUser = localStorage.getItem('user');
+      console.log("Hämtad användare från localStorage:", storedUser);
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
         
@@ -435,8 +437,9 @@ export const useUserStore = create<UserStore>((set, get) => {
       }
     
       const updatedCredits = currentUser.credits - price;
-    
+       // Om emojin inte finns, lägg till den med count 1
       // Kontrollera om emojin redan finns
+
       const emojiIndex = currentUser.purchasedEmojis.findIndex((e) => e.emoji === emoji);
       let updatedPurchasedEmojis = [...currentUser.purchasedEmojis];
     
@@ -444,7 +447,7 @@ export const useUserStore = create<UserStore>((set, get) => {
    
         updatedPurchasedEmojis[emojiIndex].count += 1;
       } else {
-        // Om emojin inte finns, lägg till den med count 1
+     
         updatedPurchasedEmojis.push({ emoji, count: 1 });
       }
     
