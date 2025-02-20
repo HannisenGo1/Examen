@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import {validateFormData, intresseLista} from '../validering'
 import { FormData } from '../interface/interfaceUser';
 import { Anvandarpolicy } from './UseInfo';
+import { doSignUpWithEmailAndPassword } from './data/getUser';
 
 export const Register = () => {
     const navigate = useNavigate();
@@ -121,30 +122,23 @@ export const Register = () => {
         }
     
         try {
-            console.log('Skickar till API:', JSON.stringify(formData));
-            
-            const response = await fetch('http://localhost:3000/users', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-    
-            const text = await response.text();
-    
-            if (response.ok) {
+            const success = await doSignUpWithEmailAndPassword(formData);
+     
+            if (success === true) {
                 setIsRegistered(true);
             } else {
-                setErrors({ general: text || 'Något gick fel vid registreringen.' });
+                setErrors({ general: success }); 
             }
         } catch (error) {
-            console.error('Fel vid begäran:', error);
-            setErrors({ general: 'Ett fel vid registreringen.' });
+            console.error('Fel vid registrering:', error);
+            setErrors({ general: 'Ett fel uppstod vid registrering.' });
         }
     };
     
     
+    // public sitekey rechapta google:
+    //6Lc34dwqAAAAAMalcXHywK0joU217Ftkt2uSOaMB
+
     const goBackToHome = () => {
         navigate('/');
     };

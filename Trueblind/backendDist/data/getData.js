@@ -1,4 +1,4 @@
-import { collection, getDocs, getDoc, addDoc, deleteDoc, updateDoc, doc } from "firebase/firestore/lite";
+import { collection, getDocs, getDoc, addDoc, query, deleteDoc, updateDoc, where, doc } from "firebase/firestore/lite";
 import { db } from "./firebase.js";
 const userCollection = collection(db, "users");
 export async function GetUser() {
@@ -36,6 +36,20 @@ export async function UpdateUser(userId, updatedData) {
         throw error;
     }
 }
+export async function GetUserByNameOrEmail(email) {
+    try {
+        const emailQuery = query(userCollection, where("email", "==", email));
+        const emailSnapshot = await getDocs(emailQuery);
+        if (!emailSnapshot.empty) {
+            return { email: true };
+        }
+        return null;
+    }
+    catch (error) {
+        console.error("Fel vid sökning av användare:", error);
+        throw new Error("Fel vid sökning av användare");
+    }
+}
 export async function GetUserById(userId) {
     const userDoc = doc(db, "users", userId);
     const snapshot = await getDoc(userDoc);
@@ -50,7 +64,7 @@ export async function DeleteUser(usersId) {
         await deleteDoc(user);
     }
     catch (error) {
-        console.error("Fel vid borttagning av jobbannons:", error);
+        console.error("Fel vid borttagning av användare:", error);
         throw error;
     }
 }

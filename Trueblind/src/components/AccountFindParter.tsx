@@ -26,20 +26,15 @@ const [currentUser,setCurrentUser]= useState(0)
 
   const { gender: yourGender, sexualOrientation: yourSexualOrientation, id: yourId } = user;
 
-  const seenUsersKey = `seenUsers-${user.id}`;
-
   const getUserStorageKey = (userId: string, key: string) => `${key}-${userId}`;
 
   
-  
-  const filterNewUsers = (filteredUsers: User[]) => {
-    return filteredUsers.filter((user) => 
-      user.id &&
-      !likedUsers.some(likedUser => likedUser.id === user.id) &&
+  const filterLikedAndDeniedUsers = (users: User[], likedUsers: User[], deniedUsers: User[]): User[] => {
+    return users.filter(user => 
+      !likedUsers.some(likedUser => likedUser.id === user.id) && 
       !deniedUsers.some(deniedUser => deniedUser.id === user.id)
     );
   };
-  
 
 
 
@@ -60,14 +55,9 @@ const fetchUsers = async (userId: string) => {
 
     const data = await response.json();
     
-    const savedSeenUsers = JSON.parse(localStorage.getItem(seenUsersKey) || '[]');
 
-    const filteredUsers = data.filter((user: User) => 
-      user.id &&
-      !savedSeenUsers.includes(user.id) &&
-      !likedUsers.some(likedUser => likedUser.id === user.id) &&
-      !nekadUser.some(deniedUser => deniedUser.id === user.id)
-    );
+    // Filtrera bort de användare som är gillade eller nekade
+    const filteredUsers = filterLikedAndDeniedUsers(data, likedUsers, deniedUsers);
 
     setUsers(filteredUsers);
   } catch (err) {
@@ -76,7 +66,6 @@ const fetchUsers = async (userId: string) => {
     setLoading(false);
   }
 };
-
   useEffect(() => {
     if (userId) {
       fetchUsers(userId);
@@ -100,6 +89,8 @@ const fetchUsers = async (userId: string) => {
   };
 
   const filterUsers = () => {
+
+    console.log("Alla användare:", users);
     const normalizedSexualOrientation = yourSexualOrientation;
 
     const filteredUsers = users.filter((user: User) => {
@@ -137,8 +128,7 @@ const fetchUsers = async (userId: string) => {
       return isCityMatch && isGenderMatch && isReligionMatch && isNotDenied;;
       
     });
-
-    const newUsers = filterNewUsers(filteredUsers);
+    console.log(" Filterade resultat:", filteredUsers);
     setMatchingResults(filteredUsers);
     setCurrentUser(0); 
   };

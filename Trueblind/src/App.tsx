@@ -9,7 +9,7 @@ import { Chat } from "./components/Chat";
 import { Afterlogin } from "./components/Afterlogin";
 import { SearchHere } from "./components/SearchPartner";
 import { Shop } from "./components/Shop";
-
+//import { AuthProvider } from './components/auth/Email';
 
 function App() {
   return (
@@ -17,6 +17,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Frontpage />} /> {/*  "Framsidan" */}
         <Route path="/register" element={<Register />} /> {/* "Registreringssidan" */}
+
+     
+        
+      
         <Route path="/login" element={<Login/> } /> {/*  "Log in " */}
         <Route path="/homepage" element ={<Afterlogin /> }/>   {/*Val efter inloggning*/ }   
         <Route path="/account" element={<AccountPage/> } /> {/* "Kontosidan"*/}

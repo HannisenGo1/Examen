@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import { useUserStore } from '../storage/storage';
 import logga from '../img/logga.png';
-
+import ForgotPassword from './auth/ForgotPassword';
+import { doSignInWithEmailAndPassword } from './data/getUser';
 
 
 export const Login= () => {
@@ -45,36 +46,37 @@ export const Login= () => {
 
     fetchUsers();
   }, []); 
-  const handleSubmit = (e: React.FormEvent) => {
+  
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
-    const foundUser = users.find(user => user.email === email && user.password === password);
-  
-    if (foundUser) {
-      console.log('Inloggad:', foundUser);
-  
-      const userId = foundUser.id;
-  
-      const storedVIPStatus = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'vipStatus')) || 'false');
-      const storedVIPExpiryString = localStorage.getItem(getUserStorageKey(userId, 'vipExpiry'));
-      const storedVIPExpiry = storedVIPExpiryString ? Number(storedVIPExpiryString) : null;
-  
-      const updatedUser = {
-        ...foundUser,
-        vipStatus: storedVIPStatus,
-        vipExpiry: storedVIPExpiry,
-      };
-  
-      useUserStore.getState().setUser(updatedUser);
-      useUserStore.getState().loadRequestsFromStorage();
-      useUserStore.getState().loadChatsFromStorage();
-  
-      setError('');
-      navigate('/homepage');
-    } else {
-      setError('Fel e-post eller lösenord.');
+
+    try {
+        const userData = await doSignInWithEmailAndPassword(email, password);
+
+        console.log(" Inloggad som:", userData);
+
+        const userId = userData.uid;
+        const storedVIPStatus = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'vipStatus')) || 'false');
+        const storedVIPExpiryString = localStorage.getItem(getUserStorageKey(userId, 'vipExpiry'));
+        const storedVIPExpiry = storedVIPExpiryString ? Number(storedVIPExpiryString) : null;
+
+        const updatedUser = {
+            ...userData, 
+            vipStatus: storedVIPStatus,
+            vipExpiry: storedVIPExpiry,
+        };
+
+        useUserStore.getState().setUser(updatedUser);
+        useUserStore.getState().loadRequestsFromStorage();
+        useUserStore.getState().loadChatsFromStorage();
+
+        setError('');
+        navigate('/homepage'); 
+    } catch (error) {
+        console.error('❌ Fel vid inloggning:', error);
+        setError('Fel e-post eller lösenord.');
     }
-  };
+};
 
   return (
     <> 
@@ -84,7 +86,7 @@ export const Login= () => {
       <h2 className="login-header">Logga in</h2>   
       <div className="login-container">
 
-        
+   
         <form className="form-login"onSubmit={handleSubmit}>
           <div className="input-group">
             <label htmlFor="email">E-post</label>
@@ -106,7 +108,7 @@ export const Login= () => {
               required
             />
           </div>
-          <button className="justtextbtn">Glömt lösenord</button>
+          <ForgotPassword  /> 
           <button type="submit" className="login-button">Logga in</button>
         </form>
   

@@ -3,20 +3,22 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-"scripts": {
-  "dev": "vite",
-"backend": "tsc --project tsconfig.backend.json && node --env-file .env ./backendDist/server.js",
+  "scripts": {
+    "dev": "vite",
+    "backend": "tsc --project tsconfig.backend.json && node --env-file .env ./backendDist/server.js",
     "build-backend": "tsc --project tsconfig.backend.json",
-    "start-backend": "node --env-file .env ./backendDist/server.js",
+    "start-backend": "node -r dotenv/config ./backendDist/server.js",
     "build-frontend": "tsc -b && vite build",
     "build": "npm run build-frontend && npm run build-backend",
     "lint": "eslint .",
     "preview": "vite preview"
-},
+  },
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "firebase": "^11.2.0",
+    "firebase-admin": "^13.1.0",
     "joi": "^17.13.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

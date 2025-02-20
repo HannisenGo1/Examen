@@ -1,6 +1,8 @@
 import express, { Express, Request, Response, NextFunction } from "express";
-import { GetUser, AddUser, UpdateUser, GetUserById} from "./data/getData.js";
-
+import { GetUser, AddUser, UpdateUser, GetUserById,DeleteUser} from "./data/getData.js";
+import {router as auth} from './data/admin.js'
+import { config } from 'dotenv';
+config();
 const app: Express = express();
 const port = process.env.PORT || 3000;
 
@@ -15,6 +17,7 @@ app.use('/', (req: Request, _, next: NextFunction) => {
     next();
   });
 
+  app.use('/users', auth)
 
   app.get("/users", async (_, res: Response) => {
     try {
@@ -52,6 +55,18 @@ app.patch('/users/:id', async (req: Request, res: Response) => {
   }
 });
 
+// Ta bort en användare
+app.delete('/users/:id', async (req: Request, res: Response) => {
+  const userId = req.params.id;
+
+  try {
+      await DeleteUser(userId);  
+      res.status(200).json({ message: "User deleted" });  
+  } catch (error) {
+      console.error('Error deleting user:', error);
+      res.status(500).json({ message: 'Failed to delete user' });  
+  }
+});
 
 // 404 Middleware (om ingen route matchar)
 app.use((_: any, res: Response) => {
