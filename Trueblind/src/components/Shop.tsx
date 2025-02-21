@@ -6,8 +6,23 @@ import bukett from '../img/imgProdukter/bukett.png';
 import nalle1 from '../img/imgProdukter/nalle1.png';
 import nalle2 from '../img/imgProdukter/nalle2.png';
 import heart from '../img/imgProdukter/heart.png';
-import { VipUser } from './VipUser';  
-import  {Vipinformation } from './Vipinfo';
+import {VipUser} from './VipUser';  
+import {Vipinformation } from './Vipinfo';
+
+
+// premium funktion ( VIP) för 99.90kronor / månaden, = 60 krediter.
+// Vip plus ( 179.90) = 100 krediter
+//VIP och VIP Plus:
+
+//VIP för 99,90 SEK / månad – Inkludera de grundläggande funktionerna som:
+// * Återställa nekade användare.
+//* Få tillgång till premium emojis.
+//* Se all information om en användare vid sökning.
+//VIP Plus för 179,90 SEK / månad – För större funktioner, t.ex.:
+//Prioriterad support.
+//Möjlighet att skicka fler emojis.
+// endast se > 40% matchning och uppåt.
+//Andra exklusiva funktioner du kan komma på.
 
 export const Shop = () => {
   const navigate = useNavigate();
@@ -67,7 +82,7 @@ export const Shop = () => {
 
   // Hantering av köp -> VIP
   const handleVIPPurchase = () => {
-    if (credits < 100) {
+    if (credits < 60) {
       console.log("Du har inte tillräckligt med krediter för VIP!");
       return;
     }
@@ -78,9 +93,9 @@ export const Shop = () => {
   
     const updatedUser = {
       ...user,
-      credits: credits - 100 + 30, 
+      credits: credits - 60 + 30, 
       vipStatus: true,
-       // VIP 30 dagar framåt
+      
       vipExpiry: Date.now() + 30 * 24 * 60 * 60 * 1000,
     };
   
@@ -88,6 +103,30 @@ export const Shop = () => {
   
     localStorage.setItem('user', JSON.stringify(updatedUser));
   };
+
+// VIP + STATUS:::
+const handleVIPPlusPurchase = () => {
+  if (credits < 100) {
+    console.log("Du har inte tillräckligt med krediter för VIP Plus!");
+    return;
+  }
+  if (!user || !user.id) {
+    console.error("User or user.id is undefined");
+    return;
+  }
+
+  const updatedUser = {
+    ...user,
+    credits: credits - 100, 
+    vipPlusStatus: true,  
+    vipPlusExpiry: Date.now() + 30 * 24 * 60 * 60 * 1000,
+  };
+
+  updateUser(updatedUser);
+
+  localStorage.setItem('user', JSON.stringify(updatedUser));
+};
+
 
   const emojis = [
     { name: "nalle1", src: nalle1, price: 3 },
@@ -163,11 +202,14 @@ export const Shop = () => {
         </button>
         {isOpen  && (
   <Vipinformation />
+
 )}
 
  <div className="buybtncontainer">
       <VipUser user={user} onVIPPurchase={handleVIPPurchase} /> 
-
+      <button onClick={handleVIPPlusPurchase} className="shopBtn">
+  VIP Plus - 179.90 SEK / mån (100 krediter)
+</button>
      
         <button onClick={() => handleAddCredits(10)} className="shopBtn">
           10 krediter, 22.90 kronor
@@ -176,10 +218,10 @@ export const Shop = () => {
           30 krediter, 64.90 kronor
         </button>
         <button onClick={() => handleAddCredits(60)} className="shopBtn">
-          60 krediter, 119.90 kronor
+          60 krediter, 92.90 kronor
         </button>
         <button onClick={() => handleAddCredits(100)} className="shopBtn">
-          100 krediter, 179.90 kronor
+          100 krediter, 149.90 kronor
         </button>
 
       </div>

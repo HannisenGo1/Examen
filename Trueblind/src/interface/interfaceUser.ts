@@ -28,7 +28,6 @@ export type FormData = {
     lifeStatement1: string;
     lifeStatement2:string;
     id?:string;
-
     password: string;
     ommig?:string;
 };
@@ -64,6 +63,8 @@ export interface User {
     vipStatus: boolean;
     vipExpiry?: number | null; 
     hasUsedPromoCode?:boolean;
+    vipPlusStatus?:boolean;
+    vipPlusExpiry?: number | null;
   }
   
   export interface SearchResult {

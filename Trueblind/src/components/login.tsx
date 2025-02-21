@@ -10,7 +10,6 @@ export const Login= () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [users, setUsers] = useState<any[]>([]); 
   const navigate = useNavigate(); 
 
   const getUserStorageKey = (userId: string, key: string) => `${key}-${userId}`;
@@ -26,59 +25,56 @@ export const Login= () => {
   }, []);
 
   
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/users');
-        if (!response.ok) {
-          throw new Error(`HTTP error! ${response.status}`);
-        }
-
-        const userData = await response.json();
-        setUsers(userData); 
-        useUserStore.getState().setUser(userData);
-        console.log('Hämtade användare:', userData);
-
-      } catch (error) {
-        console.error('Fel vid hämtning av användare:', error);
-        setError('Kunde inte hämta användardata.');
-      }
-    };
-
-    fetchUsers();
-  }, []); 
-  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-        const userData = await doSignInWithEmailAndPassword(email, password);
+     
+      const userData = await doSignInWithEmailAndPassword(email, password);
+      const userId = userData.uid;
 
-        console.log(" Inloggad som:", userData);
+      const storedVIPStatus = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'vipStatus')) || 'false');
+      const storedVIPExpiryString = localStorage.getItem(getUserStorageKey(userId, 'vipExpiry'));
+      const storedVIPExpiry = storedVIPExpiryString ? Number(storedVIPExpiryString) : null;
 
-        const userId = userData.uid;
-        const storedVIPStatus = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'vipStatus')) || 'false');
-        const storedVIPExpiryString = localStorage.getItem(getUserStorageKey(userId, 'vipExpiry'));
-        const storedVIPExpiry = storedVIPExpiryString ? Number(storedVIPExpiryString) : null;
+      const updatedUser = {
+        ...userData,
+        vipStatus: storedVIPStatus,
+        vipExpiry: storedVIPExpiry,
+      };
 
-        const updatedUser = {
-            ...userData, 
-            vipStatus: storedVIPStatus,
-            vipExpiry: storedVIPExpiry,
+    
+      useUserStore.getState().setUser(updatedUser); 
+
+      const usersFromStorage = useUserStore.getState().users;
+      if (usersFromStorage.length === 0) {
+        const fetchUsers = async () => {
+          try {
+            const response = await fetch('http://localhost:3000/users');
+            if (!response.ok) {
+              throw new Error(`HTTP error! ${response.status}`);
+            }
+
+            const userData = await response.json();
+            useUserStore.getState().setAllUsers(userData);
+
+          } catch (error) {
+            console.error('Fel vid hämtning av användare:', error);
+            setError('Kunde inte hämta användardata.');
+          }
         };
-        useUserStore.getState().setUser(userData); 
+        fetchUsers();
+      }
+      useUserStore.getState().loadRequestsFromStorage();
+      useUserStore.getState().loadChatsFromStorage();
 
-        useUserStore.getState().setUser(updatedUser);
-        useUserStore.getState().loadRequestsFromStorage();
-        useUserStore.getState().loadChatsFromStorage();
-
-        setError('');
-        navigate('/homepage'); 
+      setError('');
+      navigate('/homepage'); 
     } catch (error) {
-        console.error('❌ Fel vid inloggning:', error);
-        setError('Fel e-post eller lösenord.');
+      console.error(' Fel vid inloggning:', error);
+      setError('Fel e-post eller lösenord.');
     }
-};
+  };
 
   return (
     <> 

@@ -2,13 +2,12 @@ import { useState} from 'react';
 
 interface EditInterestsProps {
   intresseLista: string[];
-  handleInterestUpdate: (updatedInterests: string[]) => void;
+
   initialInterests: string[];
 }
 
 export const EditInterests = ({
   intresseLista,
-  handleInterestUpdate,
   initialInterests,
 }: EditInterestsProps) => {
   const [updatedInterests, setUpdatedInterests] = useState<string[]>(initialInterests);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useUserStore } from '../storage/storage';
 import { User } from '../interface/interfaceUser';
-import {isVIPExpired}  from './VipUser'
+// import {isVIPExpired}  from './VipUser'
 
 export const FindPartners = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -15,9 +15,9 @@ export const FindPartners = () => {
 const [currentUser,setCurrentUser]= useState(0)
   const [nekadUser, setNekadUser] = useState<User[]>([]);
   const { user, likedUsers, addLikedUser,
-    deniedUsers, resetDenyUsers,addDenyUsers 
+    deniedUsers, resetDenyUsers,addDenyUsers,
    } = useUserStore();
-  const userId = useUserStore((state) => state.user?.id);
+  //const userId = useUserStore((state) => state.user?.id);
   const isVip = user?.vipStatus; 
 
   if (!user) {
@@ -37,29 +37,16 @@ const [currentUser,setCurrentUser]= useState(0)
   };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/users');
-        if (!response.ok) {
-          throw new Error(`HTTP error! ${response.status}`);
-        }
-
-        const userData = await response.json();
-        console.log('Hämtade användare:', userData);
-        const filteredUsers = filterLikedAndDeniedUsers(userData, likedUsers, deniedUsers);
-        setUsers(filteredUsers);
-    } catch (error) {
-        console.error('Fel vid hämtning av användare:', error);
-        setError('Kunde inte hämta användardata.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUsers();
-  }, []); 
+    const storedUsers = useUserStore.getState().users; 
+    if (storedUsers.length > 0) {
+      const filteredUsers = filterLikedAndDeniedUsers(storedUsers, likedUsers, deniedUsers);
+      setUsers(filteredUsers);
+    } else {
+      console.error("Ingen användardata tillgänglig!");
+      setError("Kunde inte ladda användardata.");
+    }
+  }, [likedUsers, deniedUsers]); 
   
-
 
 
 // SÖK PARNTER vid VAL.  X  |   <3
@@ -87,11 +74,8 @@ const [currentUser,setCurrentUser]= useState(0)
   const filterUsers = () => {
 
     if (!users || users.length === 0) {
-      console.log("Inga användare att filtrera.");
       return;
     }
-
-    console.log("Alla användare:", users);
     const normalizedSexualOrientation = yourSexualOrientation;
 
     const filteredUsers = users.filter((user: User) => {
@@ -129,7 +113,6 @@ const [currentUser,setCurrentUser]= useState(0)
       return isCityMatch && isGenderMatch && isReligionMatch && isNotDenied;;
       
     });
-    console.log(" Filterade resultat:", filteredUsers);
     setMatchingResults(filteredUsers);
     setCurrentUser(0); 
   };
@@ -148,7 +131,6 @@ const handleLike = (userId: string) => {
   const likedUser = matchingResults.find((user) => user.id === userId);
   if (likedUser) {
     addLikedUser(likedUser);
-    console.log('likedUser', likedUser)
 
     setMatchingResults((prev) => prev.filter((user) => user.id !== likedUser.id)); 
     nextUser();
@@ -162,8 +144,6 @@ const handleDeny = (userId: string) => {
   const deniedUser = matchingResults.find((user) => user.id === userId);
   if (deniedUser) {
     addDenyUsers(deniedUser);
-    console.log('deniedUser', deniedUser);
-
     const updatedDeniedUsers = [...deniedUsers, deniedUser];
     localStorage.setItem(getUserStorageKey(user?.id ?? "temp-user-id", "deniedUsers"), JSON.stringify(updatedDeniedUsers));
 
@@ -189,8 +169,6 @@ useEffect(() => {
     localStorage.getItem(getUserStorageKey(user?.id ?? "temp-user-id", "deniedUsers")) || "[]"
   );
 
-  console.log("Laddade nekade användare:", storedDenied); 
-
   setLoadedDeniedUsers(storedDenied);
 }, [user?.id]);
 
@@ -198,13 +176,10 @@ useEffect(() => {
 const restoreDeniedUsers = () => {
   if (!isVip || loadedDeniedUsers.length === 0) return;
 
-  console.log("Återställer nekade användare:", loadedDeniedUsers); 
-
   setMatchingResults((prevState) => [...loadedDeniedUsers, ...prevState]);
 
   setTimeout(() => {
     resetDenyUsers(); 
-    console.log("Nekade användare återställda och rensade från Zustand/localStorage.");
     setLoadedDeniedUsers([]); 
   }, 100);
 };

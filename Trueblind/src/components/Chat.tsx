@@ -25,15 +25,13 @@ export const Chat = () => {
     const isVip = user?.vipStatus;  
 
 
-
-
     if (!user) {
       return <p>Laddar användardata...</p>;
     }
  
     useEffect(() => {
       const purchasedEmojis = useUserStore.getState().user?.purchasedEmojis || [];
-      console.log('Laddade emojis i chatten:', purchasedEmojis); 
+
     }, [user?.purchasedEmojis]);
 
     useEffect(() => {
@@ -71,11 +69,10 @@ export const Chat = () => {
   };
 
   const handleEmojiClick = (emojiName: string) => {
-    console.log("emojiName", emojiName);
+
   
     // Ta bort filändelsen och  parametrar
     const emojiBaseName = emojiName.split('/').pop()?.split('?')[0].replace('.png', '') || ""; 
-    console.log("emojiBaseName:", emojiBaseName);
   
     // Hämta senaste versionen av user
     const currentUser = useUserStore.getState().user;
@@ -102,8 +99,6 @@ export const Chat = () => {
         // Uppdatera användaren i store
         const updatedUser = { ...currentUser, purchasedEmojis: updatedEmojis };
         useUserStore.getState().setUser(updatedUser);
-  
-        console.log("Uppdaterad emoji-lista:", updatedEmojis);
   
         // timer för att skicka så att den känner av att listan minskar.
         setTimeout(() => {

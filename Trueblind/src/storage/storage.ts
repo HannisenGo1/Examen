@@ -68,7 +68,9 @@ export const useUserStore = create<UserStore>((set, get) => {
       const storedVIPStatus = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'vipStatus')) || 'false');
       const storedVIPExpiryString = localStorage.getItem(getUserStorageKey(userId, 'vipExpiry'));
       const storedVIPExpiry = storedVIPExpiryString ? Number(storedVIPExpiryString) : null;
-
+      const storedVIPPLUSStatus = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'vipplusStatus')) || 'false');
+      const storedVIPPLUSExpiryString = localStorage.getItem(getUserStorageKey(userId, 'vipPlusExpiry'));
+      const storedVIPPLUSExpiry = storedVIPExpiryString ? Number(storedVIPPLUSExpiryString) : null;
       const userDeniedKey = getUserStorageKey(userId, 'deniedUsers');
       const storedDeniedUsers = JSON.parse(localStorage.getItem(userDeniedKey) || '[]');
     
@@ -80,6 +82,8 @@ export const useUserStore = create<UserStore>((set, get) => {
           purchasedEmojis: storedPurchasedEmojis || [],
           vipStatus: storedVIPStatus || false,
           vipExpiry: storedVIPExpiry,
+          vipPlusExpiry: storedVIPPLUSExpiry,
+          vipPlusStatus: storedVIPPLUSStatus
         }, 
 
         likedUsers: storedLikedUsers, 
@@ -112,11 +116,13 @@ export const useUserStore = create<UserStore>((set, get) => {
         localStorage.setItem(getUserStorageKey(userId, 'credits'), JSON.stringify(updatedUser.credits));
         localStorage.setItem(getUserStorageKey(userId, 'purchasedEmojis'), JSON.stringify(updatedUser.purchasedEmojis));
         localStorage.setItem(getUserStorageKey(userId, 'vipStatus'), JSON.stringify(updatedUser.vipStatus));
-
+        localStorage.setItem(getUserStorageKey(userId, 'vipPlusStatus'), JSON.stringify(updatedUser.vipPlusStatus));
         if (updatedUser.vipExpiry !== undefined && updatedUser.vipExpiry !== null) {
           localStorage.setItem(getUserStorageKey(userId, 'vipExpiry'), updatedUser.vipExpiry.toString());
         }
-    
+        if (updatedUser.vipPlusExpiry !== undefined && updatedUser.vipPlusExpiry !== null) {
+          localStorage.setItem(getUserStorageKey(userId, 'vipPlusExpiry'), updatedUser.vipPlusExpiry.toString());
+        }
         return { user: updatedUser };
       });
     },
@@ -124,6 +130,7 @@ export const useUserStore = create<UserStore>((set, get) => {
       set({ user: null, likedUsers: [], activeChats: [] });
       localStorage.clear(); 
     },
+    // VIP 
     setVIPStatus: (vipStatus: boolean) => {
       set((state) => {
         if (!state.user) return state;
@@ -133,6 +140,17 @@ export const useUserStore = create<UserStore>((set, get) => {
 
         localStorage.setItem(getUserStorageKey(userId, 'vipStatus'), JSON.stringify(updatedUser.vipStatus));
 
+        return { user: updatedUser };
+      });
+    },
+    // VIP + 
+    setVIPPLUSStatus: (vipPlusStatus: boolean) => {
+      set((state) => {
+        if (!state.user) return state;
+
+        const updatedUser = { ...state.user, vipPlusStatus };
+        const userId = updatedUser.id || '';
+        localStorage.setItem(getUserStorageKey(userId, 'vipPlusStatus'), JSON.stringify(updatedUser.vipPlusStatus));
         return { user: updatedUser };
       });
     },

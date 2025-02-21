@@ -67,9 +67,3 @@ app.use((_, res) => {
 app.listen(port, () => {
     console.log(`Servern körs på port ${port}`);
 });
-process.on('uncaughtException', (err) => {
-    console.error('💥 Ohanterat fel:', err);
-});
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('🚨 Ohanterad Promise rejection:', reason);
-});

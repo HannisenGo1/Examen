@@ -2,8 +2,9 @@ import { getDoc, doc, setDoc, getFirestore,deleteDoc  } from "firebase/firestore
 import { auth } from "../../data/firebase";
 import { FirebaseError } from "firebase/app";
 import { createUserWithEmailAndPassword,
- sendEmailVerification, signInWithEmailAndPassword, updatePassword } from "firebase/auth";
- import { deleteUser as deleteAuthUser } from "firebase/auth";
+ sendEmailVerification, signInWithEmailAndPassword, updatePassword
+ , EmailAuthProvider, reauthenticateWithCredential,deleteUser,  } from "firebase/auth";
+ 
 import { useUserStore } from "../../storage/storage";
 import { User } from "../../interface/interfaceUser";
  const db = getFirestore()
@@ -39,7 +40,6 @@ import { User } from "../../interface/interfaceUser";
             createdAt: new Date()
         });
 
-        console.log(" Användare registrerad & sparad i Firestore!");
         return true;
     } catch (error: any) {
         console.error("registreringen gick inte igenom:", error.message);
@@ -58,7 +58,6 @@ import { User } from "../../interface/interfaceUser";
     
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
-          console.log("Inloggning lyckades! Användardata:", userData);
     
           useUserStore.getState().setUser({
             id: user.uid,  
@@ -109,18 +108,36 @@ import { User } from "../../interface/interfaceUser";
       }
     };
     
-// Radera sitt konto 
+// Radera  konto 
+// Be användaren att logga in igen om Firebase kräver det
 export async function DeleteUser(usersId: string): Promise<void> {
   try {
-   
+    const user = auth.currentUser;
+    if (!user || user.uid !== usersId) {
+      throw new Error("Ingen användare inloggad eller fel UID.");
+    }
+
+
+    const email = user.email;
+    if (!email) {
+      throw new Error("Kan inte hämta e-postadress.");
+    }
+
+    const password = prompt("Ange ditt lösenord för att radera ditt konto:");
+    if (!password) {
+
+      return;
+    }
+    const credential = EmailAuthProvider.credential(email, password);
+    await reauthenticateWithCredential(user, credential);
+ 
+    // Radera användaren från collection
     const userDoc = doc(db, "users", usersId);
     await deleteDoc(userDoc);
-    console.log("Användare raderad från Firestore");
-    const user = auth.currentUser;
-    if (user && user.uid === usersId) {
-      await deleteAuthUser(user);
-      console.log("Användare raderad från Authentication");
-    }
+
+    // Radera användaren från Authentication
+    await deleteUser(user);
+
   } catch (error) {
     console.error("Fel vid borttagning av användare:", error);
     throw error;

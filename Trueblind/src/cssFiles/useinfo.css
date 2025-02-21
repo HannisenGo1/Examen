@@ -46,3 +46,26 @@
     padding: 0;
 
 }
+.optiondeletecancel{
+    display:flex;
+    gap: 2em;
+}
+.delete-btn{
+    border: solid 1px red;
+    width:5em;
+    height: 4em;
+    margin-top: 2em;
+}
+.cancel-btn{
+    border: solid 1px green;
+    width:5em;
+    margin-top: 2em;
+}
+.confirmation-box{
+    display:flex;
+    flex-direction: column;
+}
+.text-red{
+    color:red;
+    font-weight: bold;
+}

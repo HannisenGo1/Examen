@@ -22,10 +22,12 @@ h3{
   width: 200px;
   height: 110px;
   padding:0;
+  margin-bottom:2em;
 }
 .img{
   width: 200px;
   height: 110px;
+  margin-bottom:2em;
 }
 
 .logga2 {
@@ -34,7 +36,6 @@ h3{
   justify-content: center;
   align-items: center; 
   width: 100%; 
- 
   padding: 0;
 }
 
@@ -111,6 +112,7 @@ button:focus {
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
+  margin-top:2em;
 }
 
 .accountBtn .firstPart,
