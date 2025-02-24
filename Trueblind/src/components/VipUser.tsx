@@ -1,45 +1,44 @@
 import { User } from '../interface/interfaceUser';
-
-
-export const isVIPExpired = (user: User): boolean => {
-  if (!user.vipExpiry || new Date().getTime() > new Date(user.vipExpiry).getTime()) {
-    return true; 
-  }
-  return false;
+import { daysRemaining } from './DaysCounterVip';
+export const isVIPExpired = (expiryDate: number | null | undefined): boolean => {
+  if (!expiryDate) return true;
+  return new Date().getTime() > new Date(expiryDate).getTime();
 };
 
 interface VipUserProps {
   user: User;
   onVIPPurchase: () => void;
+  onVIPPlusPurchase: () => void;
 }
 
+export const VipUser = ({ user, onVIPPurchase, onVIPPlusPurchase }: VipUserProps) => {
+  const vipDaysLeft = daysRemaining(user.vipExpiry);
+  const vipPlusDaysLeft = daysRemaining(user.vipPlusExpiry);
 
-export const VipUser = ({ user, onVIPPurchase }: VipUserProps) => {
-
-  
-  const daysRemaining = () => {
-    if (!user.vipExpiry) return 0;
-    const expiryDate = new Date(user.vipExpiry);
-    const currentDate = new Date();
-    const timeDifference = expiryDate.getTime() - currentDate.getTime();
-    return timeDifference > 0 ? Math.floor(timeDifference / (1000 * 3600 * 24)) : 0;
-  };
-
+  const hasActiveVipPlus = user.vipPlusStatus && !isVIPExpired(user.vipPlusExpiry);
+  const hasActiveVip = user.vipStatus && !isVIPExpired(user.vipExpiry);
 
   return (
     <div className="VIP-purchased">
-      {isVIPExpired(user) ? (
-        <p>VIP har gått ut.</p>
+      {hasActiveVipPlus ? (
+        <p>Du har <strong>VIP Plus</strong>. {vipPlusDaysLeft > 0 ? `Det är ${vipPlusDaysLeft} dagar kvar på din VIP Plus.` : ''}</p>
+      ) : hasActiveVip ? (
+        <p>Du har <strong>VIP</strong>. {vipDaysLeft > 0 ? `Det är ${vipDaysLeft} dagar kvar på din VIP.` : ''}</p>
       ) : (
-        <p>Du har VIP-status. {daysRemaining() > 0 ? `Det är ${daysRemaining()} dagar kvar på din VIP.` : ''}</p>
+        <p>Du har ingen aktiv VIP-status.</p>
       )}
 
-      {isVIPExpired(user) && (
-        <button onClick={onVIPPurchase} className="shopBtn">
-          Köp VIP för 189.90 kronor (30 dagar) + Få 30 krediter
+      {!hasActiveVipPlus && (
+        <button onClick={onVIPPlusPurchase} className="shopBtn">
+          Uppgradera till VIP Plus för 189.90 kronor (30 dagar) + Få 20 krediter
         </button>
       )}
 
+      {!hasActiveVip && (
+        <button onClick={onVIPPurchase} className="shopBtn">
+          Köp VIP för 119.90 kronor (30 dagar) + Få 20 krediter
+        </button>
+      )}
     </div>
   );
 };

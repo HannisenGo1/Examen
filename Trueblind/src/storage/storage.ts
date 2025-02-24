@@ -31,7 +31,6 @@ interface UserStore {
   sendMessageRequest: (receiverId: string) => void;
   acceptMessageRequest: (senderId: string) => void;
   loadRequestsFromStorage: () => void;
-  clearUserData: () => void;
   activeChats: Chat[];
   addMessageToChat: (chatRoomId: string, message: string, senderId: string) => void;
   loadChatsFromStorage: () => void;
@@ -41,6 +40,9 @@ interface UserStore {
   addDenyUsers: (user:User) => void;
   resetDenyUsers: () => void;
   loadDeniedUsersFromStorage: () => void;
+  token: string | null;
+  setToken: (token: string | null) => void;
+  logout: () => void;
 }
 
 export const useUserStore = create<UserStore>((set, get) => {
@@ -55,7 +57,22 @@ export const useUserStore = create<UserStore>((set, get) => {
     activeChats: [],
     seenUsers: [],
    deniedUsers:[],
+   token: localStorage.getItem("authToken"), 
 
+   setToken: (token: string | null) => {
+    if (token) {
+      localStorage.setItem("authToken", token);  
+    } else {
+      localStorage.removeItem("authToken");
+    }
+    set({ token });
+  },
+  logout: () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("currentCompany"); 
+    set({ user: null, token: null });
+  },
     setUser: (userData: User) => {
       console.log("Sätter användare:", userData);
       const userId = userData.id ?? 'temp-user-id';
@@ -128,7 +145,6 @@ export const useUserStore = create<UserStore>((set, get) => {
     },
     resetUser: () => {
       set({ user: null, likedUsers: [], activeChats: [] });
-      localStorage.clear(); 
     },
     // VIP 
     setVIPStatus: (vipStatus: boolean) => {
@@ -430,16 +446,7 @@ export const useUserStore = create<UserStore>((set, get) => {
     
       set({ deniedUsers: storedDeniedUsers });
     },
-    
-    clearUserData: () => {
-      const user = get().user;
-      if (user) {
-        const userStorageKey = getUserStorageKey(user.id!, 'likedUsers');
-        localStorage.removeItem(userStorageKey);
-        const requestStorageKey = getUserStorageKey(user.id!, 'requests');
-        localStorage.removeItem(requestStorageKey);
-      }
-    },
+
 
     setAllUsers: (users: User[]) => {
       set({ users });

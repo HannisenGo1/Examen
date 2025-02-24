@@ -9,6 +9,7 @@ import { useUserStore } from "../../storage/storage";
 import { User } from "../../interface/interfaceUser";
  const db = getFirestore()
 
+
  //Firebase Authentication för registering av en användare
   export const doSignUpWithEmailAndPassword = async (formData: any) => {
     try {
@@ -49,6 +50,7 @@ import { User } from "../../interface/interfaceUser";
   
     //  Logga in med Firebase Auth -> email och lösenord
     export const doSignInWithEmailAndPassword = async (email: string, password: string) => {
+
       try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
@@ -99,8 +101,10 @@ import { User } from "../../interface/interfaceUser";
     
           return { ...userData, id: user.uid };  
         } else {
+    
           console.error("Användardata finns inte i Firestore");
           throw new Error("Användardata finns inte i Firestore.");
+         
         }
       } catch (error: any) {
         console.error(" Inloggning misslyckades:", error.message);
@@ -123,7 +127,7 @@ export async function DeleteUser(usersId: string): Promise<void> {
       throw new Error("Kan inte hämta e-postadress.");
     }
 
-    const password = prompt("Ange ditt lösenord för att radera ditt konto:");
+    const password = ("Ange ditt lösenord för att radera ditt konto:");
     if (!password) {
 
       return;
@@ -203,3 +207,5 @@ export async function DeleteUser(usersId: string): Promise<void> {
       }
     }
   };
+
+  

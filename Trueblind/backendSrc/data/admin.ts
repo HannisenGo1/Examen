@@ -4,7 +4,7 @@ import { config } from 'dotenv';
 
 const router: Router = express.Router();
 config();
-
+// sequred keys from env file
 const serviceAccount = {
     type: process.env['TYPE'],
     project_id: process.env['PROJECT_ID'],
@@ -27,7 +27,8 @@ const serviceAccount = {
   const auth = admin.auth();
   export { auth, admin };
 
-export const createCustomToken = async (uid: string) => {
+  // creating token with admin auth.
+  export const createCustomToken = async (uid: string) => {
     try {
       const token = await admin.auth().createCustomToken(uid);
       return token;
@@ -36,7 +37,6 @@ export const createCustomToken = async (uid: string) => {
       throw error;
     }
   };
-
   // uid become a token for firebase! 
   router.post('/create-token', async (req: Request, res: Response) => {
       const { uid } = req.body;
@@ -53,4 +53,6 @@ export const createCustomToken = async (uid: string) => {
         res.status(500).json({ error: 'Error generating custom token' });
       }
     });
+
+
     export {router}

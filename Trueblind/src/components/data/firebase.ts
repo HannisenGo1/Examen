@@ -1,25 +1,31 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore} from "firebase/firestore/lite";
-import { getAuth } from "firebase/auth";
-
-
+import { initializeApp, getApp, getApps } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
-  project_id: process.env['PROJECT_ID'],
-  apiKey: process.env['API_KEY'],
-  authDomain: process.env['AUTHDOMAIN'],
-  storageBucket: process.env['STORAGEBUCKET'],
-  messagingSenderId: process.env['MESSAGINGSENDERID'],
-  appId: process.env['APPID'],
-  measurementId: process.env['MEASUREMENTID'],
-  projectId: process.env['PROJECT_ID']
+  apiKey: import.meta.env.VITE_API_KEY,
+  authDomain: import.meta.env.VITE_AUTHDOMAIN,
+  projectId: import.meta.env.VITE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_STORAGEBUCKET,
+  messagingSenderId: import.meta.env.VITE_MESSAGINGSENDERID,
+  appId: import.meta.env.VITE_APPID,
+  measurementId: import.meta.env.VITE_MEASUREMENTID
+};
+
+// Kontrollera om Firebase redan har initialiserats
+// Om ingen app är initialiserad, skapa en ny instans
+// Om Firebase redan är initialiserad, använd den existerande appen
+let app;
+if (getApps().length === 0) {
+
+  app = initializeApp(firebaseConfig);
+} else {
+
+  app = getApp();
 }
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig) 
-const db = getFirestore(app)
+const db = getFirestore(app);
 const auth = getAuth(app);
 auth.useDeviceLanguage();
 
-
-export {db, auth, app}
+export { db, auth, app };

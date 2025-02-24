@@ -1,6 +1,7 @@
 import express, { Express, Request, Response, NextFunction } from "express";
 import { GetUser, AddUser, UpdateUser, GetUserById,DeleteUser} from "./data/getData.js";
 import {router as auth} from './data/admin.js'
+import verifyToken from "./data/token.js";
 import { config } from 'dotenv';
 config();
 const app: Express = express();
@@ -17,8 +18,10 @@ app.use('/', (req: Request, _, next: NextFunction) => {
     next();
   });
 
-  app.use('/users', auth)
+  app.use('/users', verifyToken, auth);
 
+  
+// få ut användartestdatan 
   app.get("/users", async (_, res: Response) => {
     try {
       const users = await GetUser();
@@ -29,6 +32,7 @@ app.use('/', (req: Request, _, next: NextFunction) => {
     }
   });
 
+//skapandet av användaren
 app.post("/users", async (req: Request, res: Response) => {
   try {
     const userData = req.body; 
@@ -40,6 +44,7 @@ app.post("/users", async (req: Request, res: Response) => {
   }
 });
 
+// använder patch för uppdatera en användare.
 app.patch('/users/:id', async (req: Request, res: Response) => {
   const userId = req.params.id; 
   const partialData = req.body; 

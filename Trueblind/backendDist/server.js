@@ -1,6 +1,7 @@
 import express from "express";
 import { GetUser, AddUser, UpdateUser, GetUserById, DeleteUser } from "./data/getData.js";
 import { router as auth } from './data/admin.js';
+import verifyToken from "./data/token.js";
 import { config } from 'dotenv';
 config();
 const app = express();
@@ -12,7 +13,8 @@ app.use('/', (req, _, next) => {
     console.log(`${req.method} ${req.url}`, req.body);
     next();
 });
-app.use('/users', auth);
+app.use('/users', verifyToken, auth);
+// få ut användartestdatan 
 app.get("/users", async (_, res) => {
     try {
         const users = await GetUser();
@@ -23,6 +25,7 @@ app.get("/users", async (_, res) => {
         res.status(500).json({ error: "Ett fel uppstod vid hämtning av användare." });
     }
 });
+//skapandet av användaren
 app.post("/users", async (req, res) => {
     try {
         const userData = req.body;
@@ -34,6 +37,7 @@ app.post("/users", async (req, res) => {
         res.status(500).json({ error: "Ett fel uppstod vid skapande av användare." });
     }
 });
+// använder patch för uppdatera en användare.
 app.patch('/users/:id', async (req, res) => {
     const userId = req.params.id;
     const partialData = req.body;

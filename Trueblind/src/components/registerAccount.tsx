@@ -28,10 +28,16 @@ export const Register = () => {
         lifeStatement1: '',
         lifeStatement2:'',
         password:'',
-        ommig:''
+        credits: 0, 
+        purchasedEmojis: [],
+        vipStatus: false, 
+        vipExpiry: null, 
+        vipPlusStatus: false,
+        vipPlusExpiry: null,
+        hasUsedPromoCode: false,
     });
     
-  
+    
     const handleInterestClick = (interest: string) => {
         setFormData((prev: FormData) => {
             const newInterests = [...prev.interests];
@@ -53,7 +59,7 @@ export const Register = () => {
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [isTermsVisible, setIsTermsVisible] = useState(false);
     
-
+    
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
         
@@ -81,20 +87,20 @@ export const Register = () => {
         setAgreedToTerms(e.target.checked);
     };
     
-      const handleShowTerms = () => {
+    const handleShowTerms = () => {
         setIsTermsVisible(true); 
     };
-
+    
     const handleAcceptTerms = () => {
         setAgreedToTerms(true);  
         setIsTermsVisible(false); 
     };
-
+    
     const handleCloseTerms = () => {
         setIsTermsVisible(false); 
     };
-
-
+    
+    
     const handleNext = () => {
         const validationErrors = validateFormData(step, formData);
         
@@ -109,21 +115,21 @@ export const Register = () => {
     const handlePrevious = () => {
         setStep((prev) => Math.max(prev - 1, 1));
     };
-   
+    
     
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-    
+        
         const validationErrors = validateFormData(6, formData);
-    
+        
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
             return;
         }
-    
+        
         try {
             const success = await doSignUpWithEmailAndPassword(formData);
-     
+            
             if (success === true) {
                 setIsRegistered(true);
             } else {
@@ -138,11 +144,11 @@ export const Register = () => {
     
     // public sitekey rechapta google:
     //6Lc34dwqAAAAAMalcXHywK0joU217Ftkt2uSOaMB
-
+    
     const goBackToHome = () => {
         navigate('/');
     };
-
+    
     
     return (
         <>
@@ -150,7 +156,7 @@ export const Register = () => {
         <img src={logga} alt="picture" className="img" onClick={goBackToHome}/>
         </div>
         <div>
-  
+        
         </div> 
         <div className="DivforRubrik">  
         <h1 className="Rubriktext">
@@ -159,28 +165,28 @@ export const Register = () => {
         <span className="firstPart">g här</span>
         </h1>
         </div>
-
+        
         {isRegistered && (
-  <div className="confirmation-message">
-    <h2>Du har blivit registrerad!</h2>
-    <button className="accountBtn" onClick={goBackToHome}>Till startsidan</button>
-  </div>
-)}
+            <div className="confirmation-message">
+            <h2>Du har blivit registrerad!</h2>
+            <button className="accountBtn" onClick={goBackToHome}>Till startsidan</button>
+            </div>
+        )}
         <form onSubmit={handleSubmit}>
         
         {step === 1 && (
             <>
-       <label htmlFor="email">E-post</label>
-         <input type="email" id="email"
-          name="email" value={formData.email}
-          onChange={handleChange} placeholder="Skriv din e-post" />
-           {errors.email && <span className="error">{errors.email}</span>}
-        <label htmlFor="password">Lösenord </label>
-        <input type="password" id="password" name="password" value={formData.password}
-        onChange={handleChange} placeholder="Skriv in lösenord" />
-        <p className="ptext"> Minst 8 tecken långt,En stor bokstav och ett tecken</p>
-        {errors.password && <span className="error">{errors.password}</span>}
-
+            <label htmlFor="email">E-post</label>
+            <input type="email" id="email"
+            name="email" value={formData.email}
+            onChange={handleChange} placeholder="Skriv din e-post" />
+            {errors.email && <span className="error">{errors.email}</span>}
+            <label htmlFor="password">Lösenord </label>
+            <input type="password" id="password" name="password" value={formData.password}
+            onChange={handleChange} placeholder="Skriv in lösenord" />
+            <p className="ptext"> Minst 8 tecken långt,En stor bokstav och ett tecken</p>
+            {errors.password && <span className="error">{errors.password}</span>}
+            
             <label htmlFor="firstName">Förnamn</label>
             <input
             type="text"
@@ -234,7 +240,7 @@ export const Register = () => {
             <option value="">Välj kön</option>
             <option value="Man">Man</option>
             <option value="Kvinna">Kvinna</option>
-    
+            
             </select>
             {errors.gender && <span className="error">{errors.gender}</span>}
             
@@ -369,7 +375,7 @@ export const Register = () => {
             <option value="Seriöst">Seriöst förhållande</option>
             <option value="Öppet">Öppen för seriöst</option>
             <option value="Vänner">Nya vänner</option>
-           
+            
             </select>
             {errors.relationshipStatus && <span className="error">{errors.relationshipStatus}</span>}
             <label htmlFor="education">Utbildningsnivå</label>
@@ -391,7 +397,7 @@ export const Register = () => {
         
         {step === 6 && (
             <>
-
+            
             <label htmlFor="favoriteSong">Favorit låt:</label>
             <input
             type="text"
@@ -400,7 +406,7 @@ export const Register = () => {
             value={formData.favoriteSong || ''}
             onChange={handleChange}
             />
-
+            
             <label htmlFor="favoriteMovie">Favorit film:</label>
             <input
             type="text"
@@ -411,59 +417,53 @@ export const Register = () => {
             />
             <p> Avsluta meningen </p>
             <label>Jag skulle aldrig kunna leva utan...</label>
-<input
-    type="text"
-    name="lifeStatement1"
-    value={formData.lifeStatement1}
-    onChange={handleChange}
-/>
-
-<label>Jag blir mest inspirerad när...</label>
-<input
-    type="text"
-    name="lifeStatement2"
-    value={formData.lifeStatement2}
-    onChange={handleChange}
-/>
-<label> Berätta något om dig själv </label>
-<input
-    type="text"
-    name="ommig"
-    value={formData.ommig}
-    onChange={handleChange}
-/>
-
-<div className="register-terms-checkbox">
-                    <input
-                        type="checkbox"
-                        id="agreeTerms"
-                        checked={agreedToTerms}
-                        onChange={handleCheckboxChange}
-                    />
-                    <label htmlFor="agreeTerms">
-                        Jag godkänner{' '}
-                        <a href="#" onClick={handleShowTerms}>
-                            användarvillkoren
-                        </a>
-                    </label>
-                </div>
+            <input
+            type="text"
+            name="lifeStatement1"
+            value={formData.lifeStatement1}
+            onChange={handleChange}
+            />
+            
+            <label>Jag blir mest inspirerad när...</label>
+            <input
+            type="text"
+            name="lifeStatement2"
+            value={formData.lifeStatement2}
+            onChange={handleChange}
+            />
+            
+            
+            <div className="register-terms-checkbox">
+            <input
+            type="checkbox"
+            id="agreeTerms"
+            checked={agreedToTerms}
+            onChange={handleCheckboxChange}
+            />
+            <label htmlFor="agreeTerms">
+            Jag godkänner{' '}
+            <a href="#" onClick={handleShowTerms}>
+            användarvillkoren
+            </a>
+            </label>
+            </div>
             </>
         )}
         
         <div className="buttoncontainerinRegister">
         {step > 1 && <button className="accountBtn2" onClick={handlePrevious}> <i className="fas fa-arrow-left"></i></button>}
         {step < 6 && <button className="accountBtn" onClick={handleNext}>Nästa</button>}
-
+        
         {step === 6 && <button className="accountBtn" type="submit" disabled={!agreedToTerms}>Registrera</button>}
         </div>
-
+        
         </form> 
         {isTermsVisible && (
-                <Anvandarpolicy
-                    onClose={handleCloseTerms}
-                    onAccept={handleAcceptTerms}
-                />
-            )}
+            <Anvandarpolicy
+            onClose={handleCloseTerms}
+            onAccept={handleAcceptTerms}
+            />
+        )}
         </>
     );
 };

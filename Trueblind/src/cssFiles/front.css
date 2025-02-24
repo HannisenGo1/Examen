@@ -190,7 +190,7 @@ button:focus {
   outline: none;
 }
 
-/* Submit button styling */
+
 .login-button {
   padding: 12px;
   background-color: #a75a13;
@@ -213,4 +213,8 @@ button:focus {
   font-size: 14px;
   text-align: center;
   margin-top: 1em;
+}
+.question{
+  display:flex;
+  flex-direction: column;
 }

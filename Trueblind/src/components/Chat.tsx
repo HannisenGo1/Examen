@@ -7,7 +7,9 @@ import bukett from '../img/imgProdukter/bukett.png'
 import nalle1 from '../img/imgProdukter/nalle1.png'
 import nalle2 from '../img/imgProdukter/nalle2.png'
 import heart from '../img/imgProdukter/heart.png'
-export const Chat = () => {
+import { QuizComponent } from './games/quiz';
+
+export const Chat = ()  => {
     const { chatRoomId } = useParams();
     const { activeChats, addMessageToChat, removeMessageFromChat, user} = useUserStore(); 
     const [errormessage, setErrorMessage]= useState('')
@@ -15,6 +17,7 @@ export const Chat = () => {
     const [showEmojis, setShowEmojis] = useState(false);
     const currentChat = activeChats.find((chat) => chat.chatRoomId === chatRoomId);
     const navigate = useNavigate();
+    const [showQuiz, setShowQuiz] = useState(false);
     const messagesite = () => { navigate('/messages'); };
     const otherUserName = currentChat && user?.id 
     ? currentChat.userNames[currentChat.userIds.indexOf(user.id) === 0 ? 1 : 0] 
@@ -22,12 +25,13 @@ export const Chat = () => {
     const getUserStorageKey = (userId: string, key: string) => `${key}-${userId}`;
  
 
-    const isVip = user?.vipStatus;  
+    const isVip = user?.vipPlusStatus;  
 
-
-    if (!user) {
-      return <p>Laddar användardata...</p>;
-    }
+    useEffect(() => {
+      if (!user) {
+        navigate('/');
+      }
+    }, [user, navigate]);
  
     useEffect(() => {
       const purchasedEmojis = useUserStore.getState().user?.purchasedEmojis || [];
@@ -69,12 +73,9 @@ export const Chat = () => {
   };
 
   const handleEmojiClick = (emojiName: string) => {
-
-  
-    // Ta bort filändelsen och  parametrar
     const emojiBaseName = emojiName.split('/').pop()?.split('?')[0].replace('.png', '') || ""; 
   
-    // Hämta senaste versionen av user
+   
     const currentUser = useUserStore.getState().user;
   
     if (!currentUser) {
@@ -92,15 +93,13 @@ export const Chat = () => {
           .map((e) => e.emoji === emojiBaseName ? { ...e, count: e.count - 1 } : e)
           .filter(e => e.count > 0); 
   
-        // Uppdatera localStorage FÖRST
         const userId = currentUser.id || '';
         localStorage.setItem(getUserStorageKey(userId, 'purchasedEmojis'), JSON.stringify(updatedEmojis));
-  
-        // Uppdatera användaren i store
+      
         const updatedUser = { ...currentUser, purchasedEmojis: updatedEmojis };
         useUserStore.getState().setUser(updatedUser);
   
-        // timer för att skicka så att den känner av att listan minskar.
+
         setTimeout(() => {
           sendEmoji(`<img src="${emojiName}" alt="emoji" class="sent-emoji"/>`);
           setShowEmojis(false);
@@ -116,78 +115,87 @@ export const Chat = () => {
   
   
   
-    return (
-      <> 
+  return (
+    <>
       <div className="logga">
         <img src={logga} alt="logo" className="img" />
       </div>
       <div className="buttondivforback ">
-        <button className="btnback"onClick={messagesite}>
-        <i className="fas fa-arrow-left"></i>
-          </button>  </div>
-            <h1 className='Rubriktext2'> Din chatt med {otherUserName}</h1>   
+        <button className="btnback" onClick={messagesite}>
+          <i className="fas fa-arrow-left"></i>
+        </button>
+      </div>
+      <h1 className='Rubriktext2'>Din chatt med {otherUserName}</h1>
 
+      {/* Chatten */}
+      <div className="chat-container">
+        {showQuiz ? (
 
+          <div className="quiz-container">
+            <button className="close-quiz" onClick={() => setShowQuiz(false)}>X</button>
+            <QuizComponent />
+          </div>
+        ) : (
+          <div className="chat-messages-container">
+            {currentChat.messages.length === 0 ? (
+              <p>Inga meddelanden än.</p>
+            ) : (
+              currentChat.messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`chat-message ${msg.senderId === user?.id ? 'sent' : 'received'}`}
+                >
+                  <div className="message-content">
+                    <p className="sender">
+                      {msg.senderId === user?.id ? 'Du' : msg.senderName}
+                    </p>
+                    <p className="message-text" dangerouslySetInnerHTML={{ __html: msg.message }}></p>
+                  </div>
 
-        <div className="chat-container">
-   
-        <div className="chat-messages-container">
-  {currentChat.messages.length === 0 ? (
-    <p>Inga meddelanden än.</p>
-  ) : (
-    currentChat.messages.map((msg) => (
-      <div
-        key={msg.id}
-        className={`chat-message ${msg.senderId === user?.id ? 'sent' : 'received'}`}
-      >
-        <div className="message-content">
-     
-          <p className="sender">
-            {msg.senderId === user?.id ? 'Du' : msg.senderName}
-          </p>
-          <p className="message-text" dangerouslySetInnerHTML={{ __html: msg.message }}></p>
-
-        </div>
-
-        {msg.senderId === user?.id && (
-          <button
-            className="delete-message"
-            onClick={() => handleDeleteMessage(msg.id)}
-          >
-            X
-          </button>
+                  {msg.senderId === user?.id && (
+                    <button
+                      className="delete-message"
+                      onClick={() => handleDeleteMessage(msg.id)}
+                    >
+                      X
+                    </button>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
         )}
       </div>
-    ))
-  )}
-</div>
 
-            </div>  
-          <div className="chat-message-input-container">
-           
-            <textarea
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Skriv ditt meddelande..."
-            />
-            <button className='sendBtn' onClick={handleSendMessage} disabled={!newMessage.trim()}>
-              Skicka
-            </button>
-            <button onClick={() => setShowEmojis(!showEmojis)} className="emoji-btn">
-                    Emojis
-                </button>
-<p> {errormessage} </p>
-                {/* Emoji-väljare */}
-                {showEmojis && (
-                    <div className="emoji-picker">
-        <img src={nalle1} alt="nalle1" className="emoji" onClick={() => handleEmojiClick(nalle1)} />
-        <img src={nalle2} alt="nalle2" className="emoji" onClick={() => handleEmojiClick(nalle2)} />
-        <img src={bukett} alt="bukett" className="emoji" onClick={() => handleEmojiClick(bukett)} />
-        <img src={heart} alt="heart" className="emoji" onClick={() => handleEmojiClick(heart)} />
-                    </div>
-                )}
+      {/* Quiz-knapp */}
+      {isVip && !showQuiz && (
+        <button className="quiz-button" onClick={() => setShowQuiz(true)}>Starta quizet</button>
+      )}
+
+      <div className="chat-message-input-container">
+        <textarea
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          placeholder="Skriv ditt meddelande..."
+        />
+        <button className='sendBtn' onClick={handleSendMessage} disabled={!newMessage.trim()}>
+          Skicka
+        </button>
+        <button onClick={() => setShowEmojis(!showEmojis)} className="emoji-btn">
+          Emojis
+        </button>
+        <p>{errormessage}</p>
+
+        {/* Emoji-väljare */}
+        {showEmojis && (
+          <div className="emoji-picker">
+            <img src={nalle1} alt="nalle1" className="emoji" onClick={() => handleEmojiClick(nalle1)} />
+            <img src={nalle2} alt="nalle2" className="emoji" onClick={() => handleEmojiClick(nalle2)} />
+            <img src={bukett} alt="bukett" className="emoji" onClick={() => handleEmojiClick(bukett)} />
+            <img src={heart} alt="heart" className="emoji" onClick={() => handleEmojiClick(heart)} />
           </div>
-       
-      </>
-    );
+        )}
+      </div>
+    </>
+  );
 };

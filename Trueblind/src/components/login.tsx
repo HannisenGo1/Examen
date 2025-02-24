@@ -4,6 +4,9 @@ import { useUserStore } from '../storage/storage';
 import logga from '../img/logga.png';
 import ForgotPassword from './auth/ForgotPassword';
 import { doSignInWithEmailAndPassword } from './data/UserAuth';
+import { getAuth} from "firebase/auth";
+
+const auth = getAuth();  
 
 
 export const Login= () => {
@@ -29,8 +32,16 @@ export const Login= () => {
     e.preventDefault();
 
     try {
-     
       const userData = await doSignInWithEmailAndPassword(email, password);
+
+      const user = auth.currentUser;;  
+      const idToken = await user?.getIdToken();  
+
+      if (!idToken) {
+        throw new Error('Kunde inte hämta token');
+      }
+      localStorage.setItem('idToken', idToken);
+
       const userId = userData.uid;
 
       const storedVIPStatus = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'vipStatus')) || 'false');
@@ -43,14 +54,20 @@ export const Login= () => {
         vipExpiry: storedVIPExpiry,
       };
 
-    
-      useUserStore.getState().setUser(updatedUser); 
 
+      useUserStore.getState().setUser(updatedUser);
+
+    
       const usersFromStorage = useUserStore.getState().users;
       if (usersFromStorage.length === 0) {
         const fetchUsers = async () => {
           try {
-            const response = await fetch('http://localhost:3000/users');
+            const response = await fetch('http://localhost:3000/users', {
+              method: 'GET',
+              headers: {
+                'Authorization': `Bearer ${idToken}`, 
+              },
+            });
             if (!response.ok) {
               throw new Error(`HTTP error! ${response.status}`);
             }
@@ -65,16 +82,18 @@ export const Login= () => {
         };
         fetchUsers();
       }
+
       useUserStore.getState().loadRequestsFromStorage();
       useUserStore.getState().loadChatsFromStorage();
 
       setError('');
-      navigate('/homepage'); 
+      navigate('/homepage');
     } catch (error) {
-      console.error(' Fel vid inloggning:', error);
+      console.error('Fel vid inloggning:', error);
       setError('Fel e-post eller lösenord.');
     }
   };
+
 
   return (
     <> 

@@ -8,21 +8,8 @@ import nalle2 from '../img/imgProdukter/nalle2.png';
 import heart from '../img/imgProdukter/heart.png';
 import {VipUser} from './VipUser';  
 import {Vipinformation } from './Vipinfo';
+import { updateUserInDatabase } from './data/UpdateDatabase';
 
-
-// premium funktion ( VIP) för 99.90kronor / månaden, = 60 krediter.
-// Vip plus ( 179.90) = 100 krediter
-//VIP och VIP Plus:
-
-//VIP för 99,90 SEK / månad – Inkludera de grundläggande funktionerna som:
-// * Återställa nekade användare.
-//* Få tillgång till premium emojis.
-//* Se all information om en användare vid sökning.
-//VIP Plus för 179,90 SEK / månad – För större funktioner, t.ex.:
-//Prioriterad support.
-//Möjlighet att skicka fler emojis.
-// endast se > 40% matchning och uppåt.
-//Andra exklusiva funktioner du kan komma på.
 
 export const Shop = () => {
   const navigate = useNavigate();
@@ -32,8 +19,12 @@ export const Shop = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
-
-  if (!user) return <p>Laddar...</p>;
+// om användaren är null eller undefined ( när inloggning har löpt ut så navigerat man till startsidan.)
+useEffect(() => {
+  if (!user) {
+    navigate('/');
+  }
+}, [user, navigate]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -43,11 +34,12 @@ export const Shop = () => {
     }
   }, []);
 
-  const credits = user.credits || 0;
+
   if (!user || !user.id) {
-    return;
+    return <p> Laddar ...  </p>;
   }
 
+  const credits = user.credits || 0;
 
   // använda för att få gratis 1000 krediter. 
   const handlePromoCode = () => {
@@ -81,30 +73,32 @@ export const Shop = () => {
 
 
   // Hantering av köp -> VIP
+  // kostar 80 krediter, men får tillbaka 20 tillgodo för att handla i shoppen
   const handleVIPPurchase = () => {
-    if (credits < 60) {
+    if (credits < 80) {
       console.log("Du har inte tillräckligt med krediter för VIP!");
       return;
     }
     if (!user || !user.id) {
-      console.error("User or user.id is undefined");
+      console.error("Användare är undefined");
       return;
     }
-  
+    const newCredits = credits - 80 + 20; 
+
     const updatedUser = {
       ...user,
-      credits: credits - 60 + 30, 
-      vipStatus: true,
-      
-      vipExpiry: Date.now() + 30 * 24 * 60 * 60 * 1000,
+      credits: newCredits,  
+      vipStatus: true,  
+      vipPlusStatus: false,  
+      vipExpiry: Date.now() + 30 * 24 * 60 * 60 * 1000, 
     };
   
-    updateUser(updatedUser);
-  
-    localStorage.setItem('user', JSON.stringify(updatedUser));
+    updateUserInDatabase(updatedUser); 
+    console.log('datan för användaren som har köpt:', updatedUser)
+    localStorage.setItem('user', JSON.stringify(updatedUser));  
   };
 
-// VIP + STATUS:::
+// VIP+ STATUS:::
 const handleVIPPlusPurchase = () => {
   if (credits < 100) {
     console.log("Du har inte tillräckligt med krediter för VIP Plus!");
@@ -114,17 +108,19 @@ const handleVIPPlusPurchase = () => {
     console.error("User or user.id is undefined");
     return;
   }
-
+  const newCredits = credits - 100 + 20; 
   const updatedUser = {
     ...user,
-    credits: credits - 100, 
-    vipPlusStatus: true,  
-    vipPlusExpiry: Date.now() + 30 * 24 * 60 * 60 * 1000,
+    credits: newCredits,  
+    vipStatus: true, 
+    vipPlusStatus: true,
+    vipPlusExpiry: Date.now() + 30 * 24 * 60 * 60 * 1000, 
+    vipExpiry: Date.now() + 30 * 24 * 60 * 60 * 1000,
   };
-
-  updateUser(updatedUser);
-
-  localStorage.setItem('user', JSON.stringify(updatedUser));
+// uppdaterar både in till firebase, så jag kan hålla reda på vilka användare som har vip, och även
+// sparar in till localstorage. 
+  updateUserInDatabase(updatedUser);  
+  localStorage.setItem('user', JSON.stringify(updatedUser)); 
 };
 
 
@@ -132,10 +128,10 @@ const handleVIPPlusPurchase = () => {
     { name: "nalle1", src: nalle1, price: 3 },
     { name: "nalle2", src: nalle2, price: 3 },
     { name: "bukett", src: bukett, price: 3 },
-    { name: "heart", src: heart, price: 1 },
+    { name: "heart", src: heart, price: 2 },
   ];
 
-  const emojisFor1Credit = emojis.filter((emoji) => emoji.price === 1);
+  const emojisFor1Credit = emojis.filter((emoji) => emoji.price === 2);
   const emojisFor3Credits = emojis.filter((emoji) => emoji.price === 3);
 
   // Hantera köp av emoji
@@ -189,12 +185,11 @@ const handleVIPPlusPurchase = () => {
       </button>
 
       <h1 className="Rubriktext">
-        <span className="firstPart">SHOPEN</span>
+        <span className="firstPart">SHOPPEN</span>
       </h1>
-
-      <div className="emoji-purchased">
-        <p>Din kredit: {credits}</p>
-      </div>
+      <div className="emoji-shop">
+<p className="price-text">Din kredit: {credits}</p> </div> 
+ 
       <button className="vipinfobtn"onClick={toggleOpenInfo}> VIP information
       <span className={`arrow ${isOpen ? 'open' : ''}`} onClick={toggleOpenInfo}>
           &#9660;
@@ -206,9 +201,9 @@ const handleVIPPlusPurchase = () => {
 )}
 
  <div className="buybtncontainer">
-      <VipUser user={user} onVIPPurchase={handleVIPPurchase} /> 
+      <VipUser user={user} onVIPPurchase={handleVIPPurchase} onVIPPlusPurchase={handleVIPPlusPurchase} /> 
       <button onClick={handleVIPPlusPurchase} className="shopBtn">
-  VIP Plus - 179.90 SEK / mån (100 krediter)
+  VIP PLUS ( 100 krediter)
 </button>
      
         <button onClick={() => handleAddCredits(10)} className="shopBtn">
@@ -243,7 +238,7 @@ const handleVIPPlusPurchase = () => {
       <div className="emoji-shop">
         {emojisFor1Credit.length > 0 && (
           <div className="emoji-group">
-            <p className="price-text">Pris: 1 kredit per emoji</p>
+            <p className="price-text">Pris: 2 kredit per emoji</p>
             <div className="emoji-picker2">
               {emojisFor1Credit.map((emoji) => (
                 <div key={emoji.name} className="emoji-item">

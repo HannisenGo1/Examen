@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useUserStore } from '../storage/storage';
 import { User } from '../interface/interfaceUser';
 // import {isVIPExpired}  from './VipUser'
-
+import viplogga from '../img/viplogga.png'
 export const FindPartners = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [matchingResults, setMatchingResults] = useState<User[]>([]);
@@ -18,7 +18,12 @@ const [currentUser,setCurrentUser]= useState(0)
     deniedUsers, resetDenyUsers,addDenyUsers,
    } = useUserStore();
   //const userId = useUserStore((state) => state.user?.id);
-  const isVip = user?.vipStatus; 
+
+const isVip = (user: User | undefined) => {
+  return user?.vipStatus || user?.vipPlusStatus ||false;
+}
+
+  
 
   if (!user) {
     return <p>Du måste vara inloggad för att söka efter partners.</p>;
@@ -48,7 +53,6 @@ const [currentUser,setCurrentUser]= useState(0)
   }, [likedUsers, deniedUsers]); 
   
 
-
 // SÖK PARNTER vid VAL.  X  |   <3
 // ut nya users och inte det som man har gjort ett val på,
 // tas det bort från gilla listan så kan man få ut dom igen.
@@ -71,17 +75,20 @@ const [currentUser,setCurrentUser]= useState(0)
     return Math.round(matchPercentage);
   };
 
-  const filterUsers = () => {
 
+
+  const filterUsers = () => {
     if (!users || users.length === 0) {
       return;
     }
     const normalizedSexualOrientation = yourSexualOrientation;
 
+
     const filteredUsers = users.filter((user: User) => {
       if (user.id === yourId) {
         return false;
       }
+
       const isCityMatch = city ? user.city === city : true;
       const isReligionMatch = religion ? user.religion === religion : true;
       const isNotDenied = !nekadUser.some((deniedUser) => deniedUser.id === user.id);
@@ -113,6 +120,8 @@ const [currentUser,setCurrentUser]= useState(0)
       return isCityMatch && isGenderMatch && isReligionMatch && isNotDenied;;
       
     });
+
+
     setMatchingResults(filteredUsers);
     setCurrentUser(0); 
   };
@@ -225,8 +234,8 @@ const restoreDeniedUsers = () => {
 
 <button 
   onClick={restoreDeniedUsers} 
-  disabled={!isVip} 
-  className={`btn ${isVip ? 'btn-primary' : 'btn-disabled'}`}
+  disabled={!isVip(user)} 
+  className={`btn ${isVip(user) ? 'btn-primary' : 'btn-disabled'}`}
 >
   Återställ nekade användare
 </button>
@@ -238,6 +247,13 @@ const restoreDeniedUsers = () => {
     <ul className="results-list">
       <li key={showCurrentUser.id} className="result-item">
         <div className="result-info">
+        <h4>
+                {showCurrentUser.firstName}{" "}
+                <span className="age">, {showCurrentUser.age}</span>
+                {showCurrentUser.vipStatus && (
+                  <img src={viplogga} alt="viplogga" className= "vip-logo"  />
+                )}
+              </h4>
           <h4>{showCurrentUser.firstName} <span className="age">, {showCurrentUser.age}</span></h4>
           <p><strong>Matchar: {calculateMatch(showCurrentUser)}%</strong> </p>
           <p><strong>Kön:</strong> {showCurrentUser.gender}</p>
@@ -247,7 +263,7 @@ const restoreDeniedUsers = () => {
         <div className="life-statements">
           <p>{showCurrentUser.lifeStatement1}</p>
           <p>{showCurrentUser.lifeStatement2}</p>
-          {isVip && (
+          {isVip(user) && (
                   <>
                     <p><strong>Intressen:</strong> {showCurrentUser.interests?.join(', ')}</p>
                     <p><strong>Har barn:</strong> {showCurrentUser.hasChildren ? 'Ja' : 'Nej'}</p>

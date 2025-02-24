@@ -3,6 +3,7 @@ import express from "express";
 import { config } from 'dotenv';
 const router = express.Router();
 config();
+// sequred keys from env file
 const serviceAccount = {
     type: process.env['TYPE'],
     project_id: process.env['PROJECT_ID'],
@@ -21,6 +22,7 @@ admin.initializeApp({
 console.log('Firebase Admin SDK is initialized.');
 const auth = admin.auth();
 export { auth, admin };
+// creating token with admin auth.
 export const createCustomToken = async (uid) => {
     try {
         const token = await admin.auth().createCustomToken(uid);
