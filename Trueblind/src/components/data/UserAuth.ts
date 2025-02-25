@@ -37,10 +37,9 @@ import { User } from "../../interface/interfaceUser";
             favoriteMovie: formData.favoriteMovie,
             lifeStatement1: formData.lifeStatement1,
             lifeStatement2: formData.lifeStatement2,
-            ommig: formData.ommig,
             createdAt: new Date()
         });
-
+        console.log("Användardata sparades i Firestore för UID:", user.uid);
         return true;
     } catch (error: any) {
         console.error("registreringen gick inte igenom:", error.message);
@@ -54,13 +53,13 @@ import { User } from "../../interface/interfaceUser";
       try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-    
+        console.log("Användarens UID vid inloggning:", user.uid);
         const userDocRef = doc(db, "users", user.uid);
         const userDocSnap = await getDoc(userDocRef);
     
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
-    
+          console.log("Användardata hämtades från Firestore:", userData);
           useUserStore.getState().setUser({
             id: user.uid,  
             firstName: userData.firstName || "Okänd",

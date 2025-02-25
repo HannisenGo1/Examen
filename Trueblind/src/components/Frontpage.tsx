@@ -1,15 +1,10 @@
 import logga from '../img/logga.png'
 import { useNavigate } from 'react-router-dom';
-export interface frontbutton {
-  loginbtn: () => void;
-  registerbtn: () => void;
-}
+import { getAuth} from "firebase/auth";
 
 
-
-// ({loginbtn, registerbtn}: frontbutton)
 export const Frontpage = () => {
-
+const auth = getAuth();  
   const navigate = useNavigate();
 
 const handleRegisterClick = () => {
@@ -19,7 +14,14 @@ const handleLoginClick = () => {
   navigate('/login');
 }
 
-
+const handleLogout = async () => {
+  try {
+    await auth.signOut();
+    console.log("Användaren har loggat ut.");
+  } catch (error) {
+    console.error("Fel vid utloggning:", error);
+  }
+};
 
 return (
   <>
@@ -38,12 +40,13 @@ return (
     <div className="btncontainer"> 
       <button className="accountBtn"onClick={handleLoginClick}> Logga in </button> 
       <button className="accountBtn"onClick={handleRegisterClick}> Registrera dig </button> 
+      <button onClick={handleLogout }> Logga ut </button> 
     </div> 
 
     <div className="frontpagetextDiv"> 
       <h2 className="welcometexttopage">
-        Vi hjälper dig att hitta äkta förbindelser baserat på känslor och gemensamma värderingar, 
-        utan att döma utifrån yttre faktorer. 
+        Vi hjälper dig att hitta äkta förbindelser baserat på känslor och 
+        gemensamma värderingar, utan att döma utifrån yttre faktorer. 
         Öppna ditt hjärta och låt känslorna leda dig till din sanna match. 
         Hitta din dröm partner här!
       </h2>

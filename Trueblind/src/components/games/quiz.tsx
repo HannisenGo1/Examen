@@ -1,115 +1,125 @@
 import { quizData } from './quizdata';
-import { useState } from 'react';
+import { useState, useEffect  } from 'react';
+import { collection, addDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
+import {db} from '../../data/firebase'
 
-export const QuizComponent = () => {
+// koppla detta med firebase för att kunna jämföra svaren 
+// mindre risk för manipulering av svaren ( mer säkerhet)
+// lägga till ett id till quizen för att göra det lättare att jämföra
 
-  const [userAnswers, setUserAnswers] = useState<{ [key: string]: { user1: string; user2: string } }>({});
+export interface Quiz {
+  userId: string;
+  quizId: string;
+  setQuizId: (id: string) => void;
+}
+interface UserAnswers {
+  [key: string]: string;
+}
+
+
+export const QuizComponent = ({userId, quizId, setQuizId} : Quiz ) => {
+  const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
   const [currentQuestions, setCurrentQuestions] = useState(0);
   const [quizFinished, setQuizFinished] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [user1Answered, setUser1Answered] = useState(false);
-  const [user2Answered, setUser2Answered] = useState(false);
-
-
-  const handleUser1Answer = (question: string, answer: string) => {
-    setUserAnswers((prevAnswers) => ({
-      ...prevAnswers,
-      [question]: { ...prevAnswers[question], user1: answer },
-    }));
-    setUser1Answered(true); 
+// Skapandet av en Quiz när man påbörjar spelet :D 
+  const createQuiz = async () => {
+    setIsLoading(true);
+    try {
+      const docRef = await addDoc(collection(db, 'quiz'), {
+        user1: userId,
+        user1Answers: {},
+        user2: null,
+        user2Answers: {},
+        createdAt: new Date(),
+      });
+      setQuizId(docRef.id);
+      console.log('Quiz created with ID:', docRef.id);
+    } catch (error) {
+      console.error('Error creating quiz:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  // Hämtar quiz-data
+  const fetchQuizData = async (quizId: string) => {
+    setIsLoading(true);
+    try {
+      const quizRef = doc(db, 'quiz', quizId);
+      const quizSnap = await getDoc(quizRef);
 
-  const handleUser2Answer = (question: string, answer: string) => {
-    setUserAnswers((prevAnswers) => ({
-      ...prevAnswers,
-      [question]: { ...prevAnswers[question], user2: answer },
-    }));
-    setUser2Answered(true); 
+      if (quizSnap.exists()) {
+        const data = quizSnap.data();
+        console.log('Fetched quiz:', data);
+        setUserAnswers(data.user1 === userId ? data.user1Answers : data.user2Answers);
+      } else {
+        console.log('No such quiz!');
+      }
+    } catch (error) {
+      console.error('Error fetching quiz:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  // svaren sparas till firebase
+  const saveAnswer = async (question: string, answer: string) => {
+    const quizRef = doc(db, 'quiz', quizId);
+    const quizSnap = await getDoc(quizRef);
+    
+    if (!quizSnap.exists()) {
+      console.log("Quizet finns inte");
+      return;
+    }
+  
+    const field = userId === quizSnap.data().user1 ? 'user1Answers' : 'user2Answers';
+  
+    const updatedAnswers = { ...userAnswers, [question]: answer };
+    await updateDoc(quizRef, { [field]: updatedAnswers });
+    setUserAnswers(updatedAnswers);
+  };
+
+// fetcha ut beroende på Quiz Id:et
+  useEffect(() => {
+    if (quizId) {
+      fetchQuizData(quizId);
+    } else {
+      createQuiz();
+    }
+  }, [quizId]);
+
+
+ // för att få nästa fråga 
   const handleNextQuestion = () => {
     if (currentQuestions < quizData.Livet.length - 1) {
-      setCurrentQuestions(currentQuestions + 1);
-      setUser1Answered(false); 
-      setUser2Answered(false); 
+      setCurrentQuestions((prev) => prev + 1);
     } else {
-   
       setQuizFinished(true);
     }
   };
 
-
-  const calculateMatchPercentage = () => {
-    const totalQuestions = quizData.Livet.length;
-    const matchingAnswers = Object.values(userAnswers).filter(
-      (answer) => answer.user1 === answer.user2
-    ).length;
-    return Math.round((matchingAnswers / totalQuestions) * 100);
-  };
-
-
+  if (isLoading) return <p>Laddar Quiz...</p>;
   if (quizFinished) {
-    const matchPercentage = calculateMatchPercentage();
-    return (
-      <div>
-        <h2>Quiz Completed!</h2>
-        <p>Din matchningsprocent är: {matchPercentage}%</p>
-      </div>
-    );
+    return <p>Quizet är klart! Vänta på den andra användaren.</p>;
   }
 
-
-  const currentQuestion = quizData.Livet[currentQuestions];
-
   return (
-    <div className="columndiv2">
-      <div className="question">
-        <p>{currentQuestion.question}</p>
-
-        {!user1Answered && (
-          <>
-            {currentQuestion.options.map((option, index) => (
-              <div key={index}>
-                <input
-                  type="radio"
-                  id={`${currentQuestion.question}-user1-${option}`}
-                  name={`user1-${currentQuestion.question}`}
-                  value={option}
-                  onChange={() => handleUser1Answer(currentQuestion.question, option)}
-                  checked={userAnswers[currentQuestion.question]?.user1 === option}
-                />
-                <label htmlFor={`${currentQuestion.question}-user1-${option}`}>{option}</label>
-              </div>
-            ))}
-          </>
-        )}
-
-
-        {user1Answered && !user2Answered && !quizFinished && (
-          <>
-            {currentQuestion.options.map((option, index) => (
-              <div key={index}>
-                <input
-                  type="radio"
-                  id={`${currentQuestion.question}-user2-${option}`}
-                  name={`user2-${currentQuestion.question}`}
-                  value={option}
-                  onChange={() => handleUser2Answer(currentQuestion.question, option)}
-                  checked={userAnswers[currentQuestion.question]?.user2 === option}
-                />
-                <label htmlFor={`${currentQuestion.question}-user2-${option}`}>{option}</label>
-              </div>
-            ))}
-          </>
-        )}
-      </div>
-
-      <div className="navigation">
-        <button onClick={handleNextQuestion} disabled={!user1Answered || !user2Answered}>
-          {currentQuestions < quizData.Livet.length - 1 ? 'Nästa fråga' : 'Avsluta quiz'}
-        </button>
-      </div>
+    <div>
+      <h2>{quizData.Livet[currentQuestions].question}</h2>
+      {quizData.Livet[currentQuestions].options.map((option, index) => (
+        <label key={index}>
+          <input
+            type="radio"
+            value={option}
+            checked={userAnswers[quizData.Livet[currentQuestions].question] === option}
+            onChange={() => saveAnswer(quizData.Livet[currentQuestions].question, option)}
+          />
+          {option}
+        </label>
+      ))}
+      <button onClick={handleNextQuestion}>Nästa fråga</button>
     </div>
   );
 };

@@ -1,4 +1,13 @@
-export const quizData = {
+type Question = {
+  question: string;
+  options: string[];
+};
+
+interface QuizData {
+  Livet: Question[];
+}
+
+export const quizData: QuizData = { 
     Livet: [
       {
         question: "Vad tycker du är viktigast i livet?",

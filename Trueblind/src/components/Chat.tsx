@@ -18,12 +18,19 @@ export const Chat = ()  => {
     const currentChat = activeChats.find((chat) => chat.chatRoomId === chatRoomId);
     const navigate = useNavigate();
     const [showQuiz, setShowQuiz] = useState(false);
+     const [quizId, setQuizId] = useState<string | null>(null); 
+
     const messagesite = () => { navigate('/messages'); };
     const otherUserName = currentChat && user?.id 
     ? currentChat.userNames[currentChat.userIds.indexOf(user.id) === 0 ? 1 : 0] 
     : "Okänd användare";
     const getUserStorageKey = (userId: string, key: string) => `${key}-${userId}`;
- 
+   
+  // för att sätta quiz id:et 
+ const startQuiz = (id: string) => {
+    setQuizId(id);
+    setShowQuiz(true);
+  };
 
     const isVip = user?.vipPlusStatus;  
 
@@ -133,7 +140,12 @@ export const Chat = ()  => {
 
           <div className="quiz-container">
             <button className="close-quiz" onClick={() => setShowQuiz(false)}>X</button>
-            <QuizComponent />
+            <QuizComponent 
+              userId={user?.id || ''}  
+              quizId={quizId || ''}  
+              setQuizId={setQuizId}  
+            />
+
           </div>
         ) : (
           <div className="chat-messages-container">
@@ -171,19 +183,18 @@ export const Chat = ()  => {
       {isVip && !showQuiz && (
         <button className="quiz-button" onClick={() => setShowQuiz(true)}>Starta quizet</button>
       )}
-
+   {!isVip && !showQuiz && (
+        <button className="quiz-button" onClick={() => setShowQuiz(true)}>Delta i quizet</button>
+      )}
+      
       <div className="chat-message-input-container">
-        <textarea
-          value={newMessage}
+        <textarea value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Skriv ditt meddelande..."
-        />
+          placeholder="Skriv ditt meddelande..."   />
         <button className='sendBtn' onClick={handleSendMessage} disabled={!newMessage.trim()}>
-          Skicka
-        </button>
+          Skicka   </button>
         <button onClick={() => setShowEmojis(!showEmojis)} className="emoji-btn">
-          Emojis
-        </button>
+          Emojis    </button>
         <p>{errormessage}</p>
 
         {/* Emoji-väljare */}

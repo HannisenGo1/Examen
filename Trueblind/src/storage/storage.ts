@@ -17,6 +17,7 @@ interface Chat {
 interface UserStore {
   user: User | null;
   setUser: (userData: User) => void;
+  setUsers: (users:User[]) => void
   resetUser: () => void;
   searchResults: SearchResult[];
   addSearchResult: (searchResult: SearchResult) => void;
@@ -51,6 +52,7 @@ export const useUserStore = create<UserStore>((set, get) => {
   return {
     user: null,
     users: [],
+    setUsers: (users: User[]) => set({ users }),
     likedUsers: [],
     requests: [],
     searchResults: [],
@@ -351,6 +353,7 @@ export const useUserStore = create<UserStore>((set, get) => {
         return { activeChats: updatedChats };
       });
     },
+    // ta bort sin egna skrivna meddelande 
     removeMessageFromChat: (chatRoomId: string, messageId: string) => {
       set((state) => {
 

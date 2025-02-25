@@ -1,8 +1,9 @@
 import express, { Express, Request, Response, NextFunction } from "express";
 import { GetUser, AddUser, UpdateUser, GetUserById,DeleteUser} from "./data/getData.js";
-import {router as auth} from './data/admin.js'
+import {router as auth} from './data/router/userRoute.js'
 import verifyToken from "./data/token.js";
 import { config } from 'dotenv';
+
 config();
 const app: Express = express();
 const port = process.env.PORT || 3000;
@@ -10,6 +11,7 @@ const port = process.env.PORT || 3000;
 app.use(express.json()); 
 import cors from 'cors';
 
+app.use('/auth', auth); 
 
 app.use(cors());
 
@@ -18,7 +20,7 @@ app.use('/', (req: Request, _, next: NextFunction) => {
     next();
   });
 
-  app.use('/users', verifyToken, auth);
+  app.use('/users', verifyToken);
 
   
 // få ut användartestdatan 
@@ -50,6 +52,11 @@ app.patch('/users/:id', async (req: Request, res: Response) => {
   const partialData = req.body; 
 
   try {
+    if (req.user?.id !== userId) {
+       res.status(403).json({ error: "Du har inte rätt att uppdatera den här användaren." });
+      return
+    }
+
     await UpdateUser(userId, partialData);
     
     const updatedUser = await GetUserById(userId); 
@@ -60,16 +67,22 @@ app.patch('/users/:id', async (req: Request, res: Response) => {
   }
 });
 
+
 // Ta bort en användare
 app.delete('/users/:id', async (req: Request, res: Response) => {
   const userId = req.params.id;
 
   try {
-      await DeleteUser(userId);  
-      res.status(200).json({ message: "User deleted" });  
+    if (req.user?.id !== userId) {
+       res.status(403).json({ error: "Du har inte rätt att ta bort denna användare." });
+      return
+    }
+
+    await DeleteUser(userId);  
+    res.status(200).json({ message: "Användare borttagen" });  
   } catch (error) {
-      console.error('Error deleting user:', error);
-      res.status(500).json({ message: 'Failed to delete user' });  
+    console.error('Error deleting user:', error);
+    res.status(500).json({ message: 'Failed to delete user' });  
   }
 });
 

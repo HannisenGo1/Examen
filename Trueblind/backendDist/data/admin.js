@@ -1,7 +1,5 @@
 import admin from 'firebase-admin';
-import express from "express";
 import { config } from 'dotenv';
-const router = express.Router();
 config();
 // sequred keys from env file
 const serviceAccount = {
@@ -21,7 +19,6 @@ admin.initializeApp({
 });
 console.log('Firebase Admin SDK is initialized.');
 const auth = admin.auth();
-export { auth, admin };
 // creating token with admin auth.
 export const createCustomToken = async (uid) => {
     try {
@@ -33,19 +30,4 @@ export const createCustomToken = async (uid) => {
         throw error;
     }
 };
-// uid become a token for firebase! 
-router.post('/create-token', async (req, res) => {
-    const { uid } = req.body;
-    if (!uid) {
-        res.status(400).json({ error: 'UID is required' });
-        return;
-    }
-    try {
-        const token = await createCustomToken(uid);
-        res.json({ token });
-    }
-    catch (error) {
-        res.status(500).json({ error: 'Error generating custom token' });
-    }
-});
-export { router };
+export { auth, admin };
