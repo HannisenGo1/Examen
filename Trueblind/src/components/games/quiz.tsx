@@ -1,7 +1,7 @@
 import { quizData } from './quizdata';
 import { useState, useEffect  } from 'react';
 import { collection, addDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
-import {db} from '../../data/firebase'
+import { db } from '../data/firebase';
 
 // koppla detta med firebase för att kunna jämföra svaren 
 // mindre risk för manipulering av svaren ( mer säkerhet)
@@ -11,20 +11,29 @@ export interface Quiz {
   userId: string;
   quizId: string;
   setQuizId: (id: string) => void;
+  vipPlusStatus: boolean
 }
+
 interface UserAnswers {
   [key: string]: string;
 }
 
 
-export const QuizComponent = ({userId, quizId, setQuizId} : Quiz ) => {
+export const QuizComponent = ({userId, quizId, setQuizId, vipPlusStatus} : Quiz ) => {
+  console.log('collection db::', db)
   const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
   const [currentQuestions, setCurrentQuestions] = useState(0);
   const [quizFinished, setQuizFinished] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [quizStartedByVipPlus, setQuizStartedByVipPlus] = useState(false)
 
 // Skapandet av en Quiz när man påbörjar spelet :D 
   const createQuiz = async () => {
+    if (!vipPlusStatus){
+      console.error('Endast VIP PLUS kan starta  quizet.')
+      return
+    }
+
     setIsLoading(true);
     try {
       const docRef = await addDoc(collection(db, 'quiz'), {
@@ -33,7 +42,9 @@ export const QuizComponent = ({userId, quizId, setQuizId} : Quiz ) => {
         user2: null,
         user2Answers: {},
         createdAt: new Date(),
+        startedByVipPlus: true,
       });
+
       setQuizId(docRef.id);
       console.log('Quiz created with ID:', docRef.id);
     } catch (error) {
@@ -53,6 +64,7 @@ export const QuizComponent = ({userId, quizId, setQuizId} : Quiz ) => {
       if (quizSnap.exists()) {
         const data = quizSnap.data();
         console.log('Fetched quiz:', data);
+        setQuizStartedByVipPlus(data.startedByVipPlus ?? false)
         setUserAnswers(data.user1 === userId ? data.user1Answers : data.user2Answers);
       } else {
         console.log('No such quiz!');
@@ -66,6 +78,11 @@ export const QuizComponent = ({userId, quizId, setQuizId} : Quiz ) => {
 
   // svaren sparas till firebase
   const saveAnswer = async (question: string, answer: string) => {
+    if (!quizStartedByVipPlus){
+      console.error('Du kan endast delta om den startades av en VIP PLUS')
+    return
+    }
+
     const quizRef = doc(db, 'quiz', quizId);
     const quizSnap = await getDoc(quizRef);
     
@@ -75,8 +92,8 @@ export const QuizComponent = ({userId, quizId, setQuizId} : Quiz ) => {
     }
   
     const field = userId === quizSnap.data().user1 ? 'user1Answers' : 'user2Answers';
-  
     const updatedAnswers = { ...userAnswers, [question]: answer };
+
     await updateDoc(quizRef, { [field]: updatedAnswers });
     setUserAnswers(updatedAnswers);
   };

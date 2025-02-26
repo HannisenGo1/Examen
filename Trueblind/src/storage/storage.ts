@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { User, SearchResult, Message } from '../interface/interfaceUser';
+import { User, SearchResult, Message,Chat } from '../interface/interfaceUser';
 
 export interface Request {
   senderId: string;
@@ -7,14 +7,9 @@ export interface Request {
   status: 'pending' | 'accepted' | 'rejected';
 }
 
-interface Chat {
-  chatRoomId: string;
-  userIds: string[];
-  messages: Message[];
-  userNames: string[];
-}
 
-interface UserStore {
+
+export interface UserStore {
   user: User | null;
   setUser: (userData: User) => void;
   setUsers: (users:User[]) => void
@@ -33,17 +28,17 @@ interface UserStore {
   acceptMessageRequest: (senderId: string) => void;
   loadRequestsFromStorage: () => void;
   activeChats: Chat[];
-  addMessageToChat: (chatRoomId: string, message: string, senderId: string) => void;
   loadChatsFromStorage: () => void;
-  removeMessageFromChat: (chatRoomId: string, messageId: string) => void;
   loadUserFromStorage: () => void;
   deniedUsers: User[];
   addDenyUsers: (user:User) => void;
   resetDenyUsers: () => void;
   loadDeniedUsersFromStorage: () => void;
   token: string | null;
-  setToken: (token: string | null) => void;
-  logout: () => void;
+  setToken: (token: string | null) => void
+  logout: () => void
+  chats: Chat[]
+  setChats: (chats: Chat[]) => void  
 }
 
 export const useUserStore = create<UserStore>((set, get) => {
@@ -60,6 +55,8 @@ export const useUserStore = create<UserStore>((set, get) => {
     seenUsers: [],
    deniedUsers:[],
    token: localStorage.getItem("authToken"), 
+   chats: [],
+   setChats: (chats: Chat[]) => set({ chats }),
 
    setToken: (token: string | null) => {
     if (token) {
@@ -315,66 +312,6 @@ export const useUserStore = create<UserStore>((set, get) => {
       });
   },
   
-    addMessageToChat: (chatRoomId: string, message: string, senderId: string) => {
-      set((state) => {
-        const chat = state.activeChats.find((chat) => chat.chatRoomId === chatRoomId);
-    
-        if (!chat) {
-          console.error('Chattrum ej hittad:', chatRoomId);
-          return state; 
-        }
-    
-        const newMessage: Message = {
-          id: new Date().toISOString(), 
-          senderId,
-          senderName: state.user?.firstName || 'Användare', 
-          message,
-          timestamp: new Date().toISOString(),
-        };
-    
-        const updatedMessages = [...chat.messages, newMessage];
-        const updatedChats = state.activeChats.map((chat) =>
-          chat.chatRoomId === chatRoomId ? { ...chat, messages: updatedMessages } : chat
-        );
-    
-        localStorage.setItem(getUserStorageKey(senderId, 'activeChats'), JSON.stringify(updatedChats));
-    
-        const otherUserId = chat.userIds.find((id) => id !== senderId);
-        if (otherUserId) {
-          const otherUserStorageKey = getUserStorageKey(otherUserId, 'activeChats');
-          const otherUserChats = JSON.parse(localStorage.getItem(otherUserStorageKey) || '[]');
-          const updatedOtherUserChats = otherUserChats.map((chat: Chat) =>
-            chat.chatRoomId === chatRoomId ? { ...chat, messages: updatedMessages } : chat
-          );
-          localStorage.setItem(otherUserStorageKey, JSON.stringify(updatedOtherUserChats));
-        }
-    
-        localStorage.setItem(getUserStorageKey(senderId, 'activeChats'), JSON.stringify(updatedChats));
-        return { activeChats: updatedChats };
-      });
-    },
-    // ta bort sin egna skrivna meddelande 
-    removeMessageFromChat: (chatRoomId: string, messageId: string) => {
-      set((state) => {
-
-        const chat = state.activeChats.find((chat) => chat.chatRoomId === chatRoomId);
-        
-        if (!chat) {
-          console.error('Chatten finns inte:', chatRoomId);
-          return state; 
-        }
-
-        const updatedMessages = chat.messages.filter((msg) => msg.id !== messageId);
-
-        const updatedChats = state.activeChats.map((chat) =>
-          chat.chatRoomId === chatRoomId ? { ...chat, messages: updatedMessages } : chat
-        );
-        localStorage.setItem(getUserStorageKey(state.user?.id!, 'activeChats'), JSON.stringify(updatedChats));
-    
-        return { activeChats: updatedChats };
-      });
-    },
-
     loadUserFromStorage: () => {
       const storedUser = localStorage.getItem('user');
       console.log("Hämtad användare från localStorage:", storedUser);

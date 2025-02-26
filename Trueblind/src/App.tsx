@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Frontpage } from "./components/Frontpage";
-import { Register } from "./components/RegisterAccount";
+import { Register } from "./components/registerAccount";
 import { AccountPage } from "./components/Account";
 import { Login } from "./components/login";
 import {MatchList} from "./components/MatchParter";

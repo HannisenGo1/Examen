@@ -1,5 +1,5 @@
 import { getDoc, doc, setDoc, getFirestore,deleteDoc  } from "firebase/firestore";
-import { auth } from "../../data/firebase";
+import {auth}from "./firebase";
 import { FirebaseError } from "firebase/app";
 import { createUserWithEmailAndPassword,
  sendEmailVerification, signInWithEmailAndPassword, updatePassword

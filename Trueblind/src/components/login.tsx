@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { doSignInWithEmailAndPassword } from './data/UserAuth';
 import logga from '../img/logga.png';
-import ForgotPassword from './auth/ForgotPassword';
+//import ForgotPassword from './auth/ForgotPassword';
 
 
 export const Login = () => {
@@ -30,7 +30,7 @@ export const Login = () => {
       setError('Fel e-post eller lösenord.');
     }
   };
-
+ // <ForgotPassword /> 
   return (
     <> 
       <div className="logga">
@@ -59,7 +59,7 @@ export const Login = () => {
               required
             />
           </div>
-          <ForgotPassword /> 
+         
           <button type="submit" className="login-button">Logga in</button>
         </form>
         {error && <p className="login-error">{error}</p>}

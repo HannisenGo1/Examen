@@ -1,39 +1,64 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate  } from 'react-router-dom';
 import { useUserStore } from '../storage/storage';
-import { useNavigate } from 'react-router-dom';
 import logga from '../img/logga.png';
 import bukett from '../img/imgProdukter/bukett.png'
 import nalle1 from '../img/imgProdukter/nalle1.png'
 import nalle2 from '../img/imgProdukter/nalle2.png'
 import heart from '../img/imgProdukter/heart.png'
 import { QuizComponent } from './games/quiz';
+import { addMessageToFirebase } from './data/ChatData';
+import { Message } from '../interface/interfaceUser';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from './data/firebase';
 
 export const Chat = ()  => {
     const { chatRoomId } = useParams();
-    const { activeChats, addMessageToChat, removeMessageFromChat, user} = useUserStore(); 
+    const { activeChats,  user} = useUserStore(); 
     const [errormessage, setErrorMessage]= useState('')
     const [newMessage, setNewMessage] = useState('');
     const [showEmojis, setShowEmojis] = useState(false);
+    const [showQuiz, setShowQuiz] = useState(false);
+    const [quizId, setQuizId] = useState<string | null>(null); 
+    const [messages, setMessages] = useState<Message[]>([]);
     const currentChat = activeChats.find((chat) => chat.chatRoomId === chatRoomId);
     const navigate = useNavigate();
-    const [showQuiz, setShowQuiz] = useState(false);
-     const [quizId, setQuizId] = useState<string | null>(null); 
+
+    useEffect(() => {
+      if (chatRoomId) {
+        const chatRef = doc(db, 'chats', chatRoomId);
+    
+    
+        const getthechats = onSnapshot(chatRef, (docSnapshot) => {
+          if (docSnapshot.exists()) {
+            const chatData = docSnapshot.data();
+            const updatedMessages = chatData?.messages || [];
+    
+            setMessages(updatedMessages); 
+          }
+        });
+    
+        return () => getthechats(); 
+      }
+    }, [chatRoomId]);
+
 
     const messagesite = () => { navigate('/messages'); };
-    const otherUserName = currentChat && user?.id 
-    ? currentChat.userNames[currentChat.userIds.indexOf(user.id) === 0 ? 1 : 0] 
-    : "Okänd användare";
+   const isVip = user?.vipPlusStatus;  
+
+   let otherUserName = "Okänd användare";
+
+   if (currentChat && currentChat.userIds && currentChat.userNames && user?.id) {
+     const otherUserId = currentChat.userIds.find(id => id !== user.id);
+     if (otherUserId) {
+       otherUserName = currentChat.userNames[currentChat.userIds.indexOf(otherUserId)];
+     }
+   }
+
+
     const getUserStorageKey = (userId: string, key: string) => `${key}-${userId}`;
    
-  // för att sätta quiz id:et 
- const startQuiz = (id: string) => {
-    setQuizId(id);
-    setShowQuiz(true);
-  };
-
-    const isVip = user?.vipPlusStatus;  
-
+  
     useEffect(() => {
       if (!user) {
         navigate('/');
@@ -54,35 +79,53 @@ export const Chat = ()  => {
     if (!currentChat) {
       return <p>Ingen chatthistorik finns än. Vänta på att användaren accepterar din förfrågan.</p>;
     }
+{/* Hanteringen av Quizet */ }
+  useEffect(() => {
+    if (currentChat?.quizId) {
+      setQuizId(currentChat.quizId); 
+    }
+  }, [currentChat]);
 
-    const handleSendMessage = () => {
-      if (newMessage.trim() && chatRoomId && user?.id) {
-        addMessageToChat(chatRoomId, newMessage, user.id); 
-        setNewMessage('');
-      } else {
-        console.error('Användar-ID saknas eller meddelandet är tomt');
-      }
-    };
-
-    const handleDeleteMessage = (messageId: string) => {
-      const chatRoomId = currentChat?.chatRoomId; 
-    
-      if (!chatRoomId) {
-        console.error('ChatRoomId finns inte!');
-        return; 
-      }
-      removeMessageFromChat(chatRoomId, messageId);
-    };
-    const sendEmoji = (emojiHtml: string) => {
-      if (chatRoomId && user?.id) {
-          addMessageToChat(chatRoomId, emojiHtml, user.id);
-      }
+   const startQuiz = (id: string) => {
+    setQuizId(id);
+    setShowQuiz(true);
   };
+
+  {/* Hanteringen av meddelande*/ }
+  const handleSendMessage = async () => {
+    if (newMessage.trim() && chatRoomId && user?.id) {
+
+      const newMessageObj: Message = {
+        senderId: user.id,
+        senderName: user.firstName ?? 'Användare', 
+        message: newMessage,
+        timestamp: new Date().toISOString(),
+        id: '', 
+      };
+  
+      await addMessageToFirebase(chatRoomId, newMessageObj.senderId, newMessageObj.senderName, newMessageObj.message);
+      setNewMessage('');
+    } 
+  };
+  
+
+    const sendEmoji = async (emojiHtml: string) => {
+      if (chatRoomId && user?.id) {
+        const newMessageObj: Message = {
+          senderId: user.id,
+          senderName: user.firstName || 'Användare',
+          message: emojiHtml, 
+          timestamp: new Date().toISOString(),
+          id: '', 
+        };
+        await addMessageToFirebase(chatRoomId, newMessageObj.senderId, newMessageObj.senderName, newMessageObj.message);
+
+        setNewMessage(''); 
+      }
+    };
 
   const handleEmojiClick = (emojiName: string) => {
     const emojiBaseName = emojiName.split('/').pop()?.split('?')[0].replace('.png', '') || ""; 
-  
-   
     const currentUser = useUserStore.getState().user;
   
     if (!currentUser) {
@@ -91,7 +134,6 @@ export const Chat = ()  => {
     }
   
     const emojiItem = currentUser.purchasedEmojis.find((emoji) => emoji.emoji === emojiBaseName);
-  
     if (emojiItem) {
       console.log("Emoji hittad:", emojiItem);
   
@@ -102,11 +144,10 @@ export const Chat = ()  => {
   
         const userId = currentUser.id || '';
         localStorage.setItem(getUserStorageKey(userId, 'purchasedEmojis'), JSON.stringify(updatedEmojis));
-      
+
         const updatedUser = { ...currentUser, purchasedEmojis: updatedEmojis };
         useUserStore.getState().setUser(updatedUser);
   
-
         setTimeout(() => {
           sendEmoji(`<img src="${emojiName}" alt="emoji" class="sent-emoji"/>`);
           setShowEmojis(false);
@@ -119,9 +160,6 @@ export const Chat = ()  => {
     }
   };
 
-  
-  
-  
   return (
     <>
       <div className="logga">
@@ -136,49 +174,40 @@ export const Chat = ()  => {
 
       {/* Chatten */}
       <div className="chat-container">
-        {showQuiz ? (
-
+      {showQuiz ? (
           <div className="quiz-container">
             <button className="close-quiz" onClick={() => setShowQuiz(false)}>X</button>
-            <QuizComponent 
-              userId={user?.id || ''}  
-              quizId={quizId || ''}  
-              setQuizId={setQuizId}  
+            <QuizComponent
+              userId={user?.id || ''}
+              quizId={quizId || ''}
+              setQuizId={setQuizId}
+              vipPlusStatus={!!isVip}
             />
-
           </div>
+
         ) : (
           <div className="chat-messages-container">
-            {currentChat.messages.length === 0 ? (
-              <p>Inga meddelanden än.</p>
-            ) : (
-              currentChat.messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`chat-message ${msg.senderId === user?.id ? 'sent' : 'received'}`}
-                >
-                  <div className="message-content">
-                    <p className="sender">
-                      {msg.senderId === user?.id ? 'Du' : msg.senderName}
-                    </p>
-                    <p className="message-text" dangerouslySetInnerHTML={{ __html: msg.message }}></p>
-                  </div>
+{messages.length === 0 ? (
+  <p>Inga meddelanden än.</p>
+) : (
+  messages.map((msg) => (
+    <div
+      key={msg.id}
+      className={`chat-message ${msg.senderId === user?.id ? 'sent' : 'received'}`}
+    >
+      <div className="message-content">
+        <p className="sender">
+          {msg.senderId === user?.id ? 'Du' : msg.senderName}
+        </p>
+        <p className="message-text" dangerouslySetInnerHTML={{ __html: msg.message }}></p>
+      </div>
 
-                  {msg.senderId === user?.id && (
-                    <button
-                      className="delete-message"
-                      onClick={() => handleDeleteMessage(msg.id)}
-                    >
-                      X
-                    </button>
-                  )}
-                </div>
-              ))
-            )}
+    </div>
+  ))
+)}
           </div>
         )}
       </div>
-
       {/* Quiz-knapp */}
       {isVip && !showQuiz && (
         <button className="quiz-button" onClick={() => setShowQuiz(true)}>Starta quizet</button>

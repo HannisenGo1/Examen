@@ -3,7 +3,7 @@ import logga from '../img/logga.png';
 import { useUserStore } from '../storage/storage';
 import { useNavigate } from 'react-router-dom';
 import { FaPen } from 'react-icons/fa';
-import { auth } from "../data/firebase";
+import {auth} from './data/firebase'
 import { DeleteUser } from './data/UserAuth';
 import { isVIPExpired } from './VipUser';
 import { User } from '../interface/interfaceUser';

@@ -5,6 +5,8 @@ import { fetchUsers } from './data/GetUserData';
 
 // import {isVIPExpired}  from './VipUser'
 import viplogga from '../img/viplogga.png'
+import viploggaplus from '../img/viplogga+.png'
+
 export const FindPartners = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [matchingResults, setMatchingResults] = useState<User[]>([]);
@@ -240,9 +242,11 @@ export const FindPartners = () => {
       <h4>
       {showCurrentUser.firstName}{" "}
       <span className="age">, {showCurrentUser.age}</span>
-      {showCurrentUser.vipStatus && (
-        <img src={viplogga} alt="viplogga" className= "vip-logo"  />
-      )}
+      {showCurrentUser.vipPlusStatus ? (
+  <img src={viploggaplus} alt="viploggaplus" className="vip-logo" />
+) : showCurrentUser.vipStatus ? (
+  <img src={viplogga} alt="viplogga" className="vip-logo" />
+) : null}
       </h4>
       <h4>{showCurrentUser.firstName} <span className="age">, {showCurrentUser.age}</span></h4>
       <p><strong>Matchar: {calculateMatch(showCurrentUser)}%</strong> </p>
