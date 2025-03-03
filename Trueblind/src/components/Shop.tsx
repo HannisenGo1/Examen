@@ -6,23 +6,22 @@ import bukett from '../img/imgProdukter/bukett.png';
 import nalle1 from '../img/imgProdukter/nalle1.png';
 import nalle2 from '../img/imgProdukter/nalle2.png';
 import heart from '../img/imgProdukter/heart.png';
-//import {VipUser} from './VipUser';  
-import {Vipinformation } from './Vipinfo';
+import { Vipinformation } from './Vipinfo';
 import { updateUserInDatabase } from './data/UpdateDatabase';
 
 export const Shop = () => {
   const navigate = useNavigate();
-  const { user} = useUserStore();
+  const { user,setUser } = useUserStore();
   const [promoCode, setPromoCode] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [credits, setCredits] = useState(user?.credits || 0);
 
   useEffect(() => {
     if (!user) {
       navigate('/');
     }
   }, [user, navigate]);
-
 
   const prices = {
     VIP: 80,
@@ -39,8 +38,6 @@ export const Shop = () => {
     return <p>Laddar...</p>;
   }
 
-  const credits = user.credits || 0;
-
   const handlePromoCode = async () => {
     const promoCodeCorrect = import.meta.env.VITE_PROMO_CODE;
     if (promoCode === promoCodeCorrect) {
@@ -50,7 +47,7 @@ export const Shop = () => {
       }
       const updatedUser = { ...user, credits: credits + 1000, hasUsedPromoCode: true };
       await updateUserInDatabase(updatedUser);
-
+      setCredits(updatedUser.credits);
       setErrorMessage("");
     } else {
       setErrorMessage("Ogiltig kod. Försök igen.");
@@ -58,8 +55,10 @@ export const Shop = () => {
   };
 
   const toggleOpenInfo = () => setIsOpen(!isOpen);
-
-  type PurchaseType = 'VIP' | 'VIPPlus' | 'emoji';
+ 
+  console.log("Användarens köpta emojis:", user.purchasedEmojis);
+  
+  type PurchaseType = 'VIP' | 'VIPPlus' ;
 
   interface Emoji {
     name: string;
@@ -67,7 +66,87 @@ export const Shop = () => {
     price: number;
   }
 
-  const handlePurchase = async (type: PurchaseType, price: number, emojiName?: string): Promise<void> => {
+  // Hantera köper för emojisar :D 
+  const handlePurchaseEmoji = async (emojiName: string, price: number) => {
+    console.log(`Försöker köpa emoji: ${emojiName} för ${price} krediter`);
+  
+    if (credits < price) {
+      setErrorMessage("Du har inte tillräckligt med krediter!");
+      return;
+    }
+  
+    const updatedCredits = credits - price;
+    setCredits(updatedCredits);
+  
+    const existingEmoji = user.purchasedEmojis?.find((e) => e.emoji === emojiName);
+    console.log("Existerande emoji:", existingEmoji);
+
+    const updatedEmojis = existingEmoji
+      ? user.purchasedEmojis.map((e) =>
+          e.emoji === emojiName ? { ...e, count: e.count + 1 } : e
+        )
+      : [...(user.purchasedEmojis || []), { emoji: emojiName, count: 1 }];
+    
+    console.log("Köpta emojis efter uppdatering:", updatedEmojis);
+  
+    const updatedUser = {
+      ...user,
+      credits: updatedCredits,
+      purchasedEmojis: updatedEmojis,
+    };
+  
+    console.log("Uppdaterat användarobjekt:", updatedUser);
+  
+    try {
+      await updateUserInDatabase(updatedUser);
+      console.log("Användaren uppdaterades  i databasen");
+  
+      setUser(updatedUser);  
+    } catch (error) {
+      console.error("Något gick fel vid uppdateringen av användaren:", error);
+    }
+  };
+  
+  
+// Köpa kredit
+  const handleAddCredits = async (amount: number): Promise<void> => {
+    const newCredits = credits + amount;
+    const updatedUser = { ...user, credits: newCredits };
+    await updateUserInDatabase(updatedUser);
+    setCredits(newCredits); 
+  };
+
+  const emojis = [
+    { name: "nalle1", src: nalle1, price: 3 },
+    { name: "nalle2", src: nalle2, price: 3 },
+    { name: "bukett", src: bukett, price: 3 },
+    { name: "heart", src: heart, price: 2 },
+  ];
+
+  const renderEmojis = (emojis: Emoji[]) => (
+    <div className="emoji-group">
+      {emojis.map((emoji) => {
+        
+        const userEmoji = user.purchasedEmojis?.find((e) => e.emoji === emoji.name);
+        const emojiCount = userEmoji ? userEmoji.count : 0; 
+  
+        return (
+          <div key={emoji.name} className="emoji-item">
+            <img
+              src={emoji.src}
+              alt={emoji.name}
+              className={`emoji ${credits < emoji.price ? "disabled" : ""}`}
+              onClick={() => handlePurchaseEmoji(emoji.name, emoji.price)}
+            />
+            <p className="price-text">{emoji.price} kredit(er)</p>
+           
+            {emojiCount > 0 && <p className="emoji-count">Du har {emojiCount}</p>}
+          </div>
+        );
+      })}
+    </div>
+  );
+  const handlePurchase = async (type: PurchaseType, price: number): Promise<void> => {
     if (credits < price) {
       setErrorMessage("Du har inte tillräckligt med krediter!");
       return;
@@ -75,8 +154,7 @@ export const Shop = () => {
 
     try {
       let updatedUser = { ...user, credits: credits - price };
-      
-      console.log("Före uppdatering av användare:", updatedUser); 
+      setCredits(updatedUser.credits); 
 
       switch (type) {
         case 'VIP':
@@ -96,55 +174,13 @@ export const Shop = () => {
           };
           break;
 
-        case 'emoji':
-          if (emojiName) {
-            const existingEmoji = user.purchasedEmojis?.find((e: any) => e.emoji === emojiName);
-            const updatedEmojis = existingEmoji
-              ? user.purchasedEmojis.map((e: any) => e.emoji === emojiName ? { ...e, count: e.count + 1 } : e)
-              : [...(user.purchasedEmojis || []), { emoji: emojiName, count: 1 }];
-            updatedUser = { ...updatedUser, purchasedEmojis: updatedEmojis };
-          }
-          break;
-      }
-
+        }
+  
       await updateUserInDatabase(updatedUser);
-
-
-      console.log("Efter uppdatering av användare:", updatedUser); 
     } catch (error) {
       console.error("Något gick fel vid köpet:", error);
     }
-};
-
-  const handleAddCredits = async (amount: number): Promise<void> => {
-    const newCredits = credits + amount;
-    const updatedUser = { ...user, credits: newCredits };
-    await updateUserInDatabase(updatedUser);
-
   };
-
-  const emojis = [
-    { name: "nalle1", src: nalle1, price: 3 },
-    { name: "nalle2", src: nalle2, price: 3 },
-    { name: "bukett", src: bukett, price: 3 },
-    { name: "heart", src: heart, price: 2 },
-  ];
-
-  const renderEmojis = (emojis: Emoji[]) => (
-    <div className="emoji-group">
-      {emojis.map((emoji) => (
-        <div key={emoji.name} className="emoji-item">
-          <img
-            src={emoji.src}
-            alt={emoji.name}
-            className={`emoji ${credits < emoji.price ? "disabled" : ""}`}
-            onClick={() => handlePurchase('emoji', emoji.price, emoji.name)}
-          />
-          <p className="price-text">{emoji.price} kredit(er)</p>
-        </div>
-      ))}
-    </div>
-  );
   return (
     <>
       <div className="logga">
@@ -160,6 +196,15 @@ export const Shop = () => {
 
       <button className="vipinfobtn" onClick={toggleOpenInfo}>VIP information</button>
       {isOpen && <Vipinformation />}
+
+      <div className="vip-status">
+        {user.vipStatus && (
+          <p>VIP : Aktiv</p>
+        )}
+        {user.vipPlusStatus && (
+          <p>VIP Plus: Aktiv</p>
+        )}
+      </div>
 
       <div className="buybtncontainer">
         <button onClick={() => handlePurchase('VIP', prices.VIP)} className="shopBtn">
