@@ -24,3 +24,17 @@ export const updateUserInDatabase = async (updatedUser: User) => {
     console.error("Fel vid uppdatering av användare i databasen:", error);
   }
 };
+
+export const updateEmojiCountInDatabase = async (userId: string, emojiName: string, count: number) => {
+  const userRef = doc(db, 'users', userId);
+  const userDataToUpdate = {
+    [`purchasedEmojis.${emojiName}.count`]: count, 
+  };
+
+  try {
+    await updateDoc(userRef, userDataToUpdate);
+    console.log("Emoji count uppdaterad i Firebase");
+  } catch (error) {
+    console.error("Fel vid uppdatering av emoji count i Firebase:", error);
+  }
+};

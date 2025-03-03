@@ -81,7 +81,37 @@ export const useUserStore = create<UserStore>((set, get) => {
       deniedUsers: storedDeniedUsers
     });
   },
-  
+  purchaseEmoji: (emoji: string, price: number) => {
+    const currentUser = get().user;
+    if (!currentUser) return;
+
+    if (currentUser.credits < price) {
+      console.log('Inte tillräckligt med krediter!');
+      return;
+    }
+
+    const updatedCredits = currentUser.credits - price;
+     // Om emojin inte finns, lägg till den med count 1
+    // Kontrollera om emojin redan finns
+
+    const emojiIndex = currentUser.purchasedEmojis.findIndex((e) => e.emoji === emoji);
+    let updatedPurchasedEmojis = [...currentUser.purchasedEmojis];
+
+    if (emojiIndex !== -1) {
+
+      updatedPurchasedEmojis[emojiIndex].count += 1;
+    } else {
+
+      updatedPurchasedEmojis.push({ emoji, count: 1 });
+    }
+
+    const updatedUser = { ...currentUser, credits: updatedCredits, purchasedEmojis: updatedPurchasedEmojis };
+    set({ user: updatedUser });
+
+    const userId = updatedUser.id || '';
+    localStorage.setItem(getUserStorageKey(userId, 'credits'), JSON.stringify(updatedCredits));
+    localStorage.setItem(getUserStorageKey(userId, 'purchasedEmojis'), JSON.stringify(updatedPurchasedEmojis));
+  },
 
 
     // Återställ (rensa) listan med nekade användare
