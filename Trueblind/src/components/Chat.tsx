@@ -9,7 +9,7 @@ import heart from '../img/imgProdukter/heart.png'
 import { QuizComponent } from './games/quiz';
 import { addMessageToFirebase } from './data/ChatData';
 import { Message } from '../interface/interfaceUser';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc,getDoc } from 'firebase/firestore';
 import { db } from './data/firebase';
 
 export const Chat = ()  => {
@@ -19,10 +19,13 @@ export const Chat = ()  => {
     const [newMessage, setNewMessage] = useState('');
     const [showEmojis, setShowEmojis] = useState(false);
     const [showQuiz, setShowQuiz] = useState(false);
+    const [quizFinished, setQuizFinished] = useState(false);
+    const [matchResult, setMatchResult] = useState<string | null>(null);
     const [quizId, setQuizId] = useState<string | null>(null); 
     const [messages, setMessages] = useState<Message[]>([]);
     const currentChat = activeChats.find((chat) => chat.chatRoomId === chatRoomId);
     const navigate = useNavigate();
+
 
     useEffect(() => {
       if (chatRoomId) {
@@ -38,10 +41,25 @@ export const Chat = ()  => {
           }
         });
     
-        return () => getthechats(); 
+        return () => 
+        getthechats(); 
       }
     }, [chatRoomId]);
-
+    
+    useEffect(() => {
+      if (quizId) {
+        const quizRef = doc(db, 'quiz', quizId);
+    
+        const unsubscribe = onSnapshot(quizRef, (docSnapshot) => {
+          if (docSnapshot.exists()) {
+            const quizData = docSnapshot.data();
+            setQuizFinished(quizData.quizFinished || false);
+          }
+        });
+    
+        return () => unsubscribe();
+      }
+    }, [quizId]);
 
     const messagesite = () => { navigate('/messages'); };
    const isVip = user?.vipPlusStatus;  
@@ -54,8 +72,26 @@ export const Chat = ()  => {
        otherUserName = currentChat.userNames[currentChat.userIds.indexOf(otherUserId)];
      }
    }
+   
+   const joinQuiz = async () => {
+    if (!quizId || !user?.id) {
+      console.error('QuizId eller userId saknas.');
+      return;
+    }
+  
+    try {
 
+      const quizRef = doc(db, 'quiz', quizId);
+      await updateDoc(quizRef, {
+        user2: user.id,
+        user2Answers: {},
+      });
 
+      setShowQuiz(true); 
+    } catch (error) {
+      console.error('Fel vid start av quizet för user2:', error);
+    }
+  };
     const getUserStorageKey = (userId: string, key: string) => `${key}-${userId}`;
    
   
@@ -86,10 +122,6 @@ export const Chat = ()  => {
     }
   }, [currentChat]);
 
-   const startQuiz = (id: string) => {
-    setQuizId(id);
-    setShowQuiz(true);
-  };
 
   {/* Hanteringen av meddelande*/ }
   const handleSendMessage = async () => {
@@ -145,8 +177,6 @@ export const Chat = ()  => {
         const userId = currentUser.id || '';
         localStorage.setItem(getUserStorageKey(userId, 'purchasedEmojis'), JSON.stringify(updatedEmojis));
 
-        const updatedUser = { ...currentUser, purchasedEmojis: updatedEmojis };
-        useUserStore.getState().setUser(updatedUser);
   
         setTimeout(() => {
           sendEmoji(`<img src="${emojiName}" alt="emoji" class="sent-emoji"/>`);
@@ -160,6 +190,49 @@ export const Chat = ()  => {
     }
   };
 
+
+  
+  const handleQuizCompletion = async () => {
+    setQuizFinished(true);
+  
+    // Uppdatera matchresultatet i quizet
+    const quizRef = doc(db, 'quiz', quizId!);
+    await updateDoc(quizRef, {
+      matchResult: 'Ni har 85% matchning!',
+    });
+  
+    setMatchResult('Ni har 85% matchning!');
+  if (!user){
+    return;
+  }
+
+    if (currentChat && currentChat.userIds.length > 1) {
+      const user2Id = currentChat.userIds.find(id => id !== user.id); 
+      if (user2Id) {
+        const message: Message = {
+          id: new Date().toISOString(),
+          senderId: user.id,  
+          senderName: user.firstName || 'Användare',
+          timestamp: new Date().toISOString(),
+          message: 'Jag har slutfört quizet. Du kan nu delta!',
+        };
+  
+        await addMessageToFirebase(chatRoomId!, user.id, user.firstName || 'Användare', message.message);
+      }
+
+    }
+  };
+  const checkIfUserCanJoinQuiz = () => {
+    if (!currentChat) return false;
+  if(!user) return false;
+
+    const user2Message = currentChat.messages.some(msg =>
+      msg.message.includes("Du kan nu delta!") && msg.senderId !== user.id
+    );
+  
+    return user2Message;
+
+  };
   return (
     <>
       <div className="logga">
@@ -174,6 +247,16 @@ export const Chat = ()  => {
 
       {/* Chatten */}
       <div className="chat-container">
+{!showQuiz && currentChat?.startedByVipPlus && (
+  currentChat?.userIds.length < 2 || (currentChat?.userIds.length === 2 && !quizFinished)
+) && (
+  <button className="quiz-button" onClick={joinQuiz}>
+    Gå med i quizet
+  </button>
+)}
+
+
+
       {showQuiz ? (
           <div className="quiz-container">
             <button className="close-quiz" onClick={() => setShowQuiz(false)}>X</button>
@@ -181,7 +264,8 @@ export const Chat = ()  => {
               userId={user?.id || ''}
               quizId={quizId || ''}
               setQuizId={setQuizId}
-              vipPlusStatus={!!isVip}
+              startedByVipPlus={!!isVip}
+              onFinish={handleQuizCompletion}
             />
           </div>
 
@@ -200,6 +284,7 @@ export const Chat = ()  => {
           {msg.senderId === user?.id ? 'Du' : msg.senderName}
         </p>
         <p className="message-text" dangerouslySetInnerHTML={{ __html: msg.message }}></p>
+        
       </div>
 
     </div>
@@ -208,13 +293,16 @@ export const Chat = ()  => {
           </div>
         )}
       </div>
-      {/* Quiz-knapp */}
-      {isVip && !showQuiz && (
-        <button className="quiz-button" onClick={() => setShowQuiz(true)}>Starta quizet</button>
-      )}
-   {!isVip && !showQuiz && (
-        <button className="quiz-button" onClick={() => setShowQuiz(true)}>Delta i quizet</button>
-      )}
+      {!isVip && !showQuiz && currentChat?.startedByVipPlus && checkIfUserCanJoinQuiz() && (
+  <button 
+    className="quiz-button" 
+    onClick={joinQuiz}
+  >
+    Gå med i quizet
+  </button>
+)}
+
+
       
       <div className="chat-message-input-container">
         <textarea value={newMessage}
@@ -222,10 +310,16 @@ export const Chat = ()  => {
           placeholder="Skriv ditt meddelande..."   />
         <button className='sendBtn' onClick={handleSendMessage} disabled={!newMessage.trim()}>
           Skicka   </button>
+ </div>
+          <div className="rowBtncontainer"> 
         <button onClick={() => setShowEmojis(!showEmojis)} className="emoji-btn">
           Emojis    </button>
         <p>{errormessage}</p>
-
+      {/* Quiz-knapp */}
+      {isVip && !showQuiz && (
+        <button className="quiz-button" onClick={() => setShowQuiz(true)}>Starta quizet</button>
+      )}
+      </div> 
         {/* Emoji-väljare */}
         {showEmojis && (
           <div className="emoji-picker">
@@ -235,7 +329,7 @@ export const Chat = ()  => {
             <img src={heart} alt="heart" className="emoji" onClick={() => handleEmojiClick(heart)} />
           </div>
         )}
-      </div>
+     
     </>
   );
 };

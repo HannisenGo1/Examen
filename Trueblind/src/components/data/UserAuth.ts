@@ -135,10 +135,11 @@ export async function DeleteUser(usersId: string): Promise<void> {
     await reauthenticateWithCredential(user, credential);
  
     // Radera användaren från collection
+    // Radera användaren från Authentication
     const userDoc = doc(db, "users", usersId);
     await deleteDoc(userDoc);
 
-    // Radera användaren från Authentication
+    
     await deleteUser(user);
 
   } catch (error) {
@@ -159,7 +160,6 @@ export async function DeleteUser(usersId: string): Promise<void> {
   };
   
   
-  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
   
   export const doSendEmailVerification = async (): Promise<void> => {
     if (!auth.currentUser) {
@@ -175,7 +175,7 @@ export async function DeleteUser(usersId: string): Promise<void> {
     } catch (error: unknown) {
       if (error instanceof FirebaseError) {
         if (error.code === 'auth/too-many-requests') {
-          await delay(60000);  
+ 
           await sendEmailVerification(auth.currentUser);
         } else {
           console.error("Error sending email verification:", error.message);
@@ -188,16 +188,13 @@ export async function DeleteUser(usersId: string): Promise<void> {
     }
   };
   
-  export const retrySendVerificationEmail = async (user: any, retries: number = 3, delay: number = 2000): Promise<void> => {
+  export const retrySendVerificationEmail = async (user: any, retries: number = 3): Promise<void> => {
     try {
       await sendEmailVerification(user);
     } catch (error: unknown) {
       if (error instanceof FirebaseError) {
         console.error("Error sending email verification:", error.message);
         if (error.code === 'auth/too-many-requests' && retries > 0) {
-          console.warn(`Too many requests, retrying in ${delay / 1000} seconds...`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-          await retrySendVerificationEmail(user, retries - 1, delay * 2);
         }
         throw error;
       } else {

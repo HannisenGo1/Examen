@@ -85,3 +85,24 @@ export const saveChatToFirestore = async (chat: Chat) => {
   };
 
 
+  
+  //  hämta chat-id från quiz-id
+ export const getChatIdFromQuizId = async (quizId: string): Promise<string | null> => {
+    try {
+      const quizRef = doc(db, "quiz", quizId); 
+      const quizSnap = await getDoc(quizRef); 
+  
+      if (quizSnap.exists()) {
+        const quizData = quizSnap.data();
+   
+        return quizData.chatId || null;
+      } else {
+        console.log("Quizet finns inte");
+        return null;
+      }
+    } catch (error) {
+      console.error("Fel vid hämtning av chatId från quiz:", error);
+      return null;
+    }
+  };
+  

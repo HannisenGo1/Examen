@@ -11,13 +11,13 @@ export const FindPartners = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [matchingResults, setMatchingResults] = useState<User[]>([]);
   const [city, setCity] = useState('');
-  const [religion, setReligion] = useState('');
+  const [religion] = useState('');
   const [error, setError] = useState<string>('');
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const [minAge, setMinAge] = useState(18);
   const [maxAge, setMaxAge] = useState(100);
   const [currentUser,setCurrentUser]= useState(0)
-  const [nekadUser, setNekadUser] = useState<User[]>([]);
+  const [nekadUser] = useState<User[]>([]);
   const { user, likedUsers, addLikedUser,
     deniedUsers, resetDenyUsers,addDenyUsers,
   } = useUserStore();
@@ -50,8 +50,8 @@ export const FindPartners = () => {
       await fetchUsers();
       const storedUsers = useUserStore.getState().users; 
       console.log('Användare från store:', storedUsers);
-      
-      if (storedUsers.length > 0) {
+  
+      if (storedUsers && storedUsers.length > 0) {
         const filteredUsers = filterLikedAndDeniedUsers(storedUsers, likedUsers, deniedUsers);
         setUsers(filteredUsers);
       } else {
@@ -59,9 +59,10 @@ export const FindPartners = () => {
         setError('Kunde inte ladda användardata.');
       }
     };
-    
+  
     loadUsers();
   }, [likedUsers, deniedUsers]);
+  
   
   // SÖK PARNTER vid VAL.  X  |   <3
   // ut nya users och inte det som man har gjort ett val på,
@@ -240,8 +241,7 @@ export const FindPartners = () => {
       <li key={showCurrentUser.id} className="result-item">
       <div className="result-info">
       <h4>
-      {showCurrentUser.firstName}{" "}
-      <span className="age">, {showCurrentUser.age}</span>
+     
       {showCurrentUser.vipPlusStatus ? (
   <img src={viploggaplus} alt="viploggaplus" className="vip-logo" />
 ) : showCurrentUser.vipStatus ? (

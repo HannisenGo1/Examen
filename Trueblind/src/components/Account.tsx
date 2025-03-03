@@ -8,6 +8,8 @@ import { DeleteUser } from './data/UserAuth';
 import { isVIPExpired } from './VipUser';
 import { User } from '../interface/interfaceUser';
 import { daysRemaining } from './DaysCounterVip';
+
+
 export const AccountPage = () => {
   const navigate = useNavigate();
   const user = useUserStore((state) => state.user);
@@ -29,7 +31,18 @@ export const AccountPage = () => {
   const isVip = (user: User | undefined) => {
     return user?.vipStatus || user?.vipPlusStatus ||false;
   }
+  const doSignOut = async () => {
+    try {
+      await auth.signOut();
+      console.log("Användaren har loggat ut.");
+      navigate ('/')
+    } catch (error) {
+      console.error("Fel vid utloggning:", error);
+    }
+  };
+
   
+
 
   useEffect(() => {
     if (user) {
@@ -82,12 +95,7 @@ export const AccountPage = () => {
   const vipDaysLeft = daysRemaining(user.vipExpiry);
   const vipPlusDaysLeft = daysRemaining(user.vipPlusExpiry);
 
-  const doSignOut = async () => {
-    await auth.signOut();
-    useUserStore.getState().resetUser(); 
-    navigate ('/')
-  };
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("Ändringarna har sparats!"); 

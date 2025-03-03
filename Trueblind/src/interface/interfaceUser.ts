@@ -83,6 +83,7 @@ export interface Message  {
   senderName: string;
   timestamp: string;
   message:string;
+  quizId?:string;
 };
 
 export interface Chat {
@@ -91,4 +92,5 @@ export interface Chat {
   messages: Message[];
   userNames: string[];
   quizId?:string;
+  startedByVipPlus?:boolean
 }

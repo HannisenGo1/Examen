@@ -10,33 +10,29 @@ export interface Request {
 
 
 export interface UserStore {
-  user: User | null;
-  setUser: (userData: User) => void;
-  setUsers: (users:User[]) => void
-  resetUser: () => void;
+ user: User | null;
+ setUser: (userData: User) => void;
+users: User[],
+setUsers: (users: User[]) => void;
   searchResults: SearchResult[];
   addSearchResult: (searchResult: SearchResult) => void;
   clearSearchResults: () => void;
-  users: User[];
   likedUsers: User[];
   requests: Request[];
   addLikedUser: (user: User) => void;
-  updateUser: (updatedFields: Partial<User>) => void;
   removeLikedUser: (userId: string) => void;
-  setAllUsers: (users: User[]) => void;
   sendMessageRequest: (receiverId: string) => void;
   acceptMessageRequest: (senderId: string) => void;
   loadRequestsFromStorage: () => void;
   activeChats: Chat[];
   loadChatsFromStorage: () => void;
-  loadUserFromStorage: () => void;
+loadUserFromStorage: () => void
   deniedUsers: User[];
   addDenyUsers: (user:User) => void;
   resetDenyUsers: () => void;
   loadDeniedUsersFromStorage: () => void;
   token: string | null;
   setToken: (token: string | null) => void
-  logout: () => void
   chats: Chat[]
   setChats: (chats: Chat[]) => void  
 }
@@ -47,15 +43,16 @@ export const useUserStore = create<UserStore>((set, get) => {
   return {
     user: null,
     users: [],
-    setUsers: (users: User[]) => set({ users }),
     likedUsers: [],
     requests: [],
     searchResults: [],
     activeChats: [],
     seenUsers: [],
    deniedUsers:[],
+   setUsers: (users) => set({ users }),
    token: localStorage.getItem("authToken"), 
    chats: [],
+  
    setChats: (chats: Chat[]) => set({ chats }),
 
    setToken: (token: string | null) => {
@@ -66,48 +63,26 @@ export const useUserStore = create<UserStore>((set, get) => {
     }
     set({ token });
   },
-  logout: () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("currentUser");
-    localStorage.removeItem("currentCompany"); 
-    set({ user: null, token: null });
+  setUser: (userData: User) => {
+    console.log("Sätter användare:", userData);
+    const userId = userData.id ?? 'temp-user-id';
+    const userStorageKey = getUserStorageKey(userId, 'likedUsers');
+    const storedLikedUsers = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
+    const storedChats = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'activeChats')) || '[]');
+    const storedRequests = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'requests')) || '[]');
+    const userDeniedKey = getUserStorageKey(userId, 'deniedUsers');
+    const storedDeniedUsers = JSON.parse(localStorage.getItem(userDeniedKey) || '[]');
+  
+    set({
+      user: userData,
+      likedUsers: storedLikedUsers,
+      activeChats: storedChats,
+      requests: storedRequests,
+      deniedUsers: storedDeniedUsers
+    });
   },
-    setUser: (userData: User) => {
-      console.log("Sätter användare:", userData);
-      const userId = userData.id ?? 'temp-user-id';
-      const userStorageKey = getUserStorageKey(userId, 'likedUsers');
-      const storedLikedUsers = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
-      const storedChats = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'activeChats')) || '[]');
-      const storedRequests = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'requests')) || '[]');
-      const storedCredits = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'credits')) || '0');
-      const storedPurchasedEmojis = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'purchasedEmojis')) || '[]');
-      const storedVIPStatus = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'vipStatus')) || 'false');
-      const storedVIPExpiryString = localStorage.getItem(getUserStorageKey(userId, 'vipExpiry'));
-      const storedVIPExpiry = storedVIPExpiryString ? Number(storedVIPExpiryString) : null;
-      const storedVIPPLUSStatus = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'vipplusStatus')) || 'false');
-      const storedVIPPLUSExpiryString = localStorage.getItem(getUserStorageKey(userId, 'vipPlusExpiry'));
-      const storedVIPPLUSExpiry = storedVIPExpiryString ? Number(storedVIPPLUSExpiryString) : null;
-      const userDeniedKey = getUserStorageKey(userId, 'deniedUsers');
-      const storedDeniedUsers = JSON.parse(localStorage.getItem(userDeniedKey) || '[]');
-    
-      
-      set({ 
-        user: { 
-          ...userData,
-          credits: storedCredits || 0,  
-          purchasedEmojis: storedPurchasedEmojis || [],
-          vipStatus: storedVIPStatus || false,
-          vipExpiry: storedVIPExpiry,
-          vipPlusExpiry: storedVIPPLUSExpiry,
-          vipPlusStatus: storedVIPPLUSStatus
-        }, 
+  
 
-        likedUsers: storedLikedUsers, 
-        activeChats: storedChats, 
-        requests: storedRequests ,
-        deniedUsers: storedDeniedUsers,
-      });
-    },
 
     // Återställ (rensa) listan med nekade användare
     resetDenyUsers: () => {
@@ -120,55 +95,8 @@ export const useUserStore = create<UserStore>((set, get) => {
       console.log("Nekade användare återställda och rensade från Zustand/localStorage.");
     },
 
- 
-    updateUser: (updatedFields: Partial<User>) => {
-      set((state) => {
-        if (!state.user) return state;
-
-        const updatedUser = { ...state.user, ...updatedFields };
-
-        // Uppdatera localStorage med nya värden för credits och purchasedEmojis
-        const userId = updatedUser.id || '';
-        localStorage.setItem(getUserStorageKey(userId, 'credits'), JSON.stringify(updatedUser.credits));
-        localStorage.setItem(getUserStorageKey(userId, 'purchasedEmojis'), JSON.stringify(updatedUser.purchasedEmojis));
-        localStorage.setItem(getUserStorageKey(userId, 'vipStatus'), JSON.stringify(updatedUser.vipStatus));
-        localStorage.setItem(getUserStorageKey(userId, 'vipPlusStatus'), JSON.stringify(updatedUser.vipPlusStatus));
-        if (updatedUser.vipExpiry !== undefined && updatedUser.vipExpiry !== null) {
-          localStorage.setItem(getUserStorageKey(userId, 'vipExpiry'), updatedUser.vipExpiry.toString());
-        }
-        if (updatedUser.vipPlusExpiry !== undefined && updatedUser.vipPlusExpiry !== null) {
-          localStorage.setItem(getUserStorageKey(userId, 'vipPlusExpiry'), updatedUser.vipPlusExpiry.toString());
-        }
-        return { user: updatedUser };
-      });
-    },
-    resetUser: () => {
-      set({ user: null, likedUsers: [], activeChats: [] });
-    },
     // VIP 
-    setVIPStatus: (vipStatus: boolean) => {
-      set((state) => {
-        if (!state.user) return state;
-
-        const updatedUser = { ...state.user, vipStatus };
-        const userId = updatedUser.id || '';
-
-        localStorage.setItem(getUserStorageKey(userId, 'vipStatus'), JSON.stringify(updatedUser.vipStatus));
-
-        return { user: updatedUser };
-      });
-    },
-    // VIP + 
-    setVIPPLUSStatus: (vipPlusStatus: boolean) => {
-      set((state) => {
-        if (!state.user) return state;
-
-        const updatedUser = { ...state.user, vipPlusStatus };
-        const userId = updatedUser.id || '';
-        localStorage.setItem(getUserStorageKey(userId, 'vipPlusStatus'), JSON.stringify(updatedUser.vipPlusStatus));
-        return { user: updatedUser };
-      });
-    },
+   
     addDenyUsers: (user) => {
       const currentUser = get().user;
       if (!currentUser) return;
@@ -311,22 +239,7 @@ export const useUserStore = create<UserStore>((set, get) => {
           return { requests: updatedRequests, activeChats: updatedChats };
       });
   },
-  
-    loadUserFromStorage: () => {
-      const storedUser = localStorage.getItem('user');
-      console.log("Hämtad användare från localStorage:", storedUser);
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        
-        // Kontrollera om VIP har gått ut
-        if (parsedUser.vipExpiry && new Date().getTime() > new Date(parsedUser.vipExpiry).getTime()) {
-          parsedUser.vipStatus = false;
-          parsedUser.vipExpiry = null;
-        }
-    
-        set({ user: parsedUser });
-      }
-    }, 
+
     loadChatsFromStorage: () => {
       const user = get().user;
       if (user) {
@@ -386,55 +299,11 @@ export const useUserStore = create<UserStore>((set, get) => {
     
       set({ deniedUsers: storedDeniedUsers });
     },
-
-
-    setAllUsers: (users: User[]) => {
-      set({ users });
-    },
-
-    purchaseEmoji: (emoji: string, price: number) => {
-      const currentUser = get().user;
-      if (!currentUser) return;
-    
-      if (currentUser.credits < price) {
-        console.log('Inte tillräckligt med krediter!');
-        return;
-      }
-    
-      const updatedCredits = currentUser.credits - price;
-       // Om emojin inte finns, lägg till den med count 1
-      // Kontrollera om emojin redan finns
-
-      const emojiIndex = currentUser.purchasedEmojis.findIndex((e) => e.emoji === emoji);
-      let updatedPurchasedEmojis = [...currentUser.purchasedEmojis];
-    
-      if (emojiIndex !== -1) {
-   
-        updatedPurchasedEmojis[emojiIndex].count += 1;
-      } else {
-     
-        updatedPurchasedEmojis.push({ emoji, count: 1 });
-      }
-    
-      const updatedUser = { ...currentUser, credits: updatedCredits, purchasedEmojis: updatedPurchasedEmojis };
-      set({ user: updatedUser });
-    
-      const userId = updatedUser.id || '';
-      localStorage.setItem(getUserStorageKey(userId, 'credits'), JSON.stringify(updatedCredits));
-      localStorage.setItem(getUserStorageKey(userId, 'purchasedEmojis'), JSON.stringify(updatedPurchasedEmojis));
-    },
-
-addCredits: (amount: number) => {
-  const currentUser = get().user;
-  if (!currentUser) return;
-
-  const updatedCredits = currentUser.credits + amount;
-  const updatedUser = { ...currentUser, credits: updatedCredits };
-  set({ user: updatedUser });
-
-  const userId = updatedUser.id || '';
-  localStorage.setItem(getUserStorageKey(userId, 'credits'), JSON.stringify(updatedCredits));
-},
- 
+ loadUserFromStorage: () => {
+  const storedUser = localStorage.getItem('user')
+  if ( storedUser){
+    const parsedUser = JSON.parse(storedUser)
+  }
+ }
   };
 });
