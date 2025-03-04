@@ -16,6 +16,8 @@ export const updateUserInDatabase = async (updatedUser: User) => {
     purchasedEmojis: updatedUser.purchasedEmojis ?? [], 
   };
 
+  console.log('Uppdaterar användardata med följande:', userDataToUpdate);
+  
   try {
     console.log('uppdateras användaren?', updatedUser);
     await updateDoc(userRef, userDataToUpdate);
@@ -38,3 +40,4 @@ export const updateEmojiCountInDatabase = async (userId: string, emojiName: stri
     console.error("Fel vid uppdatering av emoji count i Firebase:", error);
   }
 };
+

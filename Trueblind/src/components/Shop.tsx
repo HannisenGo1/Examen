@@ -126,9 +126,9 @@ export const Shop = () => {
   const renderEmojis = (emojis: Emoji[]) => (
     <div className="emoji-group">
       {emojis.map((emoji) => {
-        
-        const userEmoji = user.purchasedEmojis?.find((e) => e.emoji === emoji.name);
-        const emojiCount = userEmoji ? userEmoji.count : 0; 
+        const purchasedEmojis = Array.isArray(user.purchasedEmojis) ? user.purchasedEmojis : [];
+        const userEmoji = purchasedEmojis.find((e) => e.emoji === emoji.name);
+        const emojiCount = userEmoji ? userEmoji.count : 0;
   
         return (
           <div key={emoji.name} className="emoji-item">
@@ -139,7 +139,7 @@ export const Shop = () => {
               onClick={() => handlePurchaseEmoji(emoji.name, emoji.price)}
             />
             <p className="price-text">{emoji.price} kredit(er)</p>
-           
+  
             {emojiCount > 0 && <p className="emoji-count">Du har {emojiCount}</p>}
           </div>
         );

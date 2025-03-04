@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { useUserStore } from '../storage/storage';
 import { User } from '../interface/interfaceUser';
 import { fetchUsers } from './data/GetUserData';
-
-// import {isVIPExpired}  from './VipUser'
+import {doc, updateDoc} from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
 import viplogga from '../img/viplogga.png'
 import viploggaplus from '../img/viplogga+.png'
+
 
 export const FindPartners = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -18,33 +19,33 @@ export const FindPartners = () => {
   const [maxAge, setMaxAge] = useState(100);
   const [currentUser,setCurrentUser]= useState(0)
   const [nekadUser] = useState<User[]>([]);
-  const { user, likedUsers, addLikedUser,
-    deniedUsers, resetDenyUsers,addDenyUsers,
-  } = useUserStore();
+  const { user, likedUsers, addLikedUser, deniedUsers, resetDenyUsers,addDenyUsers } = useUserStore();
   
-  
+// storage key för användarens id.
+const getUserStorageKey = (userId: string, key: string) => `${key}-${userId}`;
+const db = getFirestore();
+
+
   const isVip = (user: User | undefined) => {
-    return user?.vipStatus || user?.vipPlusStatus ||false;
-  }
-  
-  
-  
+    return user?.vipStatus || user?.vipPlusStatus || false;   }
+
+// eftersom typescript klagade på user is undefined. 
   if (!user) {
-    return <p>Du måste vara inloggad för att söka efter partners.</p>;
-  }
+return<p>Du måste vara inloggad för att söka efter partners</p> }
   
+
   const { gender: yourGender, sexualOrientation: yourSexualOrientation, id: yourId } = user;
-  
-  const getUserStorageKey = (userId: string, key: string) => `${key}-${userId}`;
-  
+
   
   const filterLikedAndDeniedUsers = (users: User[], likedUsers: User[], deniedUsers: User[]): User[] => {
     return users.filter(user => 
       !likedUsers.some(likedUser => likedUser.id === user.id) && 
       !deniedUsers.some(deniedUser => deniedUser.id === user.id)
     );
+
   };
-  
+
+  // hämtning av gillade och nekade användare från storage.
   useEffect(() => {
     const loadUsers = async () => {
       await fetchUsers();
@@ -63,14 +64,7 @@ export const FindPartners = () => {
     loadUsers();
   }, [likedUsers, deniedUsers]);
   
-  
-  // SÖK PARNTER vid VAL.  X  |   <3
-  // ut nya users och inte det som man har gjort ett val på,
-  // tas det bort från gilla listan så kan man få ut dom igen.
-  // Vip - Få ut neka listan 
-  // INTE se sitt egna konto som val.   
-  
-  
+// calculering utav användarnas egenskaper för matchning. 
   const calculateMatch = (likedUser: User) => {
     if (!user) return 0;
     let matchScore = 0;
@@ -86,15 +80,13 @@ export const FindPartners = () => {
     return Math.round(matchPercentage);
   };
   
-  
-  
+
   const filterUsers = () => {
     if (!users || users.length === 0) {
       return;
     }
     const normalizedSexualOrientation = yourSexualOrientation;
-    
-    
+
     const filteredUsers = users.filter((user: User) => {
       if (user.id === yourId) {
         return false;
@@ -127,11 +119,8 @@ export const FindPartners = () => {
           isGenderMatch = true;
         }
       }
-      
       return isCityMatch && isGenderMatch && isReligionMatch && isNotDenied;;
-      
     });
-    
     
     setMatchingResults(filteredUsers);
     setCurrentUser(0); 
@@ -156,21 +145,18 @@ export const FindPartners = () => {
       nextUser();
     }
   };
-  
-  
-  // lägg till användaren i neka listan X 
-  // Ta bort nekad användare från fetch-listan
-  const handleDeny = (userId: string) => {
+
+  const handleDeny = async (userId: string) => {
     const deniedUser = matchingResults.find((user) => user.id === userId);
+  
     if (deniedUser) {
-      addDenyUsers(deniedUser);
-      const updatedDeniedUsers = [...deniedUsers, deniedUser];
-      localStorage.setItem(getUserStorageKey(user?.id ?? "temp-user-id", "deniedUsers"), JSON.stringify(updatedDeniedUsers));
-      
-      setMatchingResults((prev) => prev.filter((user) => user.id !== userId)); 
+      await addDenyUsers(deniedUser);
+  
+      setMatchingResults((prev) => prev.filter((user) => user.id !== userId));
       nextUser();
     }
   };
+  
   
   const nextUser = () => {
     if (matchingResults.length > 1) {
@@ -179,7 +165,7 @@ export const FindPartners = () => {
       setCurrentUser(0); 
     }
   };
-  
+
   
   const showCurrentUser = matchingResults[currentUser];
   const [loadedDeniedUsers, setLoadedDeniedUsers] = useState<User[]>([]);
@@ -193,16 +179,34 @@ export const FindPartners = () => {
   }, [user?.id]);
   
   // Återställ nekade användare om man är VIP
-  const restoreDeniedUsers = () => {
-    if (!isVip || loadedDeniedUsers.length === 0) return;
-    
+  // Fetcha ut ifrån databasen.
+ 
+  const restoreDeniedUsers = async () => {  
+    if (!isVip(user)) {
+      console.log('Endast VIP-användare kan återställa nekade användare.');
+      return;
+    }
+  
+    resetDenyUsers();
+
     setMatchingResults((prevState) => [...loadedDeniedUsers, ...prevState]);
-    
-    setTimeout(() => {
-      resetDenyUsers(); 
+  
+
+    const userRef = doc(db, 'users', user.id);
+    const updatedDenylist = user.denylist.filter((deniedUser) => !loadedDeniedUsers.some((u) => u.id === deniedUser.id));
+  
+    try {
+      await updateDoc(userRef, {
+        denylist: updatedDenylist, 
+      });
+  
       setLoadedDeniedUsers([]); 
-    }, 100);
+    } catch (error) {
+      console.error('Kunde inte återställa nekade användare:', error);
+    }
   };
+
+
   
   return (
     <div className="columndiv3">

@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { User, SearchResult, Message,Chat } from '../interface/interfaceUser';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../components/data/firebase';
 
 export interface Request {
   senderId: string;
@@ -91,9 +93,6 @@ export const useUserStore = create<UserStore>((set, get) => {
     }
 
     const updatedCredits = currentUser.credits - price;
-     // Om emojin inte finns, lägg till den med count 1
-    // Kontrollera om emojin redan finns
-
     const emojiIndex = currentUser.purchasedEmojis.findIndex((e) => e.emoji === emoji);
     let updatedPurchasedEmojis = [...currentUser.purchasedEmojis];
 
@@ -115,30 +114,54 @@ export const useUserStore = create<UserStore>((set, get) => {
 
 
     // Återställ (rensa) listan med nekade användare
-    resetDenyUsers: () => {
+    resetDenyUsers: async () => {
       console.log("Återställer nekade användare:", get().deniedUsers);
     
       set({ deniedUsers: [] });
+  
       const userId = get().user?.id ?? 'temp-user-id';
       localStorage.removeItem(getUserStorageKey(userId, 'deniedUsers'));
     
-      console.log("Nekade användare återställda och rensade från Zustand/localStorage.");
+      console.log("Nekade användare återställda och rensade från localStorage.");
+  
+      const userRef = doc(db, 'users', userId);
+    
+      try {
+        // Tar ut alla nekade användare och tömmer listan i firebase! 
+        await updateDoc(userRef, {
+          denylist: [] 
+        });
+    
+        console.log('Denylist återställd i Firebase');
+      } catch (error) {
+        console.error('Kunde inte återställa denylist i Firebase:', error);
+      }
     },
 
-    // VIP 
    
-    addDenyUsers: (user) => {
+    addDenyUsers: async (userToDeny) => {
       const currentUser = get().user;
       if (!currentUser) return;
+  
+      const updatedDeniedUsers = [...get().deniedUsers, userToDeny];
       const userStorageKey = getUserStorageKey(currentUser.id!, 'deniedUsers');
-      
-      const updatedDeniedUsers = [...get().deniedUsers, user];
       localStorage.setItem(userStorageKey, JSON.stringify(updatedDeniedUsers));
       
       set({ deniedUsers: updatedDeniedUsers });
+  
       console.log("Uppdaterade nekade användare:", updatedDeniedUsers);
+  
+      const userRef = doc(db, 'users', currentUser.id);
+  
+      try {
+        await updateDoc(userRef, {
+          denylist: updatedDeniedUsers,
+        });
+        console.log("Denylist uppdaterad i Firestore");
+      } catch (error) {
+        console.error("Fel vid uppdatering av denylist i Firestore:", error);
+      }
     },
-
 
     addLikedUser: (user) => {
       const currentUser = get().user;

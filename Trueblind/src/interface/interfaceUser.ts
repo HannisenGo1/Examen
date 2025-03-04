@@ -23,7 +23,6 @@ export type FormData = {
   lifeStatement1: string;
   lifeStatement2: string;
   id?: string;
-  password: string;
   credits: number;
   purchasedEmojis: Emoji[];
   vipStatus: boolean;
@@ -68,6 +67,7 @@ export interface User {
   vipExpiry?: number | null; 
   vipPlusStatus?:boolean;
   vipPlusExpiry?: number | null;
+  denylist: User[];
 }
 
 export interface SearchResult {
