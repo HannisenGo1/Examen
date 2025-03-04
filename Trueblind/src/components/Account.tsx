@@ -93,14 +93,18 @@ export const AccountPage = () => {
   const vipDaysLeft = daysRemaining(user.vipExpiry);
   const vipPlusDaysLeft = daysRemaining(user.vipPlusExpiry);
 
-  const calculateAge = (birthdate: { year: number; month: number; day: number }) => {
+  const calculateAge = (year: number, month: number, day: number): number => {
     const today = new Date();
-    const birthDate = new Date(birthdate.year, birthdate.month - 1, birthdate.day);
+    const birthDate = new Date(year, month - 1, day);
     let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
+  
+    if (
+      today.getMonth() < birthDate.getMonth() || 
+      (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())
+    ) {
+      age--; 
     }
+  
     return age;
   };
   
@@ -172,7 +176,17 @@ export const AccountPage = () => {
     {isOpen && (
       <div className="columndiv2">
       <p><strong>Ditt namn: {user.firstName}</strong></p>
-      <p><strong>Ålder: {user?.age?.year ? `${user.age.year}-${user.age.month}-${user.age.day}` : 'Ej angivet'}</strong></p>
+      <p>
+  <strong>
+    Ålder: {user?.age?.year && user?.age?.month && user?.age?.day 
+      ? calculateAge(
+          Number(user.age.year), 
+          Number(user.age.month), 
+          Number(user.age.day)
+        ) 
+      : 'Ej angivet'}
+  </strong>
+</p>
 
 
 
