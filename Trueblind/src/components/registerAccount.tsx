@@ -11,7 +11,10 @@ export const Register = () => {
     const [formData, setFormData] = useState<FormData>({
         firstName: '',
         lastName:'',
-        age: 18,
+        age: { 
+            month: '', 
+            day: '', 
+            year: '' },
         city: '',
         gender: '',
         sexualOrientation: '',
@@ -62,6 +65,13 @@ export const Register = () => {
     
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            age: {
+              ...prevData.age,
+              [name]: value,
+            },
+          }));
         
         if (type === 'checkbox') {
             const checked = (e.target as HTMLInputElement).checked;
@@ -206,15 +216,41 @@ export const Register = () => {
             />
             {errors.lastName && <span className="error">{errors.lastName}</span>}
             
-            <label htmlFor="age">Ålder</label>
-            <input
-            type="number"
-            id="age"
-            name="age"
-            value={formData.age}
-            onChange={handleChange}
-            />
-            {errors.age && <span className="error">{errors.age}</span>}
+            <label htmlFor="month">Månad</label>
+<input
+  type="number"
+  id="month"
+  name="month"
+  value={formData.age.month}
+  onChange={handleChange}
+  min="1"
+  max="12"
+  placeholder="Välj månad"
+/>
+
+<label htmlFor="day">Dag</label>
+<input
+  type="number"
+  id="day"
+  name="day"
+  value={formData.age.day}
+  onChange={handleChange}
+  min="1"
+  max="31"
+  placeholder="Välj dag"
+/>
+
+<label htmlFor="year">År</label>
+<input
+  type="number"
+  id="year"
+  name="year"
+  value={formData.age.year}
+  onChange={handleChange}
+  min="1945"
+  max="2025"
+  placeholder="Skriv in år (4 siffror)"
+/>
             
             <label htmlFor="city">Stad</label>
             <input

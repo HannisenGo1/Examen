@@ -1,11 +1,14 @@
 
-
 export type FormData = {
   minAge?: number; 
   maxAge?: number;
   firstName: string;
   lastName: string;
-  age: number;
+  age: {  
+    month: string;  
+    day: string;   
+    year: string;   
+  };
   city: string;
   gender: string;
   sexualOrientation: string;
@@ -24,6 +27,7 @@ export type FormData = {
   lifeStatement2: string;
   id?: string;
   credits: number;
+  password?:string;
   purchasedEmojis: Emoji[];
   vipStatus: boolean;
   vipExpiry: number | null; 
@@ -38,7 +42,11 @@ type Emoji = { emoji:string; count:number}
 export interface User {
   firstName: string;
   lastName?:string;
-  age: number;
+ age: {  
+    month: string;  
+    day: string;   
+    year: string;   
+  };
   city: string;
   email: string;
   gender: string;

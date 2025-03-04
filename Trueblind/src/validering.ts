@@ -12,8 +12,29 @@ export const validateFormData = (step: number, formData: any) => {
       }
     }
 
+    if (!formData.age || !formData.age.month || !formData.age.day || !formData.age.year) {
+      errors.age = 'Ålder måste anges.';
+    } else {
+      const { month, day, year } = formData.age;
 
-    if (!formData.age || formData.age < 18) errors.age = 'Ålder måste vara minst 18.';
+      const birthDate = new Date(year, month - 1, day); 
+      const currentDate = new Date();
+
+
+      let age = currentDate.getFullYear() - birthDate.getFullYear();
+      const monthDifference = currentDate.getMonth() - birthDate.getMonth();
+
+      if (monthDifference < 0 || (monthDifference === 0 && currentDate.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      if (age < 18) {
+        errors.age = 'Ålder måste vara minst 18.';
+      }
+    }
+    if (formData.age.year && (formData.age.year.length !== 4 || isNaN(Number(formData.age.year)))) {
+      errors.year = 'Året måste vara ett giltigt fyra-siffrigt tal.';
+    }
     if (!formData.city) errors.city = 'Stad är obligatoriskt.';
     if (!formData.email) errors.email = 'Epost är obligatoriskt';
   }

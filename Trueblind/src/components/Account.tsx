@@ -31,6 +31,7 @@ export const AccountPage = () => {
   const isVip = (user: User | undefined) => {
     return user?.vipStatus || user?.vipPlusStatus ||false;
   }
+
   const doSignOut = async () => {
     try {
       await auth.signOut();
@@ -40,9 +41,6 @@ export const AccountPage = () => {
       console.error("Fel vid utloggning:", error);
     }
   };
-
-  
-
 
   useEffect(() => {
     if (user) {
@@ -95,6 +93,17 @@ export const AccountPage = () => {
   const vipDaysLeft = daysRemaining(user.vipExpiry);
   const vipPlusDaysLeft = daysRemaining(user.vipPlusExpiry);
 
+  const calculateAge = (birthdate: { year: number; month: number; day: number }) => {
+    const today = new Date();
+    const birthDate = new Date(birthdate.year, birthdate.month - 1, birthdate.day);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -163,9 +172,11 @@ export const AccountPage = () => {
     {isOpen && (
       <div className="columndiv2">
       <p><strong>Ditt namn: {user.firstName}</strong></p>
-      <p><strong>Ålder: {user.age}</strong></p>
+      <p><strong>Ålder: {user?.age?.year ? `${user.age.year}-${user.age.month}-${user.age.day}` : 'Ej angivet'}</strong></p>
 
-{hasActiveVipPlus ? (
+
+
+      {hasActiveVipPlus ? (
         <p>Du har <strong>VIP Plus</strong>. 
         {vipPlusDaysLeft > 0 ? `Det är ${vipPlusDaysLeft} dagar kvar på din VIP Plus.` : ''}</p>
       ) : hasActiveVip ? (
