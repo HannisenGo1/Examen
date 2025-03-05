@@ -78,30 +78,27 @@ export const Shop = () => {
     const updatedCredits = credits - price;
     setCredits(updatedCredits);
   
-    const existingEmoji = user.purchasedEmojis?.find((e) => e.emoji === emojiName);
+   
+    const purchasedEmojis = Array.isArray(user?.purchasedEmojis) ? user.purchasedEmojis : [];
+  
+    const existingEmoji = purchasedEmojis.find((e) => e.emoji === emojiName);
     console.log("Existerande emoji:", existingEmoji);
-
+  
     const updatedEmojis = existingEmoji
-      ? user.purchasedEmojis.map((e) =>
+      ? purchasedEmojis.map((e) =>
           e.emoji === emojiName ? { ...e, count: e.count + 1 } : e
         )
-      : [...(user.purchasedEmojis || []), { emoji: emojiName, count: 1 }];
-    
-    console.log("Köpta emojis efter uppdatering:", updatedEmojis);
-  
+      : [...purchasedEmojis, { emoji: emojiName, count: 1 }];
+      
     const updatedUser = {
       ...user,
       credits: updatedCredits,
       purchasedEmojis: updatedEmojis,
     };
   
-    console.log("Uppdaterat användarobjekt:", updatedUser);
-  
     try {
       await updateUserInDatabase(updatedUser);
-      console.log("Användaren uppdaterades  i databasen");
-  
-      setUser(updatedUser);  
+      setUser(updatedUser); 
     } catch (error) {
       console.error("Något gick fel vid uppdateringen av användaren:", error);
     }
@@ -131,14 +128,14 @@ export const Shop = () => {
         const emojiCount = userEmoji ? userEmoji.count : 0;
   
         return (
-          <div key={emoji.name} className="emoji-item">
+          <div key={emoji.name} className="emoji-picker2">
             <img
               src={emoji.src}
               alt={emoji.name}
               className={`emoji ${credits < emoji.price ? "disabled" : ""}`}
               onClick={() => handlePurchaseEmoji(emoji.name, emoji.price)}
             />
-            <p className="price-text">{emoji.price} kredit(er)</p>
+            <p className="price-text">{emoji.price}</p>
   
             {emojiCount > 0 && <p className="emoji-count">Du har {emojiCount}</p>}
           </div>
@@ -191,12 +188,9 @@ export const Shop = () => {
         <i className="fas fa-arrow-left"></i>
       </button>
 
-      <h1 className="Rubriktext">SHOPPEN</h1>
+      <h1 className="Rubriktext">
+      <span className="firstPart"> SHOPPEN </span> </h1>
       <p className="price-text">Din kredit: {credits}</p>
-
-      <button className="vipinfobtn" onClick={toggleOpenInfo}>VIP information</button>
-      {isOpen && <Vipinformation />}
-
       <div className="vip-status">
         {user.vipStatus && (
           <p>VIP : Aktiv</p>
@@ -205,6 +199,11 @@ export const Shop = () => {
           <p>VIP Plus: Aktiv</p>
         )}
       </div>
+      
+      <button className="vipinfobtn" onClick={toggleOpenInfo}>VIP information</button>
+      {isOpen && <Vipinformation />}
+
+
 
       <div className="buybtncontainer">
         <button onClick={() => handlePurchase('VIP', prices.VIP)} className="shopBtn">
@@ -240,11 +239,11 @@ export const Shop = () => {
         {errorMessage && <p>{errorMessage}</p>}
       </div>
 
-      <div className="emoji-picker2">
+     
         <div className="emoji-item">
           {renderEmojis(emojis)}
         </div>
-      </div>
+      
     </>
   );
 };

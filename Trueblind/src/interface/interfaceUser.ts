@@ -42,11 +42,13 @@ type Emoji = { emoji:string; count:number}
 export interface User {
   firstName: string;
   lastName?:string;
+
  age: {  
     month: string;  
     day: string;   
     year: string;   
   };
+
   city: string;
   email: string;
   gender: string;
@@ -76,6 +78,12 @@ export interface User {
   vipPlusStatus?:boolean;
   vipPlusExpiry?: number | null;
   denylist: User[];
+
+  status?: {
+    online:boolean
+    lastLogin?: number | null
+  }
+
 }
 
 export interface SearchResult {
@@ -101,4 +109,9 @@ export interface Chat {
   userNames: string[];
   quizId?:string;
   startedByVipPlus?:boolean
+  
+  status?: {
+    online:boolean
+    lastLogin?: number | null
+  }
 }

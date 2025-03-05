@@ -18,3 +18,13 @@ export const fetchUsers = async () => {
     console.error('Kunde inte hämta användare:', error);
   }
 };
+
+export const updateOnlineStatus = (user: User, online: boolean): User => {
+  return {
+    ...user,
+    status: {
+      online,
+      lastLogin: online ? new Date().toISOString() : user.status?.lastLogin || null,
+    },
+  };
+};

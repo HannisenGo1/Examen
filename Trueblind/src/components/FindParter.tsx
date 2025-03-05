@@ -166,7 +166,21 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
     }
   };
 
+  const calculateAge = (year: number, month: number, day: number): number => {
+    const today = new Date();
+    const birthDate = new Date(year, month - 1, day);
+    let age = today.getFullYear() - birthDate.getFullYear();
   
+    if (
+      today.getMonth() < birthDate.getMonth() || 
+      (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())
+    ) {
+      age--; 
+    }
+  
+    return age;
+  };
+
   const showCurrentUser = matchingResults[currentUser];
   const [loadedDeniedUsers, setLoadedDeniedUsers] = useState<User[]>([]);
   
@@ -252,7 +266,16 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
   <img src={viplogga} alt="viplogga" className="vip-logo" />
 ) : null}
       </h4>
-      <h4>{showCurrentUser.firstName} <span className="age">, {showCurrentUser.age}</span></h4>
+      <div className={`status-inlog ${showCurrentUser.status?.online ? 'online' : 'offline'}`}></div>
+      <h4>{showCurrentUser.firstName} <span className="age">, 
+      Ålder: {showCurrentUser.age?.year && showCurrentUser.age?.month && showCurrentUser?.age?.day 
+      ? calculateAge(
+          Number(user.age.year), 
+          Number(user.age.month), 
+          Number(user.age.day)
+        ) 
+      : 'Ej angivet'} </span></h4>
+      
       <p><strong>Matchar: {calculateMatch(showCurrentUser)}%</strong> </p>
       <p><strong>Kön:</strong> {showCurrentUser.gender}</p>
       <p><strong>Religion:</strong> {showCurrentUser.religion}</p>

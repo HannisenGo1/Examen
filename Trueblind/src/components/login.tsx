@@ -1,8 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
+import { doc, updateDoc, serverTimestamp,getFirestore } from 'firebase/firestore';
+
 
 import { doSignInWithEmailAndPassword } from './data/UserAuth';
 import logga from '../img/logga.png';
+import { auth } from './data/firebase';
+const db = getFirestore()
+
+
 //import ForgotPassword from './auth/ForgotPassword';
 
 
@@ -15,14 +21,24 @@ export const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     try {
       const result = await doSignInWithEmailAndPassword(email, password);
-
+  
       if (typeof result === 'string') {
         setError(result);
       } else {
-        console.log("Inloggning lyckades:", result);
+        const user = auth.currentUser;
+        if (user) {
+          const userDocRef = doc(db, 'users', user.uid);
+          await updateDoc(userDocRef, {
+            'status.online': true,
+            'status.lastLogin': serverTimestamp() 
+          });
+  
+          console.log("Användaren är nu online:", user.email);
+        }
+  
         navigate('/homepage');
       }
     } catch (error: any) {

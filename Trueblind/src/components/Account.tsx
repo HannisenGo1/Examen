@@ -3,11 +3,12 @@ import logga from '../img/logga.png';
 import { useUserStore } from '../storage/storage';
 import { useNavigate } from 'react-router-dom';
 import { FaPen } from 'react-icons/fa';
-import {auth} from './data/firebase'
+import {auth,db} from './data/firebase'
 import { DeleteUser } from './data/UserAuth';
 import { isVIPExpired } from './VipUser';
-import { User } from '../interface/interfaceUser';
+
 import { daysRemaining } from './DaysCounterVip';
+import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 
 
 export const AccountPage = () => {
@@ -28,15 +29,23 @@ export const AccountPage = () => {
     sexualOrientation: user ? user.sexualOrientation : '',
     
   });
-  const isVip = (user: User | undefined) => {
-    return user?.vipStatus || user?.vipPlusStatus ||false;
-  }
+
 
   const doSignOut = async () => {
     try {
+      const user = auth.currentUser;
+      
+      if (user) {
+        const userDocRef = doc(db, 'users', user.uid);
+        await updateDoc(userDocRef, {
+          'status.online': false,
+          'status.lastLogout': serverTimestamp() 
+        });
+      }
       await auth.signOut();
       console.log("Användaren har loggat ut.");
-      navigate ('/')
+      console.log("Användaren har nu loggat ut:", user);
+      navigate('/');
     } catch (error) {
       console.error("Fel vid utloggning:", error);
     }

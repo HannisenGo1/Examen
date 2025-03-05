@@ -28,6 +28,9 @@ export const Chat = ()  => {
   const navigate = useNavigate();
   const purchasedEmojis = user?.purchasedEmojis || [];
 
+
+  //const onlineUsers = users.status((user) => user.status?.online);
+
   useEffect(() => {
     if (chatRoomId) {
       const chatRef = doc(db, 'chats', chatRoomId);
@@ -71,6 +74,7 @@ export const Chat = ()  => {
     const otherUserId = currentChat.userIds.find(id => id !== user.id);
     if (otherUserId) {
       otherUserName = currentChat.userNames[currentChat.userIds.indexOf(otherUserId)];
+
     }
   }
   
@@ -301,7 +305,11 @@ return (
   <i className="fas fa-arrow-left"></i>
   </button>
   </div>
-  <h1 className='Rubriktext2'>Din chatt med {otherUserName}</h1>
+
+  <h1 className='Rubriktext2'> 
+    Din chatt med {otherUserName}
+  <p className={`status-inlog ${currentChat?.status?.online ? 'online' : 'offline'}`}> </p></h1>
+   
   
   {/* Chatten */}
   
@@ -354,9 +362,7 @@ return (
   {!isVip && !showQuiz && currentChat?.startedByVipPlus && checkIfUserCanJoinQuiz() && (
     <button 
     className="quiz-button" 
-    onClick={joinQuiz}
-    >
-    Gå med i quizet
+    onClick={joinQuiz}>    Gå med i quizet
     </button>
   )}
   
