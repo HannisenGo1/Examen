@@ -14,6 +14,8 @@ export const updateUserInDatabase = async (updatedUser: User) => {
     vipPlusStatus: updatedUser.vipPlusStatus ?? false,
     vipPlusExpiry: updatedUser.vipPlusExpiry ?? null, 
     purchasedEmojis: updatedUser.purchasedEmojis ?? [], 
+    city: updatedUser.city ?? null,
+    sexualOrientation: updatedUser.sexualOrientation ?? null,
   };
 
   console.log('Uppdaterar användardata med följande:', userDataToUpdate);

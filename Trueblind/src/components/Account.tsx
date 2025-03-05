@@ -9,6 +9,7 @@ import { isVIPExpired } from './VipUser';
 
 import { daysRemaining } from './DaysCounterVip';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { updateUserInDatabase } from './data/UpdateDatabase';
 
 
 export const AccountPage = () => {
@@ -18,6 +19,8 @@ export const AccountPage = () => {
   const [message,setMessage] = useState('')
   const [showConfirm,setShowConfirm]= useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  
+  
   const [isEditing, setIsEditing] = useState({
     firstName: false,
     city: false,
@@ -29,8 +32,8 @@ export const AccountPage = () => {
     sexualOrientation: user ? user.sexualOrientation : '',
     
   });
-
-
+  
+  
   const doSignOut = async () => {
     try {
       const user = auth.currentUser;
@@ -50,13 +53,12 @@ export const AccountPage = () => {
       console.error("Fel vid utloggning:", error);
     }
   };
-
+  
   useEffect(() => {
     if (user) {
       setUpdatedUserData({
         city: user.city,
         sexualOrientation: user.sexualOrientation,
-        
       });
     }
   }, [user]);
@@ -75,6 +77,12 @@ export const AccountPage = () => {
       [field]: true,
     }));
   };
+  const handleBlur = (field: string) => {
+    setIsEditing((prevState) => ({
+      ...prevState,
+      [field]: false,
+    }));
+  };
   
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -83,7 +91,7 @@ export const AccountPage = () => {
       [name]: value,
     }));
   };
-
+  
   const handleDelete = async () => {
     try {
       if (!auth.currentUser) {
@@ -98,48 +106,39 @@ export const AccountPage = () => {
   }
   const hasActiveVipPlus = user.vipPlusStatus && !isVIPExpired(user.vipPlusExpiry);
   const hasActiveVip = user.vipStatus && !isVIPExpired(user.vipExpiry);
-
+  
   const vipDaysLeft = daysRemaining(user.vipExpiry);
   const vipPlusDaysLeft = daysRemaining(user.vipPlusExpiry);
-
+  
   const calculateAge = (year: number, month: number, day: number): number => {
     const today = new Date();
     const birthDate = new Date(year, month - 1, day);
     let age = today.getFullYear() - birthDate.getFullYear();
-  
+    
     if (
       today.getMonth() < birthDate.getMonth() || 
       (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())
     ) {
       age--; 
     }
-  
+    
     return age;
   };
   
-
+  // uppdaterar i databasen, sedan i zustand (lokalt)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage("Ändringarna har sparats!"); 
-  
+    setMessage('Ändringarna har sparats!');
+    
+    const updatedUser = {
+      ...user,
+      city: updatedUserData.city,
+      sexualOrientation: updatedUserData.sexualOrientation,
+    };
+    
     try {
-      const token = await auth.currentUser?.getIdToken();
-  
-      const response = await fetch(`http://localhost:3000/users/${user.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` 
-        },
-        body: JSON.stringify(updatedUserData),
-      });
-  
-      if (response.ok) {
-        const updatedUser = await response.json();
-        setUser(updatedUser);
-      } else {
-        console.error('Uppdatering misslyckades:', await response.text());
-      }
+      await updateUserInDatabase(updatedUser);
+      setUser(updatedUser); 
     } catch (error) {
       console.error('Fel vid uppdatering:', error);
     }
@@ -147,7 +146,7 @@ export const AccountPage = () => {
   
   return (
     <>
-
+    
     <div className="logga">
     <img src={logga} alt="picture" className="img" />
     </div>
@@ -157,7 +156,7 @@ export const AccountPage = () => {
     <span className="firstPart">O</span>
     </h1>
     
-
+    
     <div className="buttondivforback">
     <button className="btnback" onClick={() => navigate('/homepage')}>
     <i className="fas fa-arrow-left"></i>
@@ -186,104 +185,103 @@ export const AccountPage = () => {
       <div className="columndiv2">
       <p><strong>Ditt namn: {user.firstName}</strong></p>
       <p>
-  <strong>
-    Ålder: {user?.age?.year && user?.age?.month && user?.age?.day 
-      ? calculateAge(
+      <strong>
+      Ålder: {user?.age?.year && user?.age?.month && user?.age?.day 
+        ? calculateAge(
           Number(user.age.year), 
           Number(user.age.month), 
           Number(user.age.day)
         ) 
-      : 'Ej angivet'}
-  </strong>
-</p>
-
-
-
-      {hasActiveVipPlus ? (
-        <p>Du har <strong>VIP Plus</strong>. 
-        {vipPlusDaysLeft > 0 ? `Det är ${vipPlusDaysLeft} dagar kvar på din VIP Plus.` : ''}</p>
-      ) : hasActiveVip ? (
-        <p>Du har <strong>VIP</strong>. 
-        {vipDaysLeft > 0 ? `Det är ${vipDaysLeft} dagar kvar på din VIP.` : ''}</p>
-      ) : (
-        <p>Du har ingen aktiv VIP-status.</p>
-      )}
- 
-
-      <p>
-      <strong>Stad:</strong> 
-      {isEditing.city ? (
-        <input
-        type="text"
-        name="city"
-        value={updatedUserData.city}
-        onChange={handleChange}
-        onBlur={() => setIsEditing((prev) => ({ ...prev, city: false }))}
-        />
-      ) : (
-        <>
-        {updatedUserData.city}
-        <FaPen className="edit-icon" onClick={() => handleEditClick("city")} />
-        </>
-      )}
-      </p>
-      
-      <p>
-  <strong>Sexuell läggning:</strong>
-  {isEditing.sexualOrientation ? (
-    <div>
-      <label htmlFor="sexualOrientation">Sexuell läggning</label>
-      <select
-        id="sexualOrientation"
-        name="sexualOrientation"
-        value={updatedUserData.sexualOrientation}
-        onChange={handleChange}
-        onBlur={() => setIsEditing((prev) => ({ ...prev, sexualOrientation: false }))}
-      >
-        <option value="">Välj sexuell läggning</option>
-        <option value="Hetero">Hetero</option>
-        <option value="Homo">Homo</option>
-        <option value="Bi">Bisexuell</option>
-        <option value="other">Annat</option>
-      </select>
-    </div>
-  ) : (
-    <>
-      {updatedUserData.sexualOrientation || "Ej angiven"}
-      <FaPen className="edit-icon" onClick={() => handleEditClick("sexualOrientation")} />
-    </>
-  )}
-</p>
-      
-      {/* Radera konto-knapp */}
-      <button className="delete-btn" onClick={() => setShowConfirm(true)}>
-      Radera konto?
-      </button>
-      
-      {/* val om man är säker att radera sitt konto :)  */}
-      {showConfirm && (
-        <div className="confirmation-box">
-        <p>Är du säker på att du vill radera ditt konto? <br />
-        <span className="text-red">Hela kontot kommer att raderas.</span>
+        : 'Ej angivet'}
+        </strong>
         </p>
-        <div className="optiondeletecancel">
-        <button className="cancel-btn" onClick={() => setShowConfirm(false)} >
-        Avbryt
+        
+        
+        
+        {hasActiveVipPlus ? (
+          <p>Du har <strong>VIP Plus,</strong>
+          {vipPlusDaysLeft > 0 ? `${vipPlusDaysLeft} dagar kvar på din VIP Plus.` : ''}</p>
+        ) : hasActiveVip ? (
+          <p>Du har <strong>VIP,</strong> 
+          {vipDaysLeft > 0 ? ` ${vipDaysLeft} dagar kvar på din VIP.` : ''}</p>
+        ) : (
+          <p>Du har ingen aktiv VIP-status.</p>
+        )}
+        
+        
+        <p>
+        <strong>Stad:</strong>
+        {isEditing.city ? (
+          <input
+          type="text"
+          id="city"
+          name="city"
+          value={updatedUserData.city}
+          onChange={handleChange}
+          onBlur={() => handleBlur("city")}
+          />
+        ) : (
+          <>
+          {updatedUserData.city}
+          <FaPen className="edit-icon" onClick={() => handleEditClick("city")} />
+          </>
+        )}
+        </p>
+        
+        <p>
+        <strong>Sexuell läggning:</strong>
+        {isEditing.sexualOrientation ? (
+          <select
+          id="sexualOrientation"
+          name="sexualOrientation"
+          value={updatedUserData.sexualOrientation}
+          onChange={handleChange}
+          onBlur={() => handleBlur("sexualOrientation")}
+          >
+          <option value="">Välj sexuell läggning</option>
+          <option value="Hetero">Hetero</option>
+          <option value="Homo">Homo</option>
+          <option value="Bi">Bisexuell</option>
+          <option value="Other">Annat</option>
+          </select>
+        ) : (
+          <>
+          {updatedUserData.sexualOrientation || "Ej angiven"}
+          <FaPen className="edit-icon" onClick={() => handleEditClick("sexualOrientation")} />
+          </>
+        )}
+        </p>
+        
+        {/* Radera konto-knapp */}
+        <button className="delete-btn" onClick={() => setShowConfirm(true)}>
+        Radera konto?
         </button>
-        <button className="delete-btn" onClick={handleDelete} >
-        Radera
+        
+        {/* val om man är säker att radera sitt konto :)  */}
+        {showConfirm && (
+          <div className="confirmation-box">
+          <p>Är du säker på att du vill radera ditt konto? <br />
+          <span className="text-red">Hela kontot kommer att raderas.</span>
+          </p>
+          <div className="optiondeletecancel">
+          <button className="cancel-btn" onClick={() => setShowConfirm(false)} >
+          Avbryt
+          </button>
+          <button className="delete-btn" onClick={handleDelete} >
+          Radera
+          </button>
+          </div>
+          </div>
+        )}
+        
+        {/* Spara-knapp */}
+        <button type="submit" className="accountBtn" onClick={handleSubmit}>
+        Spara
         </button>
-        </div>
+        {message && <p>{message}</p>}
         </div>
       )}
-      
-      {/* Spara-knapp */}
-      <button type="submit" className="accountBtn" onClick={handleSubmit}>
-      Spara
-      </button>
-      {message && <p>{message}</p>}
-      </div>
-    )}
-    </>
-  );
-};
+      </>
+    );
+  };
+  
