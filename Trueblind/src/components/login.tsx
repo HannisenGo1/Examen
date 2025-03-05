@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import { doc, updateDoc, serverTimestamp,getFirestore } from 'firebase/firestore';
-
+import ForgotPassword from './Forgotpassword';
 
 import { doSignInWithEmailAndPassword } from './data/UserAuth';
 import logga from '../img/logga.png';
@@ -9,14 +9,18 @@ import { auth } from './data/firebase';
 const db = getFirestore()
 
 
-//import ForgotPassword from './auth/ForgotPassword';
-
-
 export const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isForgotPassword, setIsForgotPassword] = useState(false); 
+
   const navigate = useNavigate(); 
+
+
+const openForgot = () => {
+  setIsForgotPassword(true)
+}
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,7 +50,7 @@ export const Login = () => {
       setError('Fel e-post eller lösenord.');
     }
   };
- // <ForgotPassword /> 
+
   return (
     <> 
       <div className="logga">
@@ -77,8 +81,14 @@ export const Login = () => {
           </div>
          
           <button type="submit" className="login-button">Logga in</button>
+
+
+    
         </form>
         {error && <p className="login-error">{error}</p>}
+        <button className="justtextbtn" onClick={openForgot}>Glömt lösenord</button>
+     {isForgotPassword && <ForgotPassword />}
+
       </div>
     </>
   );

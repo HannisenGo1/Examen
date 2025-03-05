@@ -149,6 +149,20 @@ button:focus {
   color: #333;
 }
 
+.forgotpassworddiv{
+  display:flex;
+  flex-direction: column;
+  width:20em;
+  align-items: center;
+}
+.btnreset{
+  width: 10em;
+  align-items: center;
+  color: black;
+  background-color: #d68840;
+  border: 1px solid #a75a13;
+  margin-top:0.5em;
+}
 /* "Glömt lösenord" */
 .justtextbtn {
   background: none;
@@ -157,7 +171,8 @@ button:focus {
   cursor: pointer;
   text-decoration: underline;
   margin-bottom: 1em; 
-  margin-top: 1em;
+  margin-top: 2em;
+
 }
 
 
