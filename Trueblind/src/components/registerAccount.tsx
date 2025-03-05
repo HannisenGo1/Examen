@@ -5,8 +5,11 @@ import {validateFormData, intresseLista} from '../validering'
 import { FormData } from '../interface/interfaceUser';
 import { Anvandarpolicy } from './UseInfo';
 import { doSignUpWithEmailAndPassword } from './data/UserAuth';
+import ReCAPTCHA from "react-google-recaptcha"
+
 
 export const Register = () => {
+
     const navigate = useNavigate();
     const [formData, setFormData] = useState<FormData>({
         firstName: '',
@@ -61,7 +64,9 @@ export const Register = () => {
     const [isRegistered, setIsRegistered] = useState(false);
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [isTermsVisible, setIsTermsVisible] = useState(false);
-    
+    const [isReClicked, setIsReClicked] = useState(false)
+
+  
     
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
@@ -96,9 +101,11 @@ export const Register = () => {
     const handleCheckboxChange = (e:any) => {
         setAgreedToTerms(e.target.checked);
     };
-    
+      const onChangeRe = () => {
+        setIsReClicked(true)
+    }
     const handleShowTerms = () => {
-        setIsTermsVisible(true); 
+        setIsTermsVisible(true);  
     };
     
     const handleAcceptTerms = () => {
@@ -109,7 +116,10 @@ export const Register = () => {
     const handleCloseTerms = () => {
         setIsTermsVisible(false); 
     };
-    
+
+    const goBackToHome = () => {
+        navigate('/');
+    };
     
     const handleNext = () => {
         const validationErrors = validateFormData(step, formData);
@@ -143,23 +153,15 @@ export const Register = () => {
             if (success === true) {
                 setIsRegistered(true);
             } else {
-                setErrors({ general: success }); 
+                setErrors('Registrerad! '); 
             }
         } catch (error) {
             console.error('Fel vid registrering:', error);
-            setErrors({ general: 'Ett fel uppstod vid registrering.' });
+            setErrors('Ett fel uppstod vid registrering.' );
         }
     };
     
-    
-    // public sitekey rechapta google:
-    //6Lc34dwqAAAAAMalcXHywK0joU217Ftkt2uSOaMB
-    
-    const goBackToHome = () => {
-        navigate('/');
-    };
-    
-    
+
     return (
         <>
         <div className="logga">
@@ -482,15 +484,22 @@ export const Register = () => {
             användarvillkoren
             </a>
             </label>
-            </div>
-            </>
+
+               </div>
+            <div className="for-rechapta"> 
+        <ReCAPTCHA
+    sitekey="6LcjQLcqAAAAANH5r9wv-Jaa3vQf6xlZVHJYsmjl"
+    onChange={onChangeRe} />
+</div>
+     </>
         )}
         
         <div className="buttoncontainerinRegister">
         {step > 1 && <button className="accountBtn2" onClick={handlePrevious}> <i className="fas fa-arrow-left"></i></button>}
         {step < 6 && <button className="accountBtn" onClick={handleNext}>Nästa</button>}
-        
-        {step === 6 && <button className="accountBtn" type="submit" disabled={!agreedToTerms}>Registrera</button>}
+
+        {step === 6 && <button className="accountBtn" type="submit" 
+        disabled={!(agreedToTerms && isReClicked)}>Registrera</button>}
         </div>
         
         </form> 
