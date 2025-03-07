@@ -104,8 +104,9 @@ export const AccountPage = () => {
       console.error("Misslyckades att radera kontot:", error);
     }
   }
-  const hasActiveVipPlus = user.vipPlusStatus && !isVIPExpired(user.vipPlusExpiry);
-  const hasActiveVip = user.vipStatus && !isVIPExpired(user.vipExpiry);
+  const hasActiveVipPlus = user.vipPlusStatus && (user.vipPlusExpiry ? !isVIPExpired(user.vipPlusExpiry) : true);
+  const hasActiveVip = user.vipStatus && (user.vipExpiry ? !isVIPExpired(user.vipExpiry) : true);
+  
   
   const vipDaysLeft = daysRemaining(user.vipExpiry);
   const vipPlusDaysLeft = daysRemaining(user.vipPlusExpiry);
@@ -205,7 +206,7 @@ export const AccountPage = () => {
           <p>Du har <strong>VIP,</strong> 
           {vipDaysLeft > 0 ? ` ${vipDaysLeft} dagar kvar på din VIP.` : ''}</p>
         ) : (
-          <p>Du har ingen aktiv VIP-status.</p>
+          <p>Du har ingen aktiv VIP-status?.</p>
         )}
         
         

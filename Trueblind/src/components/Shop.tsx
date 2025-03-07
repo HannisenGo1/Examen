@@ -56,8 +56,6 @@ export const Shop = () => {
 
   const toggleOpenInfo = () => setIsOpen(!isOpen);
  
-  console.log("Användarens köpta emojis:", user.purchasedEmojis);
-  
   type PurchaseType = 'VIP' | 'VIPPlus' ;
 
   interface Emoji {
@@ -68,7 +66,6 @@ export const Shop = () => {
 
   // Hantera köper för emojisar :D 
   const handlePurchaseEmoji = async (emojiName: string, price: number) => {
-    console.log(`Försöker köpa emoji: ${emojiName} för ${price} krediter`);
   
     if (credits < price) {
       setErrorMessage("Du har inte tillräckligt med krediter!");
@@ -106,12 +103,14 @@ export const Shop = () => {
   
   
 // Köpa kredit
+
+{ /*  
   const handleAddCredits = async (amount: number): Promise<void> => {
     const newCredits = credits + amount;
     const updatedUser = { ...user, credits: newCredits };
     await updateUserInDatabase(updatedUser);
     setCredits(newCredits); 
-  };
+  };        */ }
 
   const emojis = [
     { name: "nalle1", src: nalle1, price: 3 },
@@ -172,7 +171,7 @@ export const Shop = () => {
           break;
 
         }
-  
+
       await updateUserInDatabase(updatedUser);
     } catch (error) {
       console.error("Något gick fel vid köpet:", error);
@@ -213,7 +212,7 @@ export const Shop = () => {
         <button onClick={() => handlePurchase('VIPPlus', prices.VIPPlus)} className="shopBtn">
           VIP PLUS (100 krediter)
         </button>
-
+         { /* 
         <button onClick={() => handleAddCredits(10)} className="shopBtn">
           10 krediter, 22.90 kronor
         </button>
@@ -225,7 +224,7 @@ export const Shop = () => {
         </button>
         <button onClick={() => handleAddCredits(100)} className="shopBtn">
           100 krediter, 149.90 kronor
-        </button>
+        </button>         */ }
       </div>
 
       <div className="promo-code-section">

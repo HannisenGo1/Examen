@@ -23,7 +23,6 @@ export const Vipinformation = () => {
     <p> ✅VIP Plus-användare får endast ut användare som matchar bäst! </p> 
     <p> ✅exklusiv samling emojis. </p> 
     <p> ✅Tillgång till premium emojis i chatt.</p> 
-    <p> ✅Spela ett frågequiz med en användare som också har VIP+ </p> 
      </div> 
     )
 }

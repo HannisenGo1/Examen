@@ -20,7 +20,8 @@ export const FindPartners = () => {
   const [currentUser,setCurrentUser]= useState(0)
   const [nekadUser] = useState<User[]>([]);
   const { user, likedUsers, addLikedUser, deniedUsers, resetDenyUsers,addDenyUsers } = useUserStore();
-  
+  const [message, setMessage] = useState('')
+
 // storage key för användarens id.
 const getUserStorageKey = (userId: string, key: string) => `${key}-${userId}`;
 const db = getFirestore();
@@ -50,8 +51,7 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
     const loadUsers = async () => {
       await fetchUsers();
       const storedUsers = useUserStore.getState().users; 
-      console.log('Användare från store:', storedUsers);
-  
+
       if (storedUsers && storedUsers.length > 0) {
         const filteredUsers = filterLikedAndDeniedUsers(storedUsers, likedUsers, deniedUsers);
         setUsers(filteredUsers);
@@ -140,6 +140,11 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
     const likedUser = matchingResults.find((user) => user.id === userId);
     if (likedUser) {
       addLikedUser(likedUser);
+      setMessage('Gillad användare tillagd i gilla på din kontosida')
+      
+      setTimeout(() => {
+        setMessage('')
+      },2000)
       
       setMatchingResults((prev) => prev.filter((user) => user.id !== likedUser.id)); 
       nextUser();
@@ -200,14 +205,11 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
       console.log('Endast VIP-användare kan återställa nekade användare.');
       return;
     }
-  
     resetDenyUsers();
-
     setMatchingResults((prevState) => [...loadedDeniedUsers, ...prevState]);
   
-
     const userRef = doc(db, 'users', user.id);
-    const updatedDenylist = user.denylist.filter((deniedUser) => !loadedDeniedUsers.some((u) => u.id === deniedUser.id));
+    const updatedDenylist = user.denylist?.filter((deniedUser) => !loadedDeniedUsers.some((u) => u.id === deniedUser.id));
   
     try {
       await updateDoc(userRef, {
@@ -221,7 +223,6 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
   };
 
 
-  
   return (
     <div className="columndiv3">
     <h2>Hitta en partner</h2>
@@ -267,14 +268,19 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
 ) : null}
       </h4>
       <div className={`status-inlog ${showCurrentUser.status?.online ? 'online' : 'offline'}`}></div>
+       
       <h4>{showCurrentUser.firstName} <span className="age">, 
-      Ålder: {showCurrentUser.age?.year && showCurrentUser.age?.month && showCurrentUser?.age?.day 
-      ? calculateAge(
+      <p>
+      <strong>
+      Ålder: {user?.age?.year && user?.age?.month && user?.age?.day 
+        ? calculateAge(
           Number(user.age.year), 
           Number(user.age.month), 
           Number(user.age.day)
         ) 
-      : 'Ej angivet'} </span></h4>
+        : 'Ej angivet'}
+        </strong>
+        </p> </span></h4>
       
       <p><strong>Matchar: {calculateMatch(showCurrentUser)}%</strong> </p>
       <p><strong>Kön:</strong> {showCurrentUser.gender}</p>
@@ -284,6 +290,8 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
       <div className="life-statements">
       <p>{showCurrentUser.lifeStatement1}</p>
       <p>{showCurrentUser.lifeStatement2}</p>
+      <p> {user?.status?.lastLogin }</p>
+      
       {isVip(user) && (
         <>
         <p><strong>Intressen:</strong> {showCurrentUser.interests?.join(', ')}</p>
@@ -294,12 +302,17 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
         <p><strong>Utbildning:</strong> {showCurrentUser.education}</p>
         <p><strong>Favoritsång:</strong> {showCurrentUser.favoriteSong}</p>
         <p><strong>Favoritfilm:</strong> {showCurrentUser.favoriteMovie}</p>
+
         </>
       )}
       <div className="button-container">
       <button onClick={() => handleDeny(showCurrentUser.id!)} className="deny-button">❌</button>
       <button onClick={() => handleLike(showCurrentUser.id!)} className="like-button">❤️</button>
+        </div> 
+      <div className='life-statements'> 
+      {message && <p className="like-message">{message}</p>}
       </div>
+
       </div>
       </li>
       </ul>

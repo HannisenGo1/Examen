@@ -15,18 +15,14 @@ export const Messages = () => {
   useEffect(() => {
     const userId = user?.id;
     if (!userId) {
-      console.log("No user available.");
       return;
     }
 
     const userStorageKey = `${userId}-requests`;
     const storedRequests = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
 
-    // Filtrera bort dubbletter baserat på senderId
     const uniqueRequests = Array.from(new Set(storedRequests.map((req: any) => req.senderId)))
       .map((senderId) => storedRequests.find((req: any) => req.senderId === senderId));
-
-    console.log('Unika förfrågningar:', uniqueRequests);
 
     setFilteredRequests(uniqueRequests);
   }, [user]);
@@ -34,7 +30,6 @@ export const Messages = () => {
 
   const handleAccept = (senderId: string) => {
     if (!user) {
-      console.log("Användare inte inloggad.");
       return;
     }
   
@@ -45,7 +40,6 @@ export const Messages = () => {
     // Kolla om chat redan finns
     const existingChat = activeChats.find((chat) => chat.chatRoomId === chatRoomId);
     if (existingChat) {
-      console.log("Chat redan existerar.");
       navigate(`/chat/${chatRoomId}`);
       return;
     }
@@ -68,7 +62,6 @@ export const Messages = () => {
     removeLikedUser(senderId);
 
     const updatedRequests = requests.filter(request => request.senderId !== senderId);
-
     const userId = user?.id || '';
     const userStorageKey = `${userId}-requests`;
     localStorage.setItem(userStorageKey, JSON.stringify(updatedRequests));
@@ -111,7 +104,6 @@ export const Messages = () => {
           })
         )}
   
-
         <div className="columndiv2">
           <h2>Dina Chattar</h2>
           {activeChats.length === 0 ? (

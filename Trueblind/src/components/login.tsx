@@ -37,10 +37,8 @@ const openForgot = () => {
           const userDocRef = doc(db, 'users', user.uid);
           await updateDoc(userDocRef, {
             'status.online': true,
-            'status.lastLogin': serverTimestamp() 
+            'status.lastLogin': serverTimestamp()  
           });
-  
-          console.log("Användaren är nu online:", user.email);
         }
   
         navigate('/homepage');

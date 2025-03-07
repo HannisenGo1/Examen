@@ -6,7 +6,6 @@ import { db } from "./firebase";
 export const updateUserInDatabase = async (updatedUser: User) => {
   const userRef = doc(db, 'users', updatedUser.id);
 
-  
   const userDataToUpdate = {
     credits: updatedUser.credits ?? 0, 
     vipStatus: updatedUser.vipStatus ?? false,
@@ -18,12 +17,8 @@ export const updateUserInDatabase = async (updatedUser: User) => {
     sexualOrientation: updatedUser.sexualOrientation ?? null,
   };
 
-  console.log('Uppdaterar användardata med följande:', userDataToUpdate);
-  
   try {
-    console.log('uppdateras användaren?', updatedUser);
     await updateDoc(userRef, userDataToUpdate);
-    console.log("Användaruppdatering lyckades i databasen.");
   } catch (error) {
     console.error("Fel vid uppdatering av användare i databasen:", error);
   }
@@ -37,7 +32,6 @@ export const updateEmojiCountInDatabase = async (userId: string, emojiName: stri
 
   try {
     await updateDoc(userRef, userDataToUpdate);
-    console.log("Emoji count uppdaterad i Firebase");
   } catch (error) {
     console.error("Fel vid uppdatering av emoji count i Firebase:", error);
   }

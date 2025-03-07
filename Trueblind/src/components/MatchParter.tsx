@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { User } from '../interface/interfaceUser';
 import logga from '../img/logga.png';
 import { useState } from 'react';
+import { calculateAge } from './DaysCounterVip';
 
 // Här är endast för alla man har gillat och kan se
 // sin matchprocent och filtrera genom  filterUsersByMatch!
@@ -94,6 +95,7 @@ console.log('sending request to' ,likedUserId)
       <div className="columndiv2">
         <h3>De användare du har gillat:</h3>
 <button className="accountBtn" onClick={tomessages}> Meddelanden </button>
+
         {/* Dropdown */}
         <label htmlFor="matchRange">Filtrera efter matchning:</label>
         <select id="matchRange" value={selectedRange} onChange={handleRangeChange}>
@@ -122,7 +124,16 @@ console.log('sending request to' ,likedUserId)
                       </button>
                     </h4>
                     <p>Matchning: {matchPercentage}%</p>
-                    <p>Är <strong>{likedUser.age}</strong> år gammal </p>
+                    <h4>   Är{' '}
+  {likedUser.age?.year && likedUser.age?.month && likedUser.age?.day
+    ? calculateAge(
+        Number(likedUser.age.year),
+        Number(likedUser.age.month),
+        Number(likedUser.age.day)
+      )
+    : 'Ej angivet'}
+</h4>
+                  
 
 
                     {matchPercentage > 10 && !requestStatus && (

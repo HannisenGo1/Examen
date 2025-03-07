@@ -66,7 +66,7 @@ export const useUserStore = create<UserStore>((set, get) => {
     set({ token });
   },
   setUser: (userData: User) => {
-    console.log("Sätter användare:", userData);
+   
     const userId = userData.id ?? 'temp-user-id';
     const userStorageKey = getUserStorageKey(userId, 'likedUsers');
     const storedLikedUsers = JSON.parse(localStorage.getItem(userStorageKey) || '[]');
@@ -88,7 +88,6 @@ export const useUserStore = create<UserStore>((set, get) => {
     if (!currentUser) return;
 
     if (currentUser.credits < price) {
-      console.log('Inte tillräckligt med krediter!');
       return;
     }
 
@@ -97,10 +96,8 @@ export const useUserStore = create<UserStore>((set, get) => {
     let updatedPurchasedEmojis = [...currentUser.purchasedEmojis];
 
     if (emojiIndex !== -1) {
-
       updatedPurchasedEmojis[emojiIndex].count += 1;
     } else {
-
       updatedPurchasedEmojis.push({ emoji, count: 1 });
     }
 
@@ -112,27 +109,19 @@ export const useUserStore = create<UserStore>((set, get) => {
     localStorage.setItem(getUserStorageKey(userId, 'purchasedEmojis'), JSON.stringify(updatedPurchasedEmojis));
   },
 
-
     // Återställ (rensa) listan med nekade användare
     resetDenyUsers: async () => {
-      console.log("Återställer nekade användare:", get().deniedUsers);
-    
       set({ deniedUsers: [] });
   
       const userId = get().user?.id ?? 'temp-user-id';
       localStorage.removeItem(getUserStorageKey(userId, 'deniedUsers'));
-    
-      console.log("Nekade användare återställda och rensade från localStorage.");
-  
       const userRef = doc(db, 'users', userId);
     
       try {
-        // Tar ut alla nekade användare och tömmer listan i firebase! 
         await updateDoc(userRef, {
           denylist: [] 
         });
     
-        console.log('Denylist återställd i Firebase');
       } catch (error) {
         console.error('Kunde inte återställa denylist i Firebase:', error);
       }
@@ -149,7 +138,6 @@ export const useUserStore = create<UserStore>((set, get) => {
       
       set({ deniedUsers: updatedDeniedUsers });
   
-      console.log("Uppdaterade nekade användare:", updatedDeniedUsers);
   
       const userRef = doc(db, 'users', currentUser.id);
   
@@ -157,7 +145,6 @@ export const useUserStore = create<UserStore>((set, get) => {
         await updateDoc(userRef, {
           denylist: updatedDeniedUsers,
         });
-        console.log("Denylist uppdaterad i Firestore");
       } catch (error) {
         console.error("Fel vid uppdatering av denylist i Firestore:", error);
       }
@@ -218,7 +205,7 @@ export const useUserStore = create<UserStore>((set, get) => {
     },
   // Acceptera en chat request 
     acceptMessageRequest: (senderId: string) => {
-      console.log("Accepterar förfrågan från:", senderId);
+
       set((state) => {
           const userId = state.user?.id || 'temp-user-id';
   
@@ -305,26 +292,24 @@ export const useUserStore = create<UserStore>((set, get) => {
     loadRequestsFromStorage: () => {
       const user = get().user;
       if (!user) {
-        console.log("Ingen användare inloggad.");
+    
         return;
       }
     
       const userStorageKey = getUserStorageKey(user.id!, 'requests');
-      console.log("Förväntad localStorage-nyckel:", userStorageKey);
+
     
       const storedRequestsRaw = localStorage.getItem(userStorageKey);
-      console.log("Hämtade data från localStorage:", storedRequestsRaw);
+   
     
       if (storedRequestsRaw) {
         const storedRequests = JSON.parse(storedRequestsRaw);
-        console.log("Hämtade requests:", storedRequests);
+
         set({ requests: storedRequests });
       } else {
-        console.log("Inga requests hittades.");
+
         set({ requests: [] });
       }
-    
-      console.log("State uppdaterad med requests:", get().requests);
     },
 
     rejectMessageRequest: (senderId: string) => {
@@ -348,15 +333,19 @@ export const useUserStore = create<UserStore>((set, get) => {
       const userStorageKey = getUserStorageKey(currentUser.id!, 'deniedUsers');
       const storedDeniedUsers = JSON.parse(localStorage.getItem(userStorageKey) || "[]");
     
-      console.log("Laddade nekade användare från localStorage vid inloggning:", storedDeniedUsers);
-    
       set({ deniedUsers: storedDeniedUsers });
     },
- loadUserFromStorage: () => {
-  const storedUser = localStorage.getItem('user')
-  if ( storedUser){
-    const parsedUser = JSON.parse(storedUser)
-  }
- }
+    loadUserFromStorage: () => {
+      const userStorageKey = getUserStorageKey(get().user?.id ?? '', 'user');
+      const storedUser = localStorage.getItem(userStorageKey);
+      
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        set({ user: parsedUser });
+      } else {
+
+      }
+    },
+
   };
 });

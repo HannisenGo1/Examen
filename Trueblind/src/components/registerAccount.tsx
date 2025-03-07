@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import {validateFormData, intresseLista} from '../validering'
 import { FormData } from '../interface/interfaceUser';
 import { Anvandarpolicy } from './UseInfo';
-import { doSignUpWithEmailAndPassword } from './data/UserAuth';
+import { doSendEmailVerification, doSignUpWithEmailAndPassword } from './data/UserAuth';
 import ReCAPTCHA from "react-google-recaptcha"
 
 
@@ -152,6 +152,7 @@ export const Register = () => {
             
             if (success === true) {
                 setIsRegistered(true);
+                await doSendEmailVerification();
             } else {
                 setErrors('Registrerad! '); 
             }

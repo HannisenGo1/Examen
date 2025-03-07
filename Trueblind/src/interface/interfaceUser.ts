@@ -34,10 +34,11 @@ export type FormData = {
   vipPlusStatus: boolean;
   vipPlusExpiry: number | null; 
   hasUsedPromoCode: boolean;
-  
+  VipplusEmoji?: VipEmoji[]
 };
 type Emoji = { emoji:string; count:number}
 
+type VipEmoji = { emoji:string; count:number }
 
 export interface User {
   firstName: string;
@@ -75,15 +76,15 @@ export interface User {
   hasUsedPromoCode?:boolean;
   vipStatus: boolean;
   vipExpiry?: number | null; 
-  vipPlusStatus?:boolean;
+  vipPlusStatus:boolean;
   vipPlusExpiry?: number | null;
-  denylist: User[];
+  denylist?: User[];
+  VipplusEmoji?: VipEmoji[]
 
   status?: {
     online:boolean
-    lastLogin?: number | null
+    lastLogin: string | number | null;
   }
-
 }
 
 export interface SearchResult {
@@ -99,7 +100,7 @@ export interface Message  {
   senderName: string;
   timestamp: string;
   message:string;
-  quizId?:string;
+
 };
 
 export interface Chat {
@@ -107,11 +108,11 @@ export interface Chat {
   userIds: string[];
   messages: Message[];
   userNames: string[];
-  quizId?:string;
+
   startedByVipPlus?:boolean
   
   status?: {
     online:boolean
-    lastLogin?: number | null
+    lastLogin: string | number | null;
   }
 }
