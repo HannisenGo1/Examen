@@ -27,6 +27,13 @@
 
 }
 
+.btn.btn-disabled{
+    background-color: #996A30; ;
+    margin:1em;
+    border: 1px solid rgb(146, 89, 3);
+    border-radius: 7%;
+}
+
 .policy-text {
     font-size: 14px;
     color: #555;

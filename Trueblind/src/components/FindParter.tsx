@@ -56,11 +56,10 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
         const filteredUsers = filterLikedAndDeniedUsers(storedUsers, likedUsers, deniedUsers);
         setUsers(filteredUsers);
       } else {
-        console.warn('Ingen användardata tillgänglig!');
+        console.error('Ingen användardata tillgänglig!');
         setError('Kunde inte ladda användardata.');
       }
     };
-  
     loadUsers();
   }, [likedUsers, deniedUsers]);
   
@@ -202,14 +201,18 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
  
   const restoreDeniedUsers = async () => {  
     if (!isVip(user)) {
-      console.log('Endast VIP-användare kan återställa nekade användare.');
       return;
     }
+  
     resetDenyUsers();
     setMatchingResults((prevState) => [...loadedDeniedUsers, ...prevState]);
   
     const userRef = doc(db, 'users', user.id);
-    const updatedDenylist = user.denylist?.filter((deniedUser) => !loadedDeniedUsers.some((u) => u.id === deniedUser.id));
+  
+
+    const updatedDenylist = user.denylist ? 
+      user.denylist.filter((deniedUser) => !loadedDeniedUsers.some((u) => u.id === deniedUser.id)) :
+      [];
   
     try {
       await updateDoc(userRef, {
@@ -218,14 +221,14 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
   
       setLoadedDeniedUsers([]); 
     } catch (error) {
-      console.error('Kunde inte återställa nekade användare:', error);
+      console.error("Fel vid uppdatering av denylist:", error);
     }
   };
 
 
   return (
     <div className="columndiv3">
-    <h2>Hitta en partner</h2>
+    <h2>Hitta din partner</h2>
     <label htmlFor="minAge">Ålder mellan:</label>
     <div className="age-filter-container">
     
@@ -245,12 +248,12 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
     placeholder="Exempel: Stockholm" className="input-field" />
     
     <button onClick={filterUsers} disabled={loading} className="search-button">
-    {loading ? 'Laddar...' : 'Sök partners'}
+    {loading ? 'Laddar...' : 'Sök partner'}
     </button>
     
     <button  onClick={restoreDeniedUsers} disabled={!isVip(user)} 
     className={`btn ${isVip(user) ? 'btn-primary' : 'btn-disabled'}`} >
-    Återställ nekade användare         </button>
+    Återställ ❌  </button>
     
     </div>
     
@@ -281,16 +284,16 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
         : 'Ej angivet'}
         </strong>
         </p> </span></h4>
-      
       <p><strong>Matchar: {calculateMatch(showCurrentUser)}%</strong> </p>
       <p><strong>Kön:</strong> {showCurrentUser.gender}</p>
       <p><strong>Religion:</strong> {showCurrentUser.religion}</p>
       <p><strong>Läggning:</strong> {showCurrentUser.sexualOrientation}</p>
+      <p> inloggad senast  : {showCurrentUser?.status?.lastLogin }</p>
       </div>
       <div className="life-statements">
-      <p>{showCurrentUser.lifeStatement1}</p>
-      <p>{showCurrentUser.lifeStatement2}</p>
-      <p> {user?.status?.lastLogin }</p>
+      <p>Jag skulle aldrig kunna leva utan {showCurrentUser.lifeStatement1}</p>
+      <p>Jag blir mest inspirerad när {showCurrentUser.lifeStatement2}</p>
+      <p> {showCurrentUser?.status?.lastLogin }</p>
       
       {isVip(user) && (
         <>

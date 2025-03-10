@@ -206,7 +206,7 @@ export const AccountPage = () => {
           <p>Du har <strong>VIP,</strong> 
           {vipDaysLeft > 0 ? ` ${vipDaysLeft} dagar kvar på din VIP.` : ''}</p>
         ) : (
-          <p>Du har ingen aktiv VIP-status?.</p>
+          <p>Du har ingen aktiv VIP-status</p>
         )}
         
         

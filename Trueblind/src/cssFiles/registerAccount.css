@@ -62,15 +62,15 @@ input[type="checkbox"] {
     margin-right: 0.5rem;
 }
 
-div {
+/* div {
     display: flex;
     justify-content: space-between;
     margin-top: 1rem;
-}
+}*/ 
 
 
 button:disabled {
-    background-color: #ccc;
+    background-color: #b17528;
     cursor: not-allowed;
 }
 

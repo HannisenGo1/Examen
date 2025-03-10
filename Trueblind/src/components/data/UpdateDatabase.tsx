@@ -20,7 +20,7 @@ export const updateUserInDatabase = async (updatedUser: User) => {
   try {
     await updateDoc(userRef, userDataToUpdate);
   } catch (error) {
-    console.error("Fel vid uppdatering av användare i databasen:", error);
+    console.error(error);
   }
 };
 
@@ -33,7 +33,7 @@ export const updateEmojiCountInDatabase = async (userId: string, emojiName: stri
   try {
     await updateDoc(userRef, userDataToUpdate);
   } catch (error) {
-    console.error("Fel vid uppdatering av emoji count i Firebase:", error);
+    console.error(error);
   }
 };
 

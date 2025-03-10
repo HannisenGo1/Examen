@@ -12,6 +12,7 @@ import { doc, onSnapshot} from 'firebase/firestore';
 import { db } from './data/firebase';
 import { updateEmojiCountInDatabase} from './data/UpdateDatabase';
 import VipPlusEmojis from './VipplusEmoji';
+import { ReportUser } from './Report';
 
 export const Chat = ()  => {
   const { chatRoomId } = useParams();
@@ -23,46 +24,42 @@ export const Chat = ()  => {
   const currentChat = activeChats.find((chat) => chat.chatRoomId === chatRoomId);
   const navigate = useNavigate();
   const purchasedEmojis = user?.purchasedEmojis || [];
+  const [otherUserName, setOtherUserName] = useState<string>('Laddar...');
+  const [loading, setLoading] = useState(true);
+  const [openReport,setOpenReport] = useState(false)
 
-
-  const vipPlusStatus = user?.vipPlusStatus ?? false;
+  // const vipPlusStatus = user?.vipPlusStatus ?? false;
  
  const messagesite = () => { navigate('/messages'); };
 
-  useEffect(() => {
-    if (chatRoomId) {
-      const chatRef = doc(db, 'chats', chatRoomId);
-      
-      
-      const getthechats = onSnapshot(chatRef, (docSnapshot) => {
-        if (docSnapshot.exists()) {
-          const chatData = docSnapshot.data();
-          const updatedMessages = chatData?.messages || [];
-          
-          setMessages(updatedMessages); 
+ useEffect(() => {
+  if (chatRoomId) {
+    const chatRef = doc(db, 'chats', chatRoomId);
+
+    const getTheChats = onSnapshot(chatRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const chatData = docSnapshot.data();
+        setMessages(chatData?.messages || []);
+        
+        const currentChat = activeChats.find((chat) => chat.chatRoomId === chatRoomId);
+        if (currentChat) {
+          const otherUserId = currentChat.userIds.find((id) => id !== user?.id) ?? '';
+          const otherUser = currentChat.userNames[currentChat.userIds.indexOf(otherUserId)];
+          setOtherUserName(otherUser || 'Okänd användare');
         }
-      });
-      
-      return () => 
-        getthechats(); 
-    }
-  }, [chatRoomId]);
-  
+      }
+      setLoading(false);
+    });
 
-  let otherUserName = "Okänd användare";
-  if (currentChat && currentChat.userIds && currentChat.userNames && user?.id) {
-    const otherUserId = currentChat.userIds.find(id => id !== user.id);
-    if (otherUserId) {
-      otherUserName = currentChat.userNames[currentChat.userIds.indexOf(otherUserId)];
-
-    }
+    return () => getTheChats();
   }
+}, [chatRoomId, activeChats, user]);
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/');
-    }
-  }, [user, navigate]);
+useEffect(() => {
+  if (!user) {
+    navigate('/');
+  }
+}, [user, navigate]);
   
   
     useEffect(() => {
@@ -149,7 +146,7 @@ if (!user || !user.id) {
 }
 
 const renderEmojis = () => {
-  if (user.purchasedEmojis.length === 0) {
+  if (!Array.isArray(user.purchasedEmojis) || user.purchasedEmojis.length === 0) {
     return <p>Du har inga köpta emojis.</p>;
   }
   
@@ -188,6 +185,9 @@ const renderEmojis = () => {
   });
 };
 
+const openTheReport = () => {
+  setOpenReport(!openReport);
+}
 
 return (
   <>
@@ -200,11 +200,23 @@ return (
   </button>
   </div>
 
-  <h1 className='Rubriktext2'> 
-    Din chatt med {otherUserName}
-  <p className={`status-inlog ${currentChat?.status?.online ? 'online' : 'offline'}`}> </p></h1>
-   
-  
+  <div className="Rubriktext2-container">
+
+   <h1 className="Rubriktext2">{otherUserName}</h1>
+  <p className={`status-inlog ${currentChat?.status?.online ? 'online' : 'offline'}`}></p>
+</div>
+
+  <div className={openReport ? "report-container open" : "report-container"}>
+  {!openReport ? (
+    <button className="reportbtn" onClick={openTheReport}>Rapportera</button>
+  ) : (
+    <>
+      <button className="closebtn" onClick={openTheReport}>❌</button>
+      <ReportUser />
+    </>
+  )}
+</div>
+
   {/* Chatten */}
   
   <div className="chat-container">
@@ -218,6 +230,7 @@ return (
         key={msg.id}
         className={`chat-message ${msg.senderId === user?.id ? 'sent' : 'received'}`}
         >
+             <p className={`status-inlog ${currentChat?.status?.online ? 'online' : 'offline'}`}></p>
         <div className="message-content">
         <p className="sender">
         {msg.senderId === user?.id ? 'Du' : msg.senderName}
@@ -248,8 +261,7 @@ return (
   <button onClick={() => setShowEmojis(!showEmojis)} className="emoji-btn">
   Emojis    </button>
   <p>{errormessage}</p>
-  {chatRoomId && <VipPlusEmojis chatRoomId={chatRoomId} sendEmoji={sendEmoji} />}
-
+  <VipPlusEmojis chatRoomId={chatRoomId} sendEmoji={sendEmoji} />
   </div> 
   
   {/* Emoji picker */}

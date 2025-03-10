@@ -80,12 +80,16 @@ flex-wrap: wrap;
     gap: 10px;
     margin-top: 10px;
   }
-  .vip-status{
-    display:flex;
+  .vip-status {
+    display: flex;
     flex-direction: column;
     text-align: center;
+    width: 20em;
+    height: 3em;
+    color: black;
+    border: 1px solid red; 
+    background-color: #f0f0f0;  
   }
-
 .emoji-picker2 img {
     width: 40px;  
     gap: 10px; 

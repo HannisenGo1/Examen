@@ -11,7 +11,7 @@ import './cssFiles/findpartner.css'
 import './cssFiles/messages.css'
 import './cssFiles/shop.css'
 import './cssFiles/useinfo.css'
-
+import './cssFiles/report.css'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

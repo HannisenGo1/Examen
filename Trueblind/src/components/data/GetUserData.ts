@@ -1,4 +1,4 @@
-import { collection, getDocs, doc, updateDoc  } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, getDoc  } from 'firebase/firestore';
 import { db } from './firebase'; 
 import { useUserStore } from '../../storage/storage';
 import { User } from '../../interface/interfaceUser';
@@ -13,7 +13,7 @@ export const fetchUsers = async () => {
 
     useUserStore.getState().setUsers(users); 
   } catch (error) {
-    console.error('Kunde inte hämta användare:', error);
+    console.error(error);
   }
 };
 
@@ -33,6 +33,18 @@ export const updateOnlineStatus = async (user: User, online: boolean): Promise<v
       status: updatedUser.status, 
     });
   } catch (error) {
-    console.error('Kunde inte uppdatera online-status i Firestore:', error);
+    console.error(error);
+  }
+};
+export const fetchUserName = async (userId: string) => {
+  try {
+    const userRef = doc(db, 'users', userId)
+    const userDoc = await getDoc(userRef)
+    if (userDoc.exists()) {
+      return userDoc.data()?.firstName || "Okänd användare"
+    }
+  } catch (error) {
+    console.error(error)
+    return "Okänd användare";
   }
 };

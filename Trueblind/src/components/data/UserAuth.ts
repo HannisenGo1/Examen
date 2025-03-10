@@ -41,7 +41,7 @@ import { User } from "../../interface/interfaceUser";
         });
         return true;
     } catch (error: any) {
-        console.error("registreringen gick inte igenom:", error.message);
+  
         return error.message;
     }
 };
@@ -118,7 +118,7 @@ export async function DeleteUser(usersId: string): Promise<void> {
   try {
     const user = auth.currentUser;
     if (!user || user.uid !== usersId) {
-      throw new Error("Ingen användare inloggad eller fel UID.");
+      throw new Error("Ingen användare inloggad");
     }
 
 

@@ -83,7 +83,7 @@ const openForgot = () => {
 
     
         </form>
-        {error && <p className="login-error">{error}</p>}
+        {error && <p className="login-error"> Fel vid inloggning</p>}
         <button className="justtextbtn" onClick={openForgot}>Glömt lösenord</button>
      {isForgotPassword && <ForgotPassword />}
 

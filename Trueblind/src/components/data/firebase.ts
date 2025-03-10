@@ -12,9 +12,7 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_MEASUREMENTID
 };
 
-// Kontrollera om Firebase redan har initialiserats
-// Om ingen app är initialiserad, skapa en ny instans
-// Om Firebase redan är initialiserad, använd den existerande appen
+
 let app;
 if (getApps().length === 0) {
 

@@ -15,7 +15,7 @@ export const Vipinformation = () => {
     <p> ✅Det som ingår i BAS</p>
     <p> ✅Som VIP Medlem kan du återställa dina nekade användare. </p>
     <p> ✅Få all information om en användare vid sökning.</p> 
-    <p> ✅Får även 30 krediter till att kunna handla för i shoppen </p>
+    <p> ✅Får även 10 krediter till att kunna handla för i shoppen </p>
 
 <h2>VIP+ </h2>
     <p> VIP+  30dagars giltighet.  </p> 

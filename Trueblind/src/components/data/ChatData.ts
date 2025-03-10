@@ -12,10 +12,8 @@ export const fetchChats = async () => {
       ...doc.data(),
     })) as Chat[];  
 
-
     useUserStore.getState().setChats(chats);  
 
-    console.log('Hämtade chattar från Firestore:', chats);
   } catch (error) {
     console.error('Kunde inte hämta chattar:', error);
   }
@@ -29,14 +27,15 @@ export const saveChatToFirestore = async (chat: Chat) => {
         userIds: chat.userIds,
         userNames: chat.userNames,
         messages: chat.messages,
-        quizId: chat.quizId || null,
+ 
       });
   
-      console.log('Chatten har sparats i Firestore:', chat);
     } catch (error) {
       console.error('Kunde inte spara chatten:', error);
     }
   };
+
+  
   export const addMessageToFirebase = async (chatRoomId: string, senderId: string, senderName: string, message: string) => {
     try {
       const chatRef = doc(db, 'chats', chatRoomId); 
@@ -59,8 +58,7 @@ export const saveChatToFirestore = async (chat: Chat) => {
         await updateDoc(chatRef, {
           messages: updatedMessages,
         });
-    
-        console.log("Meddelande tillagt!");
+  
       } else {
 
         const newChatData = {
@@ -72,12 +70,9 @@ export const saveChatToFirestore = async (chat: Chat) => {
             message,
             timestamp: new Date().toISOString(),
           }],
-          quizId: null, 
         };
     
         await setDoc(chatRef, newChatData);
-    
-        console.log("Ny chatt skapad och meddelande tillagt!");
       }
     } catch (error) {
       console.error("Fel vid att lägga till meddelande:", error);
@@ -85,24 +80,5 @@ export const saveChatToFirestore = async (chat: Chat) => {
   };
 
 
-  
-  //  hämta chat-id från quiz-id
- export const getChatIdFromQuizId = async (quizId: string): Promise<string | null> => {
-    try {
-      const quizRef = doc(db, "quiz", quizId); 
-      const quizSnap = await getDoc(quizRef); 
-  
-      if (quizSnap.exists()) {
-        const quizData = quizSnap.data();
-   
-        return quizData.chatId || null;
-      } else {
-        console.log("Quizet finns inte");
-        return null;
-      }
-    } catch (error) {
-      console.error("Fel vid hämtning av chatId från quiz:", error);
-      return null;
-    }
-  };
+
   

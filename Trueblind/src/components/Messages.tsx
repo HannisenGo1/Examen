@@ -2,9 +2,12 @@ import logga from '../img/logga.png';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../storage/storage';
 import { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid'; 
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from './data/firebase';
 
 export const Messages = () => {
-  const { requests, likedUsers, acceptMessageRequest, removeLikedUser, activeChats } = useUserStore();
+  const { requests, likedUsers, acceptMessageRequest, removeLikedUser, activeChats,setChats } = useUserStore();
   const navigate = useNavigate();
   const { user } = useUserStore();
   const [filteredRequests, setFilteredRequests] = useState<any[]>([]);
@@ -28,19 +31,19 @@ export const Messages = () => {
   }, [user]);
 
 
-  const handleAccept = (senderId: string) => {
+  const handleAccept = async (senderId: string) => {
     if (!user) {
       return;
     }
-  
     const userId = user.id;
     acceptMessageRequest(senderId);
-    const chatRoomId = [userId, senderId].sort().join('-');
+    const chatRoomId = uuidv4();
   
     // Kolla om chat redan finns
     const existingChat = activeChats.find((chat) => chat.chatRoomId === chatRoomId);
     if (existingChat) {
-      navigate(`/chat/${chatRoomId}`);
+      console.log("Chat redan existerar.");
+      navigate(`/chat`);
       return;
     }
   
@@ -50,18 +53,22 @@ export const Messages = () => {
       userIds: [userId, senderId],
       messages: [],
       userNames: [user.firstName, likedUsers.find((user) => user.id === senderId)?.firstName || "Okänd"],
-    };
-  
-    const updatedChats = [...activeChats, newChat];
-    localStorage.setItem(`${userId}-activeChats`, JSON.stringify(updatedChats));
-  
-    navigate(`/chat/${chatRoomId}`);
   };
+
+  await setDoc(doc(db, "chats", chatRoomId), newChat); 
+
+  setChats([...activeChats, newChat]);
+  localStorage.setItem(`${userId}-activeChats`, JSON.stringify([...activeChats, newChat]));
+
+  navigate(`/chat/${chatRoomId}`);
+};
+  
 
   const handleReject = (senderId: string) => {
     removeLikedUser(senderId);
 
     const updatedRequests = requests.filter(request => request.senderId !== senderId);
+
     const userId = user?.id || '';
     const userStorageKey = `${userId}-requests`;
     localStorage.setItem(userStorageKey, JSON.stringify(updatedRequests));

@@ -28,7 +28,7 @@ function App() {
         <Route path="/chat" element={<Chat /> } /> {/* "Chatt"*/}
    
       <Route path="/Findpartner" element ={ <SearchHere /> } /> 
-        <Route path="/chat/:chatRoomId" element={<Chat />} /> {/* enskilda chatten */}
+        <Route path="/chat/:chatRoomId" element={<Chat />} />  {/* enskilda chatten */}
     
         <Route path="/shop" element={<Shop /> } /> {/* Affären */}
       </Routes>

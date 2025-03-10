@@ -30,13 +30,13 @@ export const VipUser = ({ user, onVIPPurchase, onVIPPlusPurchase }: VipUserProps
 
       {!hasActiveVipPlus && (
         <button onClick={onVIPPlusPurchase} className="shopBtn">
-          Uppgradera till VIP Plus för 189.90 kronor (30 dagar) + Få 20 krediter
+          Uppgradera till VIP Plus för 189.90 kronor (30 dagar) + Få 10 krediter
         </button>
       )}
 
       {!hasActiveVip && (
         <button onClick={onVIPPurchase} className="shopBtn">
-          Köp VIP för 119.90 kronor (30 dagar) + Få 20 krediter
+          Köp VIP för 119.90 kronor (30 dagar) + Få 10 krediter
         </button>
       )}
     </div>

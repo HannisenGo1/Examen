@@ -23,6 +23,8 @@ export const Shop = () => {
     }
   }, [user, navigate]);
 
+
+
   const prices = {
     VIP: 80,
     VIPPlus: 100,
@@ -75,11 +77,9 @@ export const Shop = () => {
     const updatedCredits = credits - price;
     setCredits(updatedCredits);
   
-   
     const purchasedEmojis = Array.isArray(user?.purchasedEmojis) ? user.purchasedEmojis : [];
   
     const existingEmoji = purchasedEmojis.find((e) => e.emoji === emojiName);
-    console.log("Existerande emoji:", existingEmoji);
   
     const updatedEmojis = existingEmoji
       ? purchasedEmojis.map((e) =>
@@ -97,20 +97,18 @@ export const Shop = () => {
       await updateUserInDatabase(updatedUser);
       setUser(updatedUser); 
     } catch (error) {
-      console.error("Något gick fel vid uppdateringen av användaren:", error);
+      console.error(error);
     }
   };
   
   
 // Köpa kredit
-
-{ /*  
   const handleAddCredits = async (amount: number): Promise<void> => {
     const newCredits = credits + amount;
     const updatedUser = { ...user, credits: newCredits };
     await updateUserInDatabase(updatedUser);
     setCredits(newCredits); 
-  };        */ }
+  };        
 
   const emojis = [
     { name: "nalle1", src: nalle1, price: 3 },
@@ -142,6 +140,7 @@ export const Shop = () => {
       })}
     </div>
   );
+
   const handlePurchase = async (type: PurchaseType, price: number): Promise<void> => {
     if (credits < price) {
       setErrorMessage("Du har inte tillräckligt med krediter!");
@@ -173,10 +172,16 @@ export const Shop = () => {
         }
 
       await updateUserInDatabase(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser)
     } catch (error) {
-      console.error("Något gick fel vid köpet:", error);
+      console.error(error);
     }
   };
+
+
+
+
   return (
     <>
       <div className="logga">
@@ -191,13 +196,13 @@ export const Shop = () => {
       <span className="firstPart"> SHOPPEN </span> </h1>
       <p className="price-text">Din kredit: {credits}</p>
       <div className="vip-status">
-        {user.vipStatus && (
-          <p>VIP : Aktiv</p>
-        )}
-        {user.vipPlusStatus && (
-          <p>VIP Plus: Aktiv</p>
-        )}
-      </div>
+  {user.vipStatus !== undefined && (
+    <p>VIP : {user.vipStatus ? 'Aktiv' : 'Inaktiv'}</p>
+  )}
+  {user.vipPlusStatus !== undefined && (
+    <p>VIP Plus: {user.vipPlusStatus ? 'Aktiv' : 'Inaktiv'}</p>
+  )}
+</div>
       
       <button className="vipinfobtn" onClick={toggleOpenInfo}>VIP information</button>
       {isOpen && <Vipinformation />}
@@ -212,11 +217,11 @@ export const Shop = () => {
         <button onClick={() => handlePurchase('VIPPlus', prices.VIPPlus)} className="shopBtn">
           VIP PLUS (100 krediter)
         </button>
-         { /* 
+        
         <button onClick={() => handleAddCredits(10)} className="shopBtn">
           10 krediter, 22.90 kronor
         </button>
-        <button onClick={() => handleAddCredits(30)} className="shopBtn">
+         { /* <button onClick={() => handleAddCredits(30)} className="shopBtn">
           30 krediter, 64.90 kronor
         </button>
         <button onClick={() => handleAddCredits(60)} className="shopBtn">

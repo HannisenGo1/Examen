@@ -18,7 +18,7 @@ const backTochoices = () => (
   </button> 
 
 <h2 className="confirmation-message">
-Vilken partner söker du? 
+
 
 </h2>
 <FindPartners/> 

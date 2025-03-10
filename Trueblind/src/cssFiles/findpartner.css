@@ -7,19 +7,27 @@ h4{
   width:2em;
   height: 2em;
 }
-.status-inlog{
-  width: 10px;
-  height: 10px;
+.status-inlog {
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
+  position: absolute;
+  top: -25px;
+
 }
 .online {
-  background-color: #4caf50; 
+  background-color: #00c907; 
 }
 
 .offline {
-  background-color: #f44336; 
+  background-color: #f81100; 
 }
-
+.Rubriktext2-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative; 
+}
 .btnmatchsite, .ToChatBtn{
   padding: 10px 20px; 
   font-size: 1em; 
