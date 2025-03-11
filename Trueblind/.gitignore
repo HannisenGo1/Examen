@@ -13,6 +13,7 @@ dist-ssr
 *.local
 .env
 env
+.env.*
 .dotenv
 dotenv
 # Editor directories and files
