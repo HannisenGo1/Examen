@@ -70,34 +70,42 @@ export const Register = () => {
     
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            age: {
-              ...prevData.age,
-              [name]: value,
-            },
-          }));
-        
-        if (type === 'checkbox') {
+      
+        let newValue = value;
+        if (name === 'email') {
+          newValue = value.toLowerCase();
+        }
+      
+        setFormData((prevData) => {
+          if (name === 'age') {
+            return {
+              ...prevData,
+              age: {
+                ...prevData.age,
+                [name]: newValue,  
+              },
+            };
+          } else if (type === 'checkbox') {
             const checked = (e.target as HTMLInputElement).checked;
-            setFormData((prev) => ({
-                ...prev,
-                [name]: checked,
-            }));
-        } else if (type === 'select-multiple') {
+            return {
+              ...prevData,
+              [name]: checked,
+            };
+          } else if (type === 'select-multiple') {
             const options = (e.target as HTMLSelectElement).selectedOptions;
             const values = Array.from(options).map((option) => option.value);
-            setFormData((prev) => ({
-                ...prev,
-                [name]: values,
-            }));
-        } else {
-            setFormData((prev) => ({
-                ...prev,
-                [name]: value,
-            }));
-        }
-    };
+            return {
+              ...prevData,
+              [name]: values,
+            };
+          } else {
+            return {
+              ...prevData,
+              [name]: newValue,
+            };
+          }
+        });
+      };
     const handleCheckboxChange = (e:any) => {
         setAgreedToTerms(e.target.checked);
     };

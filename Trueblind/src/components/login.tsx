@@ -22,32 +22,49 @@ const openForgot = () => {
   setIsForgotPassword(true)
 }
 
+// spelar ingen roll om användaren har en liten eller stor bokstav i sin mejl.
+// om registrerad med HANNa_kArlsson@gmail.com
+// så ska det funka även om dom skriver hanna.karlsson@gmail.com eller HANNA.Karlsson@gmail.com
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  
+  try {
+    const result = await doSignInWithEmailAndPassword(email.toLowerCase(), password);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-  
-    try {
-      const result = await doSignInWithEmailAndPassword(email, password);
-  
-      if (typeof result === 'string') {
-        setError(result);
-      } else {
-        const user = auth.currentUser;
-        if (user) {
-          const userDocRef = doc(db, 'users', user.uid);
-          await updateDoc(userDocRef, {
-            'status.online': true,
-            'status.lastLogin': serverTimestamp()  
-          });
-        }
-    
-        navigate('/homepage');
-      }
-    } catch (error: any) {
-      console.error('Fel vid inloggning:', error.message);
-      setError('Fel e-post eller lösenord.');
+    if (typeof result === 'string') {
+      setError(result); 
+      return;
     }
-  };
+
+    const user = auth.currentUser;
+    
+    if (user) {
+      if (!user.emailVerified) {
+        setError("Verifiera din email innan du loggar in. ");
+        return;
+      }
+      const userDocRef = doc(db, 'users', user.uid);
+      await updateDoc(userDocRef, {
+        'status.online': true,
+        'status.lastLogin': serverTimestamp()
+      });
+
+  
+      navigate('/homepage');
+    } else {
+      setError('Användaren kunde inte hittas.');
+    }
+  } catch (error: any) {
+    console.error('Fel vid inloggning:', error.message);
+    if (error.code === 'auth/wrong-password') {
+      setError('Felaktigt lösenord.');
+    } else if (error.code === 'auth/user-not-found') {
+      setError('Ingen användare med det e-postadressen.');
+    } else {
+      setError('Något gick fel vid inloggning.');
+    }
+  }
+};
 
   return (
     <> 
