@@ -1,6 +1,6 @@
 import { User } from "../../interface/interfaceUser";
  
-import { doc, updateDoc } from "firebase/firestore"; 
+import { doc, getDoc, updateDoc } from "firebase/firestore"; 
 import { db } from "./firebase";
 
 export const updateUserInDatabase = async (updatedUser: User) => {
@@ -15,6 +15,7 @@ export const updateUserInDatabase = async (updatedUser: User) => {
     purchasedEmojis: updatedUser.purchasedEmojis ?? [], 
     city: updatedUser.city ?? null,
     sexualOrientation: updatedUser.sexualOrientation ?? null,
+    hasUsedPromoCode: updatedUser.hasUsedPromoCode ?? false,
   };
 
   try {
@@ -36,4 +37,14 @@ export const updateEmojiCountInDatabase = async (userId: string, emojiName: stri
     console.error(error);
   }
 };
+export const getUserFromDatabase = async (userId: string): Promise<User | null> => {
+  const userRef = doc(db, 'users', userId);
+  const userSnapshot = await getDoc(userRef);
 
+  if (userSnapshot.exists()) {
+    return userSnapshot.data() as User;
+  } else {
+    console.log("No user found with the given ID.");
+    return null;
+  }
+};

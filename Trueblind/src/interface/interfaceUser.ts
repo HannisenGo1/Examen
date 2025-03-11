@@ -35,6 +35,7 @@ export type FormData = {
   vipPlusExpiry: number | null; 
   hasUsedPromoCode: boolean;
   VipplusEmoji?: VipEmoji[]
+ 
 };
 type Emoji = { emoji:string; count:number}
 

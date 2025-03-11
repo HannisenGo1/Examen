@@ -46,8 +46,6 @@ export const AccountPage = () => {
         });
       }
       await auth.signOut();
-      console.log("Användaren har loggat ut.");
-      console.log("Användaren har nu loggat ut:", user);
       navigate('/');
     } catch (error) {
       console.error("Fel vid utloggning:", error);
@@ -110,7 +108,7 @@ export const AccountPage = () => {
   
   const vipDaysLeft = daysRemaining(user.vipExpiry);
   const vipPlusDaysLeft = daysRemaining(user.vipPlusExpiry);
-  
+
   const calculateAge = (year: number, month: number, day: number): number => {
     const today = new Date();
     const birthDate = new Date(year, month - 1, day);
@@ -199,15 +197,21 @@ export const AccountPage = () => {
         
         
         
-        {hasActiveVipPlus ? (
-          <p>Du har <strong>VIP Plus,</strong>
-          {vipPlusDaysLeft > 0 ? `${vipPlusDaysLeft} dagar kvar på din VIP Plus.` : ''}</p>
-        ) : hasActiveVip ? (
-          <p>Du har <strong>VIP,</strong> 
-          {vipDaysLeft > 0 ? ` ${vipDaysLeft} dagar kvar på din VIP.` : ''}</p>
-        ) : (
-          <p>Du har ingen aktiv VIP-status</p>
-        )}
+        {user.vipPlusStatus ? (
+        <p>Du har <strong>VIP Plus</strong>, 
+          {vipPlusDaysLeft > 0 
+            ? `${vipPlusDaysLeft} dagar kvar på din VIP Plus.` 
+            : 'Din VIP Plus har gått ut.'}
+        </p>
+      ) : user.vipStatus ? (
+        <p>Du har <strong>VIP</strong>, 
+          {vipDaysLeft > 0 
+            ? `${vipDaysLeft} dagar kvar på din VIP.` 
+            : 'Din VIP har gått ut.'}
+        </p>
+      ) : (
+        <p>Du har ingen aktiv VIP.</p>
+      )}
         
         
         <p>
@@ -259,6 +263,7 @@ export const AccountPage = () => {
         </button>
         
         {/* val om man är säker att radera sitt konto :)  */}
+
         {showConfirm && (
           <div className="confirmation-box">
           <p>Är du säker på att du vill radera ditt konto? <br />

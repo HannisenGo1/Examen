@@ -40,7 +40,7 @@ const openForgot = () => {
             'status.lastLogin': serverTimestamp()  
           });
         }
-  
+    
         navigate('/homepage');
       }
     } catch (error: any) {

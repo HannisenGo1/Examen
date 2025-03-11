@@ -10,7 +10,7 @@ export const fetchUsers = async () => {
       id: doc.id,
       ...doc.data(),
     })) as User[];
-
+   
     useUserStore.getState().setUsers(users); 
   } catch (error) {
     console.error(error);

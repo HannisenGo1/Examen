@@ -27,7 +27,6 @@ setUsers: (users: User[]) => void;
   acceptMessageRequest: (senderId: string) => void;
   loadRequestsFromStorage: () => void;
   activeChats: Chat[];
-
   loadChatsFromStorage: () => void;
 loadUserFromStorage: () => void
   deniedUsers: User[];
@@ -38,7 +37,8 @@ loadUserFromStorage: () => void
   setToken: (token: string | null) => void
   chats: Chat[]
   setChats: (chats: Chat[]) => void  
-
+  hasUsedPromoCode: boolean; 
+  updatePromoCodeStatus: (hasUsedPromoCode: boolean) => void;
 }
 
 export const useUserStore = create<UserStore>((set, get) => {
@@ -53,9 +53,11 @@ export const useUserStore = create<UserStore>((set, get) => {
     activeChats: [],
     seenUsers: [],
    deniedUsers:[],
+   hasUsedPromoCode: false,
    setUsers: (users) => set({ users }),
    token: localStorage.getItem("authToken"), 
    chats: [],
+ 
   
    setChats: (chats: Chat[]) => set({ chats }),
 
@@ -76,15 +78,26 @@ export const useUserStore = create<UserStore>((set, get) => {
     const storedRequests = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'requests')) || '[]');
     const userDeniedKey = getUserStorageKey(userId, 'deniedUsers');
     const storedDeniedUsers = JSON.parse(localStorage.getItem(userDeniedKey) || '[]');
-  
+    const storedUserData = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'user')) || '{}');
     set({
       user: userData,
       likedUsers: storedLikedUsers,
       activeChats: storedChats,
       requests: storedRequests,
-      deniedUsers: storedDeniedUsers
+      deniedUsers: storedDeniedUsers,
+      hasUsedPromoCode: storedUserData.hasUsedPromoCode || false
     });
   },
+  updatePromoCodeStatus: (hasUsedPromoCode: boolean) => {
+    const currentUser = get().user;
+    if (!currentUser) return;
+
+    set({ hasUsedPromoCode });
+
+    const updatedUser = { ...currentUser, hasUsedPromoCode };
+    localStorage.setItem(getUserStorageKey(currentUser.id!, 'user'), JSON.stringify(updatedUser));
+  },
+
   purchaseEmoji: (emoji: string, price: number) => {
     const currentUser = get().user;
     if (!currentUser) return;

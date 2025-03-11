@@ -37,6 +37,7 @@ import { User } from "../../interface/interfaceUser";
             favoriteMovie: formData.favoriteMovie,
             lifeStatement1: formData.lifeStatement1,
             lifeStatement2: formData.lifeStatement2,
+            hasUsedPromoCode: formData.hasUsedPromoCode,
             createdAt: new Date()
         });
         return true;
@@ -85,7 +86,7 @@ import { User } from "../../interface/interfaceUser";
             vipStatus: userData.vipStatus || false,
             vipExpiry: userData.vipExpiry || null,
             vipPlusStatus: userData.vipPlusStatus || false,
-            
+            hasUsedPromoCode: userData.hasUsedPromoCode || false,
     
             purchaseEmoji: (emoji: string, cost: number) => {
              

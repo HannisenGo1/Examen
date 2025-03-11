@@ -20,9 +20,8 @@ export const Vipinformation = () => {
 <h2>VIP+ </h2>
     <p> VIP+  30dagars giltighet.  </p> 
     <p> ✅Allt som ingår i VIP </p>
-    <p> ✅VIP Plus-användare får endast ut användare som matchar bäst! </p> 
     <p> ✅exklusiv samling emojis. </p> 
-    <p> ✅Tillgång till premium emojis i chatt.</p> 
+    <p> ✅Tillgång till oändlig premium emojis i chatt.</p> 
      </div> 
     )
 }

@@ -15,6 +15,13 @@ h4{
   top: -25px;
 
 }
+
+.status-inlogfind {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+
+}
 .online {
   background-color: #00c907; 
 }
@@ -46,11 +53,6 @@ h4{
   word-wrap: break-word;  
 }
 
-.life-statements {
-  display: flex;
-  flex-direction: column;  
-  gap: 10px; 
-}
 .like-message {
   margin-top: 10px;
   padding: 10px;
@@ -324,7 +326,7 @@ form > .form2{
 
 .life-statements {
   margin-top: 15px;
-  font-style: italic;
+
   color: #777;
   margin:0.5em;
 }

@@ -11,7 +11,7 @@ import { updateUserInDatabase } from './data/UpdateDatabase';
 
 export const Shop = () => {
   const navigate = useNavigate();
-  const { user,setUser } = useUserStore();
+  const { user,setUser, updatePromoCodeStatus  } = useUserStore();
   const [promoCode, setPromoCode] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -39,18 +39,38 @@ export const Shop = () => {
   if (!user || !user.id) {
     return <p>Laddar...</p>;
   }
-
+  useEffect(() => {
+    if (user) {
+      if (user.hasUsedPromoCode) {
+        setErrorMessage("");
+      }
+    }
+  }, [user]);
   const handlePromoCode = async () => {
     const promoCodeCorrect = import.meta.env.VITE_PROMO_CODE;
+  
+ 
     if (promoCode === promoCodeCorrect) {
       if (user.hasUsedPromoCode) {
         setErrorMessage("Du har redan använt din gratis kod.");
-        return;
+        return; 
       }
       const updatedUser = { ...user, credits: credits + 1000, hasUsedPromoCode: true };
-      await updateUserInDatabase(updatedUser);
-      setCredits(updatedUser.credits);
-      setErrorMessage("");
+      console.log("Uppdaterad användare med ny rabattkod:", updatedUser);
+      
+      try {
+        await updateUserInDatabase(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+ 
+        setUser(updatedUser); 
+        updatePromoCodeStatus(true);
+        setCredits(updatedUser.credits); 
+  
+        setErrorMessage(""); 
+      } catch (error) {
+        setErrorMessage("Något gick fel vid uppdatering. Försök igen senare.");
+        console.error(error); 
+      }
     } else {
       setErrorMessage("Ogiltig kod. Försök igen.");
     }
@@ -117,63 +137,91 @@ export const Shop = () => {
     { name: "heart", src: heart, price: 2 },
   ];
 
-  const renderEmojis = (emojis: Emoji[]) => (
-    <div className="emoji-group">
-      {emojis.map((emoji) => {
-        const purchasedEmojis = Array.isArray(user.purchasedEmojis) ? user.purchasedEmojis : [];
-        const userEmoji = purchasedEmojis.find((e) => e.emoji === emoji.name);
-        const emojiCount = userEmoji ? userEmoji.count : 0;
-  
-        return (
-          <div key={emoji.name} className="emoji-picker2">
-            <img
-              src={emoji.src}
-              alt={emoji.name}
-              className={`emoji ${credits < emoji.price ? "disabled" : ""}`}
-              onClick={() => handlePurchaseEmoji(emoji.name, emoji.price)}
-            />
-            <p className="price-text">{emoji.price}</p>
-  
-            {emojiCount > 0 && <p className="emoji-count">Du har {emojiCount}</p>}
-          </div>
-        );
-      })}
-    </div>
-  );
+  const renderEmojis = (emojis: Emoji[]) => {
 
-  const handlePurchase = async (type: PurchaseType, price: number): Promise<void> => {
+    const emojisFor3Credits = emojis.filter(emoji => emoji.price === 3);
+    const emojisFor2Credits = emojis.filter(emoji => emoji.price === 2);
+  
+    return (
+      <div className="emoji-group">
+        {/* Emoji med 3 krediter */}
+        <div className="emoji-price-group">
+          <h2>Kostnad: 3 krediter</h2>
+          <div className="emoji-list">
+            {emojisFor3Credits.map((emoji) => {
+              const purchasedEmojis = Array.isArray(user.purchasedEmojis) ? user.purchasedEmojis : [];
+              const userEmoji = purchasedEmojis.find((e) => e.emoji === emoji.name);
+              const emojiCount = userEmoji ? userEmoji.count : 0;
+  
+              return (
+                <div key={emoji.name} className="emoji-item" onClick={() => handlePurchaseEmoji(emoji.name, emoji.price)}>
+                  <img src={emoji.src} alt={emoji.name} className={`emoji ${credits < emoji.price ? "disabled" : ""}`} />
+                  
+                  {emojiCount > 0 && <p className="emoji-count"><strong>  {emojiCount}</strong></p>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+  
+        {/* Emoji med 2 krediter */}
+        <div className="emoji-price-group">
+          <h2>Kostnad: 2 krediter</h2>
+          <div className="emoji-list">
+            {emojisFor2Credits.map((emoji) => {
+              const purchasedEmojis = Array.isArray(user.purchasedEmojis) ? user.purchasedEmojis : [];
+              const userEmoji = purchasedEmojis.find((e) => e.emoji === emoji.name);
+              const emojiCount = userEmoji ? userEmoji.count : 0;
+  
+              return (
+                <div key={emoji.name} className="emoji-item" onClick={() => handlePurchaseEmoji(emoji.name, emoji.price)}>
+                  <img src={emoji.src} alt={emoji.name} className={`emoji ${credits < emoji.price ? "disabled" : ""}`} />
+                
+                  {emojiCount > 0 && <p className="emoji-count"><strong> {emojiCount}</strong></p>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const handlePurchase = async (type: 'VIP' | 'VIPPlus', price: number): Promise<void> => {
     if (credits < price) {
       setErrorMessage("Du har inte tillräckligt med krediter!");
       return;
     }
-
+  
     try {
       let updatedUser = { ...user, credits: credits - price };
       setCredits(updatedUser.credits); 
-
+  
+      const expiryDate = Date.now() + 30 * 24 * 60 * 60 * 1000; 
+  
       switch (type) {
         case 'VIP':
           updatedUser = {
             ...updatedUser,
             vipStatus: true,
-            vipExpiry: Date.now() + 30 * 24 * 60 * 60 * 1000,
+            vipExpiry: expiryDate, 
           };
           break;
-
+  
         case 'VIPPlus':
           updatedUser = {
             ...updatedUser,
             vipStatus: true,
             vipPlusStatus: true,
-            vipPlusExpiry: Date.now() + 30 * 24 * 60 * 60 * 1000,
+            vipPlusExpiry: expiryDate, 
           };
           break;
-
-        }
-
+      }
+   
       await updateUserInDatabase(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
-      setUser(updatedUser)
+      setUser(updatedUser);
+  
     } catch (error) {
       console.error(error);
     }
@@ -204,7 +252,12 @@ export const Shop = () => {
   )}
 </div>
       
-      <button className="vipinfobtn" onClick={toggleOpenInfo}>VIP information</button>
+      <button className="vipinfobtn" onClick={toggleOpenInfo}>VIP information
+      <span className={`arrow ${isOpen ? 'open' : ''}`} onClick={toggleOpenInfo}>
+    &#9660;
+    </span>
+      </button>
+     
       {isOpen && <Vipinformation />}
 
 
@@ -237,16 +290,20 @@ export const Shop = () => {
           type="text"
           placeholder="Ange din kod här"
           value={promoCode}
-          onChange={(e) => setPromoCode(e.target.value)}
+          onChange={(e) => setPromoCode(e.target.value)
+            
+          }
         />
-        <button onClick={handlePromoCode}>Använd kod</button>
+        <button className="usecodeBtn"onClick={handlePromoCode} >Använd kod</button>
         {errorMessage && <p>{errorMessage}</p>}
       </div>
 
      
-        <div className="emoji-item">
-          {renderEmojis(emojis)}
-        </div>
+      <div className="emoji-shop">
+  <div className="emoji-shop-list">
+    {renderEmojis(emojis)}
+  </div>
+</div>
       
     </>
   );

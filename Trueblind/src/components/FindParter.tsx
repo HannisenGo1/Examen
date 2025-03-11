@@ -251,10 +251,13 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
     {loading ? 'Laddar...' : 'Sök partner'}
     </button>
     
-    <button  onClick={restoreDeniedUsers} disabled={!isVip(user)} 
-    className={`btn ${isVip(user) ? 'btn-primary' : 'btn-disabled'}`} >
-    Återställ ❌  </button>
-    
+    {isVip(user) && (
+  <button 
+    onClick={restoreDeniedUsers} 
+    className="btn btn-primary">
+    Återställ ❌
+  </button>
+)}
     </div>
     
     {matchingResults.length > 0 && showCurrentUser ? (
@@ -270,9 +273,8 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
   <img src={viplogga} alt="viplogga" className="vip-logo" />
 ) : null}
       </h4>
-      <div className={`status-inlog ${showCurrentUser.status?.online ? 'online' : 'offline'}`}></div>
-       
-      <h4>{showCurrentUser.firstName} <span className="age">, 
+      <div className={`status-inlogfind ${showCurrentUser.status?.online ? 'online' : 'offline'}`}></div>
+      <h4>{showCurrentUser.firstName} <span className="age">
       <p>
       <strong>
       Ålder: {user?.age?.year && user?.age?.month && user?.age?.day 
@@ -288,7 +290,6 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
       <p><strong>Kön:</strong> {showCurrentUser.gender}</p>
       <p><strong>Religion:</strong> {showCurrentUser.religion}</p>
       <p><strong>Läggning:</strong> {showCurrentUser.sexualOrientation}</p>
-      <p> inloggad senast  : {showCurrentUser?.status?.lastLogin }</p>
       </div>
       <div className="life-statements">
       <p>Jag skulle aldrig kunna leva utan {showCurrentUser.lifeStatement1}</p>
@@ -301,7 +302,7 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
         <p><strong>Har barn:</strong> {showCurrentUser.hasChildren ? 'Ja' : 'Nej'}</p>
         <p><strong>Vill ha barn:</strong> {showCurrentUser.wantsChildren ? 'Ja' : 'Nej'}</p>
         <p><strong>Röker:</strong> {showCurrentUser.smokes}</p>
-        <p><strong>Relationsstatus:</strong> {showCurrentUser.relationshipStatus}</p>
+        <p><strong>Söker/relationsstatus: </strong> {showCurrentUser.relationshipStatus}</p>
         <p><strong>Utbildning:</strong> {showCurrentUser.education}</p>
         <p><strong>Favoritsång:</strong> {showCurrentUser.favoriteSong}</p>
         <p><strong>Favoritfilm:</strong> {showCurrentUser.favoriteMovie}</p>

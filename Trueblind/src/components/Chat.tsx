@@ -6,6 +6,7 @@ import bukett from '../img/imgProdukter/bukett.png'
 import nalle1 from '../img/imgProdukter/nalle1.png'
 import nalle2 from '../img/imgProdukter/nalle2.png'
 import heart from '../img/imgProdukter/heart.png'
+
 import { addMessageToFirebase } from './data/ChatData';
 import { Message } from '../interface/interfaceUser';
 import { doc, onSnapshot} from 'firebase/firestore';
@@ -145,131 +146,124 @@ if (!user || !user.id) {
   return <p>Laddar...</p>;
 }
 
-const renderEmojis = () => {
-  if (!Array.isArray(user.purchasedEmojis) || user.purchasedEmojis.length === 0) {
-    return <p>Du har inga köpta emojis.</p>;
-  }
-  
-  return user.purchasedEmojis.map((emoji) => {
-    let emojiSrc;
-    
-    switch (emoji.emoji) {
-      case 'nalle1':
-      emojiSrc = nalle1;
-      break;
-      case 'nalle2':
-      emojiSrc = nalle2;
-      break;
-      case 'bukett':
-      emojiSrc = bukett;
-      break;
-      case 'heart':
-      emojiSrc = heart;
-      break;
-      default:
-      emojiSrc = ''; 
-      break;
-    }
-    
-    return (
-      <div key={emoji.emoji} className="emoji-item">
-      <img
-      src={emojiSrc}
-      alt={emoji.emoji}
-      className="emoji-img"
-      onClick={() => handleEmojiClick(emojiSrc)} 
-      />
-      <span>{emoji.count}</span> 
-      </div>
-    );
-  });
+const emojiClass = (emojiName: string) => {
+  return ["nalle1", "nalle2", "bukett"].includes(emojiName) ? "small-emoji" : "";
 };
 
 const openTheReport = () => {
   setOpenReport(!openReport);
-}
+};
 
 return (
   <>
-  <div className="logga">
-  <img src={logga} alt="logo" className="img" />
-  </div>
-  <div className="buttondivforback ">
-  <button className="btnback" onClick={messagesite}>
-  <i className="fas fa-arrow-left"></i>
-  </button>
-  </div>
-
-  <div className="Rubriktext2-container">
-
-   <h1 className="Rubriktext2">{otherUserName}</h1>
-  <p className={`status-inlog ${currentChat?.status?.online ? 'online' : 'offline'}`}></p>
-</div>
-
-  <div className={openReport ? "report-container open" : "report-container"}>
-  {!openReport ? (
-    <button className="reportbtn" onClick={openTheReport}>Rapportera</button>
-  ) : (
-    <>
-      <button className="closebtn" onClick={openTheReport}>❌</button>
-      <ReportUser />
-    </>
-  )}
-</div>
-
-  {/* Chatten */}
-  
-  <div className="chat-container">
- : 
-    <div className="chat-messages-container">
-    {messages.length === 0 ? (
-      <p>Inga meddelanden än.</p>
-    ) : (
-      messages.map((msg) => (
-        <div
-        key={msg.id}
-        className={`chat-message ${msg.senderId === user?.id ? 'sent' : 'received'}`}
-        >
-             <p className={`status-inlog ${currentChat?.status?.online ? 'online' : 'offline'}`}></p>
-        <div className="message-content">
-        <p className="sender">
-        {msg.senderId === user?.id ? 'Du' : msg.senderName}
-        </p>
-        <p className="message-text" dangerouslySetInnerHTML={{ __html: msg.message }}></p>
-        
-        </div>
-        
-        </div>
-      ))
-    )}
+    <div className="logga">
+      <img src={logga} alt="logo" className="img" />
+    </div>
+    <div className="buttondivforback">
+      <button className="btnback" onClick={messagesite}>
+        <i className="fas fa-arrow-left"></i>
+      </button>
     </div>
 
-  </div>
+    <div className="Rubriktext2-container">
+      <h1 className="Rubriktext2">{otherUserName}</h1>
+      <p className={`status-inlog ${currentChat?.status?.online ? 'online' : 'offline'}`}></p>
+    </div>
 
+    <div className={openReport ? "report-container open" : "report-container"}>
+      {!openReport ? (
+        <button className="reportbtn" onClick={openTheReport}>Rapportera</button>
+      ) : (
+        <>
+          <button className="closebtn" onClick={openTheReport}>❌</button>
+          <ReportUser />
+        </>
+      )}
+    </div>
 
-  
-  <div className="chat-message-input-container">
-  <textarea value={newMessage}
-  onChange={(e) => setNewMessage(e.target.value)}
-  placeholder="Skriv ditt meddelande..."   />
-  <button className='sendBtn' onClick={handleSendMessage} disabled={!newMessage.trim()}>
-  Skicka   </button>
-  </div>
-  
-  {/* Emoji Väljare */}
-  <div className="rowBtncontainer"> 
+    {/* Chatten */}
+    <div className="chat-container">
+      <div className="chat-messages-container">
+        {messages.length === 0 ? (
+          <p>Inga meddelanden än.</p>
+        ) : (
+          messages.map((msg) => (
+            <div key={msg.id} className={`chat-message ${msg.senderId === user?.id ? 'sent' : 'received'}`}>
+              <p className={`status-inlog ${currentChat?.status?.online ? 'online' : 'offline'}`}></p>
+              <div className="message-content">
+                <p className="sender">{msg.senderId === user?.id ? 'Du' : msg.senderName}</p>
+                <p className="message-text" dangerouslySetInnerHTML={{ __html: msg.message }}></p>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+
+    <div className="chat-message-input-container">
+      <textarea
+        value={newMessage}
+        onChange={(e) => setNewMessage(e.target.value)}
+        placeholder="Skriv ditt meddelande..."
+      />
+      <button className="sendBtn" onClick={handleSendMessage} disabled={!newMessage.trim()}>
+        Skicka
+      </button>
+    </div>
+
+    {/* Emoji Väljare */}
+    <div className="rowBtncontainer">
   <button onClick={() => setShowEmojis(!showEmojis)} className="emoji-btn">
-  Emojis    </button>
+    Emojis
+  </button>
   <p>{errormessage}</p>
-  <VipPlusEmojis chatRoomId={chatRoomId} sendEmoji={sendEmoji} />
-  </div> 
-  
-  {/* Emoji picker */}
+
   {showEmojis && (
     <div className="emoji-picker">
-    {renderEmojis()}
+      <div className="emoji-list">
+        {/* Rendera VIP emojis */}
+        <VipPlusEmojis chatRoomId={chatRoomId} sendEmoji={sendEmoji} />
+
+        {/* Rendera köpta emojis */}
+        {Array.isArray(user.purchasedEmojis) && user.purchasedEmojis.length > 0 ? (
+          user.purchasedEmojis.map((emoji) => {
+            let emojiSrc;
+
+            switch (emoji.emoji) {
+              case "nalle1":
+                emojiSrc = nalle1;
+                break;
+              case "nalle2":
+                emojiSrc = nalle2;
+                break;
+              case "bukett":
+                emojiSrc = bukett;
+                break;
+              case "heart":
+                emojiSrc = heart;
+                break;
+              default:
+                emojiSrc = "";
+                break;
+            }
+
+            return (
+              <button
+                key={emoji.emoji}
+                onClick={() => handleEmojiClick(emojiSrc)}
+                className={`emoji-item ${emojiClass(emoji.emoji)}`}
+              >
+                <img src={emojiSrc} alt={emoji.emoji} className="emoji-img" />
+                <span>{emoji.count}</span>
+              </button>
+            );
+          })
+        ) : (
+          <p>Du har inga köpta emojis.</p>
+        )}
+      </div>
     </div>
   )}
-  </>
-);
-};
+</div>
+</> 
+)} 
