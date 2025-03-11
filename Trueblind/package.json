@@ -11,7 +11,8 @@
     "build-frontend": "tsc -b && vite build",
     "build": "npm run build-frontend && npm run build-backend",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "cors": "^2.8.5",
