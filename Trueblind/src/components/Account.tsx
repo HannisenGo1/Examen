@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaPen } from 'react-icons/fa';
 import {auth,db} from './data/firebase'
 import { DeleteUser } from './data/UserAuth';
-import { isVIPExpired } from './VipUser';
+// import { isVIPExpired } from './VipUser';
 
 import { daysRemaining } from './DaysCounterVip';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
@@ -102,8 +102,8 @@ export const AccountPage = () => {
       console.error("Misslyckades att radera kontot:", error);
     }
   }
-  const hasActiveVipPlus = user.vipPlusStatus && (user.vipPlusExpiry ? !isVIPExpired(user.vipPlusExpiry) : true);
-  const hasActiveVip = user.vipStatus && (user.vipExpiry ? !isVIPExpired(user.vipExpiry) : true);
+//  const hasActiveVipPlus = user.vipPlusStatus && (user.vipPlusExpiry ? !isVIPExpired(user.vipPlusExpiry) : true);
+//  const hasActiveVip = user.vipStatus && (user.vipExpiry ? !isVIPExpired(user.vipExpiry) : true);
   
   
   const vipDaysLeft = daysRemaining(user.vipExpiry);
