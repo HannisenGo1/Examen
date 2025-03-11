@@ -22,9 +22,6 @@ const openForgot = () => {
   setIsForgotPassword(true)
 }
 
-// spelar ingen roll om användaren har en liten eller stor bokstav i sin mejl.
-// om registrerad med HANNa_kArlsson@gmail.com
-// så ska det funka även om dom skriver hanna.karlsson@gmail.com eller HANNA.Karlsson@gmail.com
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   
