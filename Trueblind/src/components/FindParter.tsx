@@ -290,11 +290,11 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
       <p><strong>Kön:</strong> {showCurrentUser.gender}</p>
       <p><strong>Religion:</strong> {showCurrentUser.religion}</p>
       <p><strong>Läggning:</strong> {showCurrentUser.sexualOrientation}</p>
+      
       </div>
       <div className="life-statements">
       <p>Jag skulle aldrig kunna leva utan {showCurrentUser.lifeStatement1}</p>
       <p>Jag blir mest inspirerad när {showCurrentUser.lifeStatement2}</p>
-      <p> {showCurrentUser?.status?.lastLogin }</p>
       
       {isVip(user) && (
         <>
