@@ -36,7 +36,14 @@ export const validateFormData = (step: number, formData: any) => {
       errors.year = 'Året måste vara ett giltigt fyra-siffrigt tal.';
     }
     if (!formData.city) errors.city = 'Stad är obligatoriskt.';
-    if (!formData.email) errors.email = 'Epost är obligatoriskt';
+    if (!formData.email) {
+      errors.email = 'Epost är obligatoriskt.';
+    } else {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|se|net|nu)$/i;
+      if (!emailRegex.test(formData.email)) {
+        errors.email = 'Epost är obligatoriskt';
+      }
+    }
   }
 
   if (step >= 2) {  
