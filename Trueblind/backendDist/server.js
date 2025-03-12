@@ -26,6 +26,7 @@ app.get("/users", async (_, res) => {
         res.status(500).json({ error: "Ett fel uppstod vid hämtning av användare." });
     }
 });
+
 //skapandet av användaren
 app.post("/users", async (req, res) => {
     try {

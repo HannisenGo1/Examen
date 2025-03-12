@@ -8,7 +8,7 @@ config();
 const app: Express = express();
 const port = process.env.PORT || 3000;
 
-app.use(express.json()); 
+app.use('/', express.json())  
 import cors from 'cors';
 
 app.use('/auth', auth); 
@@ -20,8 +20,13 @@ app.use('/', (req: Request, _, next: NextFunction) => {
     next();
   });
 
-  app.use('/users', verifyToken);
+  app.use('/', express.static('./dist')); 
 
+  app.use('/users', verifyToken);
+  app.get('/', (_, res) => {
+    res.send('Välkommen till backend!');
+  });
+  
   
 // få ut användartestdatan 
   app.get("/users", async (_, res: Response) => {
