@@ -4,7 +4,7 @@ import heart2 from '../img/imgProdukter/heart2.png';
 import vipblomma1 from '../img/imgProdukter/vipblomma1.png';
 import vipblomma2 from '../img/imgProdukter/vipblomma2.png';
 
-import vipnalle from '../assets/img/imgProdukter/vipnalle.png';
+const vipnalle = `${import.meta.env.BASE_URL}assets/img/imgProdukter/vipnalle.png`;
 
 
 interface VipPlusEmojisProps {
