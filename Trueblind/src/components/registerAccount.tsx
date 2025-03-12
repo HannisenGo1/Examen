@@ -77,15 +77,15 @@ export const Register = () => {
         }
       
         setFormData((prevData) => {
-          if (name === 'age') {
-            return {
-              ...prevData,
-              age: {
-                ...prevData.age,
-                [name]: newValue,  
-              },
-            };
-          } else if (type === 'checkbox') {
+            if (['month', 'day', 'year'].includes(name)) {
+                return {
+                  ...prevData,
+                  age: {
+                    ...prevData.age,
+                    [name]: newValue, 
+                  },
+                };
+              } else if (type === 'checkbox') {
             const checked = (e.target as HTMLInputElement).checked;
             return {
               ...prevData,
