@@ -1,0 +1,37 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main  # Workflowen körs när du gör en push till main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'  # Ange den Node.js-version du använder
+
+      - name: Install dependencies
+        run: |
+          cd trueblind
+          npm install
+
+      - name: Build the project
+        run: |
+          cd trueblind
+          npm run build  # Bygg din applikation och skapa dist-mappen
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages   
+          folder: trueblind/dist  # Ange rätt mapp (trueblind/dist)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
