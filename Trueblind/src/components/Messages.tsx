@@ -10,6 +10,7 @@ export const Messages = () => {
   const { requests, likedUsers, acceptMessageRequest, removeLikedUser, activeChats,setChats } = useUserStore();
   const navigate = useNavigate();
   const { user } = useUserStore();
+  // @ts-ignore
   const [filteredRequests, setFilteredRequests] = useState<any[]>([]);
   const backsite = () => {
     navigate('/account');

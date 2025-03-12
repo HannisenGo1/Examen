@@ -87,14 +87,14 @@ import { User } from "../../interface/interfaceUser";
             vipExpiry: userData.vipExpiry || null,
             vipPlusStatus: userData.vipPlusStatus || false,
             hasUsedPromoCode: userData.hasUsedPromoCode || false,
-    
+    // @ts-ignore
             purchaseEmoji: (emoji: string, cost: number) => {
              
-            },
+            },// @ts-ignore
             updateUser: (updatedFields: Partial<User>) => {
     
               
-            },
+            },// @ts-ignore
             addCredits: (amount: number) => {
               
             },

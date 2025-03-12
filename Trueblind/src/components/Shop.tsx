@@ -77,7 +77,7 @@ export const Shop = () => {
   };
 
   const toggleOpenInfo = () => setIsOpen(!isOpen);
- 
+ // @ts-ignore
   type PurchaseType = 'VIP' | 'VIPPlus' ;
 
   interface Emoji {

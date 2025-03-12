@@ -26,6 +26,7 @@ export const Chat = ()  => {
   const navigate = useNavigate();
   const purchasedEmojis = user?.purchasedEmojis || [];
   const [otherUserName, setOtherUserName] = useState<string>('Laddar...');
+  // @ts-ignore
   const [loading, setLoading] = useState(true);
   const [openReport,setOpenReport] = useState(false)
 

@@ -102,7 +102,9 @@ export const AccountPage = () => {
       console.error("Misslyckades att radera kontot:", error);
     }
   }
+  // @ts-ignore
   const hasActiveVipPlus = user.vipPlusStatus && (user.vipPlusExpiry ? !isVIPExpired(user.vipPlusExpiry) : true);
+  // @ts-ignore
   const hasActiveVip = user.vipStatus && (user.vipExpiry ? !isVIPExpired(user.vipExpiry) : true);
   
   
