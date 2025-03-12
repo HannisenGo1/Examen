@@ -185,7 +185,7 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
     return age;
   };
 
-  const showCurrentUser = matchingResults[currentUser];
+  const showCurrentUser = matchingResults?.[currentUser] ?? null;
   const [loadedDeniedUsers, setLoadedDeniedUsers] = useState<User[]>([]);
   
   useEffect(() => {
@@ -310,8 +310,16 @@ return<p>Du måste vara inloggad för att söka efter partners</p> }
         </>
       )}
       <div className="button-container">
-      <button onClick={() => handleDeny(showCurrentUser.id!)} className="deny-button">❌</button>
-      <button onClick={() => handleLike(showCurrentUser.id!)} className="like-button">❤️</button>
+      <button 
+  onClick={() => showCurrentUser?.id && handleDeny(showCurrentUser.id)} 
+  className="deny-button">
+  ❌
+</button>
+<button 
+  onClick={() => showCurrentUser?.id && handleLike(showCurrentUser.id)} 
+  className="like-button">
+  ❤️
+</button>
         </div> 
       <div className='life-statements'> 
       {message && <p className="like-message">{message}</p>}
