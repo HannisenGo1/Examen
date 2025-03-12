@@ -8,16 +8,19 @@
 
     /* Bundler mode */
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
-    // @ts-ignore
-    "emitDeclarationOnly": true,  
+
+    /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* Deklarationsfiler */
+    "declaration": true,  // Lägg till denna rad
+    "emitDeclarationOnly": true // Bevarar denna rad
   },
   "include": ["vite.config.ts"]
 }
