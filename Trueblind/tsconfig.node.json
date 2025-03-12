@@ -11,6 +11,7 @@
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
+    // @ts-ignore
     "emitDeclarationOnly": true,  
     "strict": true,
     "noUnusedLocals": true,
