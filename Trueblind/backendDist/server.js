@@ -6,7 +6,7 @@ import { config } from 'dotenv';
 config();
 const app = express();
 const port = process.env.PORT || 3000;
-app.use(express.json());
+app.use('/', express.json());
 import cors from 'cors';
 app.use('/auth', auth);
 app.use(cors());
@@ -14,7 +14,11 @@ app.use('/', (req, _, next) => {
     console.log(`${req.method} ${req.url}`, req.body);
     next();
 });
+app.use('/', express.static('./dist'));
 app.use('/users', verifyToken);
+app.get('/', (_, res) => {
+    res.send('Välkommen till backend!');
+});
 // få ut användartestdatan 
 app.get("/users", async (_, res) => {
     try {
@@ -26,7 +30,6 @@ app.get("/users", async (_, res) => {
         res.status(500).json({ error: "Ett fel uppstod vid hämtning av användare." });
     }
 });
-
 //skapandet av användaren
 app.post("/users", async (req, res) => {
     try {
