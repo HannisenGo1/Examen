@@ -7,20 +7,18 @@
     "skipLibCheck": true,
 
     /* Bundler mode */
-    "moduleResolution": "bundler",
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
+    "noEmit": true,
 
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
-
-    /* Deklarationsfiler */
-    "declaration": true,  // Lägg till denna rad
-    "emitDeclarationOnly": true // Bevarar denna rad
+    "noUncheckedSideEffectImports": true
   },
   "include": ["vite.config.ts"]
 }
