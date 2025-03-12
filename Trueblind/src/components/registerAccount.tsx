@@ -497,7 +497,7 @@ export const Register = () => {
                </div>
             <div className="for-rechapta"> 
         <ReCAPTCHA
-    sitekey="6LcjQLcqAAAAANH5r9wv-Jaa3vQf6xlZVHJYsmjl"
+    sitekey="6Lft3OkqAAAAAPuCJoXWHjEgBaBE5tYSC2hHf1kq"
     onChange={onChangeRe} />
 </div>
      </>
