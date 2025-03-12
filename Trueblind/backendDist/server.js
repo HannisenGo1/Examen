@@ -3,7 +3,6 @@ import { GetUser, AddUser, UpdateUser, GetUserById, DeleteUser } from "./data/ge
 import { router as auth } from './data/router/userRoute.js';
 import verifyToken from "./data/token.js";
 import { config } from 'dotenv';
-// import { User } from "./data/interface.js";
 config();
 const app = express();
 const port = process.env.PORT || 3000;
