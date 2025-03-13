@@ -40,6 +40,7 @@ export const Register = () => {
         vipPlusStatus: false,
         vipPlusExpiry: null,
         hasUsedPromoCode: false,
+
     });
     
     
@@ -47,16 +48,23 @@ export const Register = () => {
         setFormData((prev: FormData) => {
             const newInterests = [...prev.interests];
             const index = newInterests.indexOf(interest);
+    
             if (index > -1) {
-                newInterests.splice(index, 1);  
-            } 
-            else if (newInterests.length < 5) {
+
+                newInterests.splice(index, 1);
+            } else if (newInterests.length < 5) {
                 newInterests.push(interest);
             }
-            
-            return { ...prev, interests: newInterests };
+    
+            const updatedData = { ...prev, interests: newInterests };
+    
+            const errors = validateFormData(step, updatedData); 
+            setErrors(errors); 
+    
+            return updatedData;
         });
     };
+    
     type Errors = {
         [key: string]: string; 
       };
@@ -65,7 +73,7 @@ export const Register = () => {
     const [errors2, setErrors2] = useState<any>({}); 
     const [step, setStep] = useState(1);
     const [isRegistered, setIsRegistered] = useState(false);
-    const [agreedToTerms, setAgreedToTerms] = useState(false);
+    const [agreedToTerms, setAgreedToTerms] = useState(true);
     const [isTermsVisible, setIsTermsVisible] = useState(false);
     const [isReClicked, setIsReClicked] = useState(false)
     const [filteredErrors, setFilteredErrors] = useState<[string, string][]>([]);
@@ -77,66 +85,62 @@ export const Register = () => {
     
         let newValue = value;
     
-        // För att konvertera e-post till små bokstäver
+     
         if (name === 'email') {
             newValue = value.toLowerCase();
         }
     
         setFormData((prevData) => {
-            // För 'age' objektet, uppdatera månads-, dags- eller års-fältet
+
+            let updatedData = { ...prevData };
             if (['month', 'day', 'year'].includes(name)) {
-                return {
+                updatedData = {
                     ...prevData,
                     age: {
                         ...prevData.age,
                         [name]: newValue,
                     },
                 };
-            }
+            } else if (type === 'checkbox') {
     
-            // För checkbox, sätt 'true' eller 'false' baserat på om den är markerad eller inte
-            if (type === 'checkbox') {
                 const checked = (e.target as HTMLInputElement).checked;
-                return {
+                updatedData = {
                     ...prevData,
                     [name]: checked,
                 };
-            }
-    
-            // För select-multiple, hantera val av flera alternativ
-            if (type === 'select-multiple') {
+            } else if (type === 'select-multiple') {
+
                 const options = (e.target as HTMLSelectElement).selectedOptions;
                 const values = Array.from(options).map((option) => option.value);
-                return {
+                updatedData = {
                     ...prevData,
                     [name]: values,
                 };
+            } else {
+                updatedData = {
+                    ...prevData,
+                    [name]: newValue,
+                };
             }
+            const errors = validateFormData(step, updatedData);
+            setErrors(errors);
     
-            // För alla andra typer (text, radio, etc.), uppdatera värdet direkt
-            return {
-                ...prevData,
-                [name]: newValue,
-            };
+            return updatedData;
         });
     };
-    const handleCheckboxChange = (e:any) => {
-        const checked = e.target.checked;
-        setAgreedToTerms(checked);
-        if (checked) {
-            delete errors.agreeTerms;
-        } else {
-            errors.agreeTerms = 'Du måste godkänna användarvillkoren'; 
-        setErrors({...errors});
+    const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setAgreedToTerms(e.target.checked);
     };
-}
+    
+    
     const onChangeRe = (value: string | null) => {
         setIsReClicked(!!value);
       };
     const handleShowTerms = () => {
         setIsTermsVisible(true);  
     };
-    
+      
+    {/* 
     const handleAcceptTerms = () => {
         setAgreedToTerms(true);  
         setIsTermsVisible(false); 
@@ -144,7 +148,7 @@ export const Register = () => {
     
     const handleCloseTerms = () => {
         setIsTermsVisible(false); 
-    };
+    };       */ }
 
     const goBackToHome = () => {
         navigate('/');
@@ -160,7 +164,7 @@ export const Register = () => {
           3: ['religion', 'interests'],
           4: ['hasChildren', 'smokes'],
           5: ['relationshipStatus', 'education'],
-          6: ['favoriteSong', 'favoriteMovie', 'lifeStatement1', 'lifeStatement2', 'agreeTerms'],
+          6: ['favoriteSong', 'favoriteMovie', 'lifeStatement1', 'lifeStatement2'],
         };
         
         const filteredErrors = Object.entries(validationErrors).filter(([key]) =>
@@ -173,9 +177,7 @@ export const Register = () => {
         } else {
             setFilteredErrors([]);
             setStep(step + 1);  
-            console.log("agreedToTerms:", agreedToTerms);
-            console.log("isReClicked:", isReClicked);
-            console.log("errors:", errors);
+
         }
     };
 
@@ -187,7 +189,7 @@ export const Register = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!(agreedToTerms && isReClicked && Object.keys(errors).length === 0)) {
+        if (!(isReClicked && Object.keys(errors).length === 0)) {
             return; 
         }
     
@@ -221,12 +223,7 @@ export const Register = () => {
         </h1>
         </div>
         
-        {isRegistered && (
-            <div className="confirmation-message">
-            <h2>Du har blivit registrerad!</h2>
-            <button className="accountBtn" onClick={goBackToHome}>Till startsidan</button>
-            </div>
-        )}
+
         <form onSubmit={handleSubmit}>
         
         {step === 1 && (
@@ -385,6 +382,7 @@ export const Register = () => {
                 className={`interest-button ${formData.interests.includes(interest.toLowerCase()) ? 'selected' : ''}`}
                 onClick={() => handleInterestClick(interest.toLowerCase())}
                 disabled={formData.interests.length >= 5 && !formData.interests.includes(interest.toLowerCase())}
+                
                 >
                 {interest}
                 </button>
@@ -530,24 +528,28 @@ export const Register = () => {
             onChange={handleChange}
             />
             
-            
+             {/* 
             <div className="register-terms-checkbox">
-            <input
-            type="checkbox"
-            id="agreeTerms"
-            checked={agreedToTerms}
-            onChange={handleCheckboxChange}
-            />
+        
             <label htmlFor="agreeTerms">
             Jag godkänner * {' '}
             <a href="#" onClick={handleShowTerms}>
             användarvillkoren 
             </a>
-            </label>
+            </label>    <input
+            type="checkbox"
+            id="agreeTerms"
+            checked={agreedToTerms}
+            onChange={(e) => setFormData({
+                ...formData,
+                agreeTerms: e.target.checked  // Här uppdateras agreeTerms korrekt
+              })}
+            />
+            </div>
+*/ }  
 
 
-
-               </div>
+               
             <div className="for-rechapta"> 
         <ReCAPTCHA
     sitekey="6Le2GPMqAAAAAAzKGmzp0K8kbsG_C_kJUb8nBfXs"
@@ -568,7 +570,7 @@ export const Register = () => {
                         <button 
   className="accountBtn" 
   type="submit" 
-  disabled={!(agreedToTerms && isReClicked && Object.keys(errors).length === 0)}>
+  disabled={!( isReClicked && Object.keys(errors).length === 0)}>
   Registrera
 </button>
                     </div>
@@ -576,17 +578,21 @@ export const Register = () => {
             )}
         {isRegistered && (
             <div className="confirmation-message">
+                 <div className="confirmation-message">
+            <h2>Du har blivit registrerad!</h2>
+
+            </div>
             <p>Välkommen till Trublind! Verifiering mejl har skickats till din e-post, verifiera dig innan du kan komma in</p>
             <button className="accountBtn" onClick={goBackToHome}>Till startsidan</button>
             </div>
         )}
         </form> 
-        {isTermsVisible && (
+        {/* {isTermsVisible && (
             <Anvandarpolicy
             onClose={handleCloseTerms}
             onAccept={handleAcceptTerms}
             />
-        )}
+        )}  */ } 
         </>
     );
 };

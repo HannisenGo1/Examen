@@ -169,10 +169,10 @@ export async function DeleteUser(usersId: string, password: string): Promise<voi
     try {
       await sendEmailVerification(auth.currentUser);
     } catch (error: any) {
-      console.error("Fel vid verifiering av e-post:", error.message);
+    //  console.error("Fel vid verifiering av e-post:", error.message);
   
       if (error.code === 'auth/too-many-requests') {
-        console.error("försök igen senare.");
+      //  console.error("försök igen senare.");
         return; 
       }
       throw error; 
