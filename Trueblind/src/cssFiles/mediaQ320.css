@@ -4,6 +4,12 @@
         padding: 1em;
         max-width: 90%;
     }
+ 
+      .Rubriktext {
+          font-size: 25px; 
+          align-items: center;
+          margin-top:1em; 
+      }
 
     .login-header {
         font-size: 18px; 

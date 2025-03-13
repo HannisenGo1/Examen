@@ -127,7 +127,11 @@
         font-size: 15px;  
         padding:1em;
     }
-
+    .Rubriktext {
+      font-size: 30px; 
+      align-items: center;
+      margin-top:1em; 
+  }
 
     .btncontainer {
         flex-direction: column;  
@@ -141,12 +145,12 @@
 }
 @media (max-width: 425px) {
   .result-item {
-    width: 90%; /* Anpassar sig till mindre skärmar */
+    width: 90%; 
     padding: 10px;
   }
   
   .button-container {
-    gap: 10px; /* Minska avståndet mellan knappar */
+    gap: 10px; 
   }
 
   .like-button, .deny-button {
