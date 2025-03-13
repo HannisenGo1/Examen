@@ -166,13 +166,6 @@ export const Register = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        const validationErrors = validateFormData(6, formData);
-    
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-            return;
-        }
-        
         try {
             const success = await doSignUpWithEmailAndPassword(formData);
             if (success === true) {

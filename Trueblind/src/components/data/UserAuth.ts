@@ -42,9 +42,13 @@ import { User } from "../../interface/interfaceUser";
         });
         await doSendEmailVerification();
         return true;
-    } catch (error: any) {
-      console.error('Fel vid registrering:', error.message);
-        return error.message;
+      } catch (error: any) {
+        if (error.code === "auth/email-already-in-use") {
+            console.error("E-postadressen är redan registrerad.");
+            return "E-postadressen är redan registrerad.";
+        }
+        console.error('Fel vid registrering:', error.message);
+        return "Ett okänt fel uppstod vid registrering.";
     }
 };
   
