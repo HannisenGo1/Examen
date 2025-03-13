@@ -3,7 +3,7 @@ import {auth}from "./firebase";
 import { FirebaseError } from "firebase/app";
 import { createUserWithEmailAndPassword,
  sendEmailVerification, signInWithEmailAndPassword, updatePassword
- , EmailAuthProvider, reauthenticateWithCredential,deleteUser,  } from "firebase/auth";
+ , EmailAuthProvider, reauthenticateWithCredential,deleteUser } from "firebase/auth";
  
 import { useUserStore } from "../../storage/storage";
 import { User } from "../../interface/interfaceUser";
@@ -40,9 +40,10 @@ import { User } from "../../interface/interfaceUser";
             hasUsedPromoCode: formData.hasUsedPromoCode,
             createdAt: new Date()
         });
+        await doSendEmailVerification();
         return true;
     } catch (error: any) {
-  
+      console.error('Fel vid registrering:', error.message);
         return error.message;
     }
 };
@@ -174,19 +175,13 @@ export async function DeleteUser(usersId: string): Promise<void> {
   
     try {
       await sendEmailVerification(auth.currentUser);
-    } catch (error: unknown) {
-      if (error instanceof FirebaseError) {
-        if (error.code === 'auth/too-many-requests') {
- 
-          await sendEmailVerification(auth.currentUser);
-        } else {
-          console.error("Error sending email verification:", error.message);
-          throw error; 
-        }
-      } else {
-        console.error("Unknown error:", error);
-        throw error;  
+    } catch (error: any) {
+      console.error("Fel vid verifiering av e-post:", error.message);
+  
+      if (error.code === 'auth/too-many-requests') {
+        console.log("För många begärningar, försök igen senare.");
       }
+      throw error; 
     }
   };
   
