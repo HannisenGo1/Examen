@@ -25,7 +25,7 @@ export const Chat = ()  => {
   const currentChat = activeChats.find((chat) => chat.chatRoomId === chatRoomId);
   const navigate = useNavigate();
   const purchasedEmojis = user?.purchasedEmojis || [];
-  const [otherUserName, setOtherUserName] = useState<string>('Laddar...');
+  const [otherUserName, setOtherUserName] = useState<string>('');
   // @ts-ignore
   const [loading, setLoading] = useState(true);
   const [openReport,setOpenReport] = useState(false)
@@ -188,7 +188,7 @@ return (
         {messages.length === 0 ? (
           <p>Inga meddelanden än.</p>
         ) : (
-          messages.map((msg) => (
+          messages.map((msg,) => (
             <div key={msg.id} className={`chat-message ${msg.senderId === user?.id ? 'sent' : 'received'}`}>
               <p className={`status-inlog ${currentChat?.status?.online ? 'online' : 'offline'}`}></p>
               <div className="message-content">

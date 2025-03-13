@@ -79,13 +79,16 @@ export const useUserStore = create<UserStore>((set, get) => {
     const userDeniedKey = getUserStorageKey(userId, 'deniedUsers');
     const storedDeniedUsers = JSON.parse(localStorage.getItem(userDeniedKey) || '[]');
     const storedUserData = JSON.parse(localStorage.getItem(getUserStorageKey(userId, 'user')) || '{}');
+    const storedVIPExpiryString = localStorage.getItem(getUserStorageKey(userId, 'vipExpiry'));
+    const storedVIPExpiry = storedVIPExpiryString ? Number(storedVIPExpiryString) : null;
     set({
       user: userData,
       likedUsers: storedLikedUsers,
       activeChats: storedChats,
       requests: storedRequests,
       deniedUsers: storedDeniedUsers,
-      hasUsedPromoCode: storedUserData.hasUsedPromoCode || false
+      hasUsedPromoCode: storedUserData.hasUsedPromoCode || false,
+      
     });
   },
   updatePromoCodeStatus: (hasUsedPromoCode: boolean) => {

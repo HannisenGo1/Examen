@@ -30,7 +30,6 @@ export const updateEmojiCountInDatabase = async (userId: string, emojiName: stri
   const userDataToUpdate = {
     [`purchasedEmojis.${emojiName}.count`]: count, 
   };
-
   try {
     await updateDoc(userRef, userDataToUpdate);
   } catch (error) {
@@ -44,7 +43,6 @@ export const getUserFromDatabase = async (userId: string): Promise<User | null> 
   if (userSnapshot.exists()) {
     return userSnapshot.data() as User;
   } else {
-    console.log("No user found with the given ID.");
     return null;
   }
 };

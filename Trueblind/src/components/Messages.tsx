@@ -41,10 +41,14 @@ export const Messages = () => {
     const chatRoomId = uuidv4();
   
     // Kolla om chat redan finns
-    const existingChat = activeChats.find((chat) => chat.chatRoomId === chatRoomId);
+    const existingChat = activeChats.find(
+      (chat) =>
+        chat.userIds.includes(userId) && chat.userIds.includes(senderId)
+    );
+    
     if (existingChat) {
-      console.log("Chat redan existerar.");
-      navigate(`/chat`);
+      console.log("Chatt mellan användarna existerar redan.");
+      navigate(`/chat/${existingChat.chatRoomId}`);
       return;
     }
   

@@ -45,14 +45,13 @@ const handleSubmit = async (e: React.FormEvent) => {
         'status.online': true,
         'status.lastLogin': serverTimestamp()
       });
-
   
       navigate('/homepage');
     } else {
       setError('Användaren kunde inte hittas.');
     }
   } catch (error: any) {
-    console.error('Fel vid inloggning:', error.message);
+    console.error('Verifiera din email innan du loggar in.', error.message);
     if (error.code === 'auth/wrong-password') {
       setError('Felaktigt lösenord.');
     } else if (error.code === 'auth/user-not-found') {

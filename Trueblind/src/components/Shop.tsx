@@ -8,6 +8,8 @@ import nalle2 from '../img/imgProdukter/nalle2.png';
 import heart from '../img/imgProdukter/heart.png';
 import { Vipinformation } from './Vipinfo';
 import { updateUserInDatabase } from './data/UpdateDatabase';
+import { getDaysLeft} from './DaysCounterVip';
+
 
 export const Shop = () => {
   const navigate = useNavigate();
@@ -22,7 +24,6 @@ export const Shop = () => {
       navigate('/');
     }
   }, [user, navigate]);
-
 
 
   const prices = {
@@ -56,8 +57,7 @@ export const Shop = () => {
         return; 
       }
       const updatedUser = { ...user, credits: credits + 1000, hasUsedPromoCode: true };
-      console.log("Uppdaterad användare med ny rabattkod:", updatedUser);
-      
+
       try {
         await updateUserInDatabase(updatedUser);
         localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -187,7 +187,7 @@ export const Shop = () => {
     );
   };
 
-  const handlePurchase = async (type: 'VIP' | 'VIPPlus', price: number): Promise<void> => {
+  const handleVIPPurchase = async (price: number): Promise<void> => {
     if (credits < price) {
       setErrorMessage("Du har inte tillräckligt med krediter!");
       return;
@@ -195,29 +195,16 @@ export const Shop = () => {
   
     try {
       let updatedUser = { ...user, credits: credits - price };
-      setCredits(updatedUser.credits); 
+      setCredits(updatedUser.credits);
   
-      const expiryDate = Date.now() + 30 * 24 * 60 * 60 * 1000; 
+      const expiryDate = Date.now() + 30 * 24 * 60 * 60 * 1000;
   
-      switch (type) {
-        case 'VIP':
-          updatedUser = {
-            ...updatedUser,
-            vipStatus: true,
-            vipExpiry: expiryDate, 
-          };
-          break;
-  
-        case 'VIPPlus':
-          updatedUser = {
-            ...updatedUser,
-            vipStatus: true,
-            vipPlusStatus: true,
-            vipPlusExpiry: expiryDate, 
-          };
-          break;
-      }
-   
+      updatedUser = {
+        ...updatedUser,
+        vipStatus: true,
+        vipExpiry: expiryDate,
+      };
+
       await updateUserInDatabase(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
       setUser(updatedUser);
@@ -226,7 +213,34 @@ export const Shop = () => {
       console.error(error);
     }
   };
-
+  
+  const handleVIPPlusPurchase = async (price: number): Promise<void> => {
+    if (credits < price) {
+      setErrorMessage("Du har inte tillräckligt med krediter!");
+      return;
+    }
+  
+    try {
+      let updatedUser = { ...user, credits: credits - price };
+      setCredits(updatedUser.credits);
+  
+      const expiryDate = Date.now() + 30 * 24 * 60 * 60 * 1000;
+  
+      updatedUser = {
+        ...updatedUser,
+        vipStatus: true, 
+        vipPlusStatus: true,
+        vipPlusExpiry: expiryDate,
+        vipExpiry: expiryDate,
+      };
+      await updateUserInDatabase(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+  
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
 
 
@@ -250,7 +264,14 @@ export const Shop = () => {
   {user.vipPlusStatus !== undefined && (
     <p>VIP Plus: {user.vipPlusStatus ? 'Aktiv' : 'Inaktiv'}</p>
   )}
-</div>
+  <p> {getDaysLeft(user.vipExpiry ?? null)}dagar kvar
+  {getDaysLeft(user.vipExpiry ?? null) > 0 
+      ? '' 
+      : 'Inga dagar på vip!'}
+
+
+  </p>
+</div> 
       
       <button className="vipinfobtn" onClick={toggleOpenInfo}>VIP information
       <span className={`arrow ${isOpen ? 'open' : ''}`} onClick={toggleOpenInfo}>
@@ -263,13 +284,16 @@ export const Shop = () => {
 
 
       <div className="buybtncontainer">
-        <button onClick={() => handlePurchase('VIP', prices.VIP)} className="shopBtn">
-          VIP (80 krediter)
-        </button>
+     
+  <button onClick={() => handleVIPPurchase(80)} className="shopBtn">
+    VIP (80 krediter)
+  </button>
 
-        <button onClick={() => handlePurchase('VIPPlus', prices.VIPPlus)} className="shopBtn">
-          VIP PLUS (100 krediter)
-        </button>
+  <button onClick={() => handleVIPPlusPurchase(100)} className="shopBtn">
+    VIP PLUS (100 krediter)
+  </button>
+
+
         
         <button onClick={() => handleAddCredits(10)} className="shopBtn">
           10 krediter, 22.90 kronor

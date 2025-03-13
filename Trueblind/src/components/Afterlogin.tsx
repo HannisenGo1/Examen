@@ -1,11 +1,15 @@
 import logga from '../img/logga.png';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import bild from '../img/bild.png'
+
+
 export const Afterlogin = () => {
 const navigate = useNavigate()
 
 const handleToPartner = () => (navigate('/Findpartner'))
 const handleToAccount = () => (navigate ('/account'))
+
+
 
 return (
 <>

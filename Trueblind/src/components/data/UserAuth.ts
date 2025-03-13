@@ -87,8 +87,9 @@ import { User } from "../../interface/interfaceUser";
             vipStatus: userData.vipStatus || false,
             vipExpiry: userData.vipExpiry || null,
             vipPlusStatus: userData.vipPlusStatus || false,
+            vipPlusExpiry: userData.vipExpiry || null,
             hasUsedPromoCode: userData.hasUsedPromoCode || false,
-    // @ts-ignore
+              // @ts-ignore
             purchaseEmoji: (emoji: string, cost: number) => {
              
             },// @ts-ignore
@@ -179,7 +180,8 @@ export async function DeleteUser(usersId: string): Promise<void> {
       console.error("Fel vid verifiering av e-post:", error.message);
   
       if (error.code === 'auth/too-many-requests') {
-        console.log("För många begärningar, försök igen senare.");
+        console.error("försök igen senare.");
+        return; 
       }
       throw error; 
     }

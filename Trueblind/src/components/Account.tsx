@@ -7,7 +7,7 @@ import {auth,db} from './data/firebase'
 import { DeleteUser } from './data/UserAuth';
 import { isVIPExpired } from './VipUser';
 
-import { daysRemaining } from './DaysCounterVip';
+import { getDaysLeft } from './DaysCounterVip';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { updateUserInDatabase } from './data/UpdateDatabase';
 
@@ -108,9 +108,7 @@ export const AccountPage = () => {
   const hasActiveVip = user.vipStatus && (user.vipExpiry ? !isVIPExpired(user.vipExpiry) : true);
   
   
-  const vipDaysLeft = daysRemaining(user.vipExpiry);
-  const vipPlusDaysLeft = daysRemaining(user.vipPlusExpiry);
-
+  
   const calculateAge = (year: number, month: number, day: number): number => {
     const today = new Date();
     const birthDate = new Date(year, month - 1, day);
@@ -144,7 +142,9 @@ export const AccountPage = () => {
       console.error('Fel vid uppdatering:', error);
     }
   };
-  
+  useEffect(() => {
+    
+  }, [user]);
   return (
     <>
     
@@ -200,96 +200,98 @@ export const AccountPage = () => {
         
         
         {user.vipPlusStatus ? (
-        <p>Du har <strong>VIP Plus</strong>, 
-          {vipPlusDaysLeft > 0 
-            ? `${vipPlusDaysLeft} dagar kvar på din VIP Plus.` 
+          <p>
+          Du har <strong>VIP Plus</strong>, <strong>  {getDaysLeft(user.vipPlusExpiry ?? null)}</strong> dagar kvar.
+          {getDaysLeft(user.vipPlusExpiry ?? null) > 0 
+            ? '' 
             : 'Din VIP Plus har gått ut.'}
-        </p>
-      ) : user.vipStatus ? (
-        <p>Du har <strong>VIP</strong>, 
-          {vipDaysLeft > 0 
-            ? `${vipDaysLeft} dagar kvar på din VIP.` 
-            : 'Din VIP har gått ut.'}
-        </p>
-      ) : (
-        <p>Du har ingen aktiv VIP.</p>
-      )}
-        
-        
-        <p>
-        <strong>Stad:</strong>
-        {isEditing.city ? (
-          <input
-          type="text"
-          id="city"
-          name="city"
-          value={updatedUserData.city}
-          onChange={handleChange}
-          onBlur={() => handleBlur("city")}
-          />
-        ) : (
-          <>
-          {updatedUserData.city}
-          <FaPen className="edit-icon" onClick={() => handleEditClick("city")} />
+            </p>
+          ) : user.vipStatus ? (
+            <p>
+            Du har <strong>VIP</strong>, <strong> {getDaysLeft(user.vipExpiry ?? null)}</strong>dagar kvar.
+            {getDaysLeft(user.vipExpiry ?? null) > 0 
+              ? '' 
+              : 'Din VIP har gått ut.'}
+              </p>
+            ) : (
+              <p>Du har ingen aktiv VIP.</p>
+            )}
+            
+            
+            <p>
+            <strong>Stad:</strong>
+            {isEditing.city ? (
+              <input
+              type="text"
+              id="city"
+              name="city"
+              value={updatedUserData.city}
+              onChange={handleChange}
+              onBlur={() => handleBlur("city")}
+              />
+            ) : (
+              <>
+              {updatedUserData.city}
+              <FaPen className="edit-icon" onClick={() => handleEditClick("city")} />
+              </>
+            )}
+            </p>
+            
+            <p>
+            <strong>Sexuell läggning:</strong>
+            {isEditing.sexualOrientation ? (
+              <select
+              id="sexualOrientation"
+              name="sexualOrientation"
+              value={updatedUserData.sexualOrientation}
+              onChange={handleChange}
+              onBlur={() => handleBlur("sexualOrientation")}
+              >
+              <option value="">Välj sexuell läggning</option>
+              <option value="Hetero">Hetero</option>
+              <option value="Homo">Homo</option>
+              <option value="Bi">Bisexuell</option>
+              <option value="Other">Annat</option>
+              </select>
+            ) : (
+              <>
+              {updatedUserData.sexualOrientation || "Ej angiven"}
+              <FaPen className="edit-icon" onClick={() => handleEditClick("sexualOrientation")} />
+              </>
+            )}
+            </p>
+            
+            {/* Radera konto-knapp */}
+            <button className="delete-btn" onClick={() => setShowConfirm(true)}>
+            Radera konto?
+            </button>
+            
+            {/* val om man är säker att radera sitt konto :)  */}
+            
+            {showConfirm && (
+              <div className="confirmation-box">
+              <p>Är du säker på att du vill radera ditt konto? <br />
+              <span className="text-red">Hela kontot kommer att raderas.</span>
+              </p>
+              <div className="optiondeletecancel">
+              <button className="cancel-btn" onClick={() => setShowConfirm(false)} >
+              Avbryt
+              </button>
+              <button className="delete-btn" onClick={handleDelete} >
+              Radera
+              </button>
+              </div>
+              </div>
+            )}
+            
+            {/* Spara-knapp */}
+            <button type="submit" className="accountBtn" onClick={handleSubmit}>
+            Spara
+            </button>
+            {message && <p>{message}</p>}
+            </div>
+          )}
           </>
-        )}
-        </p>
-        
-        <p>
-        <strong>Sexuell läggning:</strong>
-        {isEditing.sexualOrientation ? (
-          <select
-          id="sexualOrientation"
-          name="sexualOrientation"
-          value={updatedUserData.sexualOrientation}
-          onChange={handleChange}
-          onBlur={() => handleBlur("sexualOrientation")}
-          >
-          <option value="">Välj sexuell läggning</option>
-          <option value="Hetero">Hetero</option>
-          <option value="Homo">Homo</option>
-          <option value="Bi">Bisexuell</option>
-          <option value="Other">Annat</option>
-          </select>
-        ) : (
-          <>
-          {updatedUserData.sexualOrientation || "Ej angiven"}
-          <FaPen className="edit-icon" onClick={() => handleEditClick("sexualOrientation")} />
-          </>
-        )}
-        </p>
-        
-        {/* Radera konto-knapp */}
-        <button className="delete-btn" onClick={() => setShowConfirm(true)}>
-        Radera konto?
-        </button>
-        
-        {/* val om man är säker att radera sitt konto :)  */}
-
-        {showConfirm && (
-          <div className="confirmation-box">
-          <p>Är du säker på att du vill radera ditt konto? <br />
-          <span className="text-red">Hela kontot kommer att raderas.</span>
-          </p>
-          <div className="optiondeletecancel">
-          <button className="cancel-btn" onClick={() => setShowConfirm(false)} >
-          Avbryt
-          </button>
-          <button className="delete-btn" onClick={handleDelete} >
-          Radera
-          </button>
-          </div>
-          </div>
-        )}
-        
-        {/* Spara-knapp */}
-        <button type="submit" className="accountBtn" onClick={handleSubmit}>
-        Spara
-        </button>
-        {message && <p>{message}</p>}
-        </div>
-      )}
-      </>
-    );
-  };
-  
+        );
+      };
+      
