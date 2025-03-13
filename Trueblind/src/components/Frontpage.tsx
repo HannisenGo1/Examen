@@ -23,7 +23,7 @@ export const Frontpage = () => {
     <div className="DivforRubrik">  
     <h1 className="Rubriktext">
     <span className="firstPart">Find your</span>
-    <span className="secondPart">true</span>
+    <span className="secondPart"> true</span>
     <span className="firstPart"> match</span>
     </h1>
     </div>

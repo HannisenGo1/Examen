@@ -24,41 +24,58 @@ const openForgot = () => {
 
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
-  
+  setError('');  
+
   try {
     const result = await doSignInWithEmailAndPassword(email.toLowerCase(), password);
-
-    if (typeof result === 'string') {
-      setError(result); 
-      return;
-    }
-
     const user = auth.currentUser;
-    
+
     if (user) {
       if (!user.emailVerified) {
-        setError("Verifiera din email innan du loggar in. ");
+        setError('Verifiera din e-postadress innan du loggar in.');
         return;
       }
+
       const userDocRef = doc(db, 'users', user.uid);
       await updateDoc(userDocRef, {
         'status.online': true,
-        'status.lastLogin': serverTimestamp()
+        'status.lastLogin': serverTimestamp(),
       });
-  
+
       navigate('/homepage');
-    } else {
-      setError('Användaren kunde inte hittas.');
     }
   } catch (error: any) {
-    console.error('Verifiera din email innan du loggar in.', error.message);
-    if (error.code === 'auth/wrong-password') {
-      setError('Felaktigt lösenord.');
-    } else if (error.code === 'auth/user-not-found') {
-      setError('Ingen användare med det e-postadressen.');
-    } else {
-      setError('Något gick fel vid inloggning.');
+    console.error('Fel vid inloggning:', error);
+console.log(error.code); 
+
+
+    // Alla olika felkoder vid inloggning från Firebase auth.
+    switch (error.code) {
+      case 'auth/wrong-password':
+        setError('Fel lösenord. Försök igen.');
+        break;
+      case 'auth/user-not-found':
+        setError('Ingen användare med denna e-postadress.');
+        break;
+      case 'auth/invalid-email':
+        setError('Ogiltig e-postadress.');
+        break;
+      case 'auth/too-many-requests':
+        setError('För många försök. Vänta en stund och försök igen.');
+        break;
+      case 'auth/user-disabled':
+        setError('Detta konto har inaktiverats.');
+        break;
+      case 'auth/email-already-in-use':
+        setError('Denna e-postadress används redan.');
+        break;
+        case'auth/invalid-credential':
+        setError('Felaktig Email eller lösenord')
+        break;
+      default:
+        setError('Ett oväntat fel uppstod. Försök igen senare...');
     }
+
   }
 };
 
@@ -96,7 +113,8 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     
         </form>
-        {error && <p className="login-error"> Fel vid inloggning</p>}
+        {error && <p className="login-error">{error}</p>}
+
         <button className="justtextbtn" onClick={openForgot}>Glömt lösenord</button>
      {isForgotPassword && <ForgotPassword />}
 

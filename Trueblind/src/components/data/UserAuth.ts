@@ -104,14 +104,11 @@ import { User } from "../../interface/interfaceUser";
     
           return { ...userData, id: user.uid };  
         } else {
-    
-          console.error("Användardata finns inte i Firestore");
-          throw new Error("Användardata finns inte i Firestore.");
-         
+          throw new Error("user-not-found");
         }
       } catch (error: any) {
-        console.error(" Inloggning misslyckades:", error.message);
-        return error.message;
+        console.error("Inloggningsfel:", error.code || "unknown", error.message);
+        throw { code: error.code, message: error.message }
       }
     };
     
@@ -138,7 +135,7 @@ export async function DeleteUser(usersId: string, password: string): Promise<voi
     await deleteUser(user);
 
   } catch (error) {
-    console.error("Fel vid borttagning av användare:", error);
+    console.error("Fel vid borttagning av användare:");
     throw error;
   }
 }
