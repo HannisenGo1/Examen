@@ -117,33 +117,24 @@ import { User } from "../../interface/interfaceUser";
     
 // Radera  konto 
 // Be användaren att logga in igen om Firebase kräver det
-export async function DeleteUser(usersId: string): Promise<void> {
+export async function DeleteUser(usersId: string, password: string): Promise<void> {
   try {
     const user = auth.currentUser;
     if (!user || user.uid !== usersId) {
       throw new Error("Ingen användare inloggad");
     }
 
-
     const email = user.email;
     if (!email) {
       throw new Error("Kan inte hämta e-postadress.");
     }
 
-    const password = ("Ange ditt lösenord för att radera ditt konto:");
-    if (!password) {
-
-      return;
-    }
     const credential = EmailAuthProvider.credential(email, password);
-    await reauthenticateWithCredential(user, credential);
- 
-    // Radera användaren från collection
-    // Radera användaren från Authentication
+    await reauthenticateWithCredential(user, credential); 
+
     const userDoc = doc(db, "users", usersId);
     await deleteDoc(userDoc);
 
-    
     await deleteUser(user);
 
   } catch (error) {

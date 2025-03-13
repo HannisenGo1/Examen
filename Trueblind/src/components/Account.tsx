@@ -89,19 +89,29 @@ export const AccountPage = () => {
       [name]: value,
     }));
   };
-  
+
+const [password, setPassword] = useState('');
+const [errorMessage, setErrorMessage] = useState('');
+
   const handleDelete = async () => {
     try {
       if (!auth.currentUser) {
         console.error("Ingen användare inloggad!");
+        navigate('/')
         return;
       }
-      await DeleteUser(auth.currentUser.uid);
+      if (!password) {
+        setErrorMessage('Vänligen ange ditt lösenord.');
+        return;
+      }
+  
+      await DeleteUser(auth.currentUser.uid, password);
       
     } catch (error) {
+      setErrorMessage('Misslyckades att radera kontot. Kontrollera lösenordet.');
       console.error("Misslyckades att radera kontot:", error);
     }
-  }
+  };
   // @ts-ignore
   const hasActiveVipPlus = user.vipPlusStatus && (user.vipPlusExpiry ? !isVIPExpired(user.vipPlusExpiry) : true);
   // @ts-ignore
@@ -268,21 +278,33 @@ export const AccountPage = () => {
             
             {/* val om man är säker att radera sitt konto :)  */}
             
-            {showConfirm && (
-              <div className="confirmation-box">
-              <p>Är du säker på att du vill radera ditt konto? <br />
-              <span className="text-red">Hela kontot kommer att raderas.</span>
-              </p>
-              <div className="optiondeletecancel">
-              <button className="cancel-btn" onClick={() => setShowConfirm(false)} >
-              Avbryt
-              </button>
-              <button className="delete-btn" onClick={handleDelete} >
-              Radera
-              </button>
-              </div>
-              </div>
-            )}
+            {showConfirm ? (
+  <div className="confirmation-box">
+    <p>
+      Är du säker på att du vill radera ditt konto? <br />
+      <span className="text-red">Hela kontot kommer att raderas.</span>
+    </p>
+    <input
+      type="password"
+      placeholder="Ange ditt lösenord"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      className="password-input"
+    />
+    {errorMessage && <p className="error-message">{errorMessage}</p>}
+
+    <div className="optiondeletecancel">
+      <button className="cancel-btn" onClick={() => setShowConfirm(false)}>
+        Avbryt
+      </button>
+      <button className="delete-btn" onClick={handleDelete}>
+        Radera
+      </button>
+    </div>
+  </div>
+) : (
+  <p> </p>
+)}
             
             {/* Spara-knapp */}
             <button type="submit" className="accountBtn" onClick={handleSubmit}>
