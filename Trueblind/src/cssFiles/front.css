@@ -38,6 +38,19 @@ h3{
   padding: 0;
 }
 
+.logga3{
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  width: 100%; 
+  padding: 0;
+}
+.img3 {
+  max-width: 50%; 
+  height: auto; 
+}
+
 .img2 {
   max-width: 80%; 
   height: auto; 

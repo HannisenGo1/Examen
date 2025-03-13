@@ -57,13 +57,18 @@ export const Register = () => {
             return { ...prev, interests: newInterests };
         });
     };
-    
-    const [errors, setErrors] = useState<any>({}); 
+    type Errors = {
+        [key: string]: string; 
+      };
+      const [errors, setErrors] = useState<Errors>({});
+
+    const [errors2, setErrors2] = useState<any>({}); 
     const [step, setStep] = useState(1);
     const [isRegistered, setIsRegistered] = useState(false);
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [isTermsVisible, setIsTermsVisible] = useState(false);
     const [isReClicked, setIsReClicked] = useState(false)
+    const [filteredErrors, setFilteredErrors] = useState<[string, string][]>([]);
 
   
     
@@ -130,15 +135,28 @@ export const Register = () => {
     };
     
     const handleNext = () => {
-        const validationErrors = validateFormData(step, formData);
-        
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-            return; 
-        }
-        setErrors({}); 
-        setStep((prev) => prev + 1);  
-    };
+        const validationErrors = validateFormData(step, formData); 
+      
+        const stepFields: Record<number, string[]> = {
+          1: ['firstName', 'lastName', 'password', 'age', 'city', 'email'],
+          2: ['gender', 'sexualOrientation'],
+          3: ['religion', 'interests'],
+          4: ['hasChildren', 'smokes'],
+          5: ['relationshipStatus', 'education'],
+          6: ['favoriteSong', 'favoriteMovie', 'lifeStatement1', 'lifeStatement2', 'agreeTerms'],
+        };
+      
+        const filteredErrors = Object.entries(validationErrors).filter(([key]) =>
+          stepFields[step]?.includes(key)
+        );
+      
+        setErrors(validationErrors);
+        setFilteredErrors(filteredErrors);
+  if (filteredErrors.length === 0 && Object.keys(validationErrors).length === 0) {
+        setStep(step + 1); 
+    }
+      };
+      
     
     const handlePrevious = () => {
         setStep((prev) => Math.max(prev - 1, 1));
@@ -149,7 +167,7 @@ export const Register = () => {
         e.preventDefault();
         
         const validationErrors = validateFormData(6, formData);
-        
+    
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
             return;
@@ -157,16 +175,15 @@ export const Register = () => {
         
         try {
             const success = await doSignUpWithEmailAndPassword(formData);
-            
             if (success === true) {
                 setIsRegistered(true);
                 await doSendEmailVerification();
             } else {
-                setErrors('Registrerad! '); 
+                setErrors2('Registrerad! '); 
             }
         } catch (error) {
             console.error('Fel vid registrering:', error);
-            setErrors('Ett fel uppstod vid registrering.' );
+            setErrors2('Ett fel uppstod vid registrering.' );
         }
     };
     
@@ -197,18 +214,27 @@ export const Register = () => {
         
         {step === 1 && (
             <>
-            <label htmlFor="email">E-post</label>
-            <input type="email" id="email" aria-label="E-postadress" 
-            name="email" value={formData.email}
-            onChange={handleChange} placeholder="Skriv din e-post" />
-            {errors.email && <span className="error">{errors.email}</span>}
-            <label htmlFor="password">Lösenord </label>
+            <label htmlFor="email">E-post * </label>
+            <input type="email" 
+            id="email" 
+            aria-label="E-postadress" 
+            name="email" 
+            value={formData.email}
+            onChange={handleChange} 
+            placeholder="Skriv din e-post" 
+            />
+            {errors.email && <p className="error">{errors.email}</p>}
+          
+
+
+
+            <label htmlFor="password">Lösenord *</label>
             <input type="password" id="password" name="password" value={formData.password}
             onChange={handleChange} aria-label="lösenord"  placeholder="Skriv in lösenord" />
             <p className="ptext"> Minst 8 tecken långt,En stor bokstav och ett tecken</p>
             {errors.password && <span className="error">{errors.password}</span>}
             
-            <label htmlFor="firstName">Förnamn</label>
+            <label htmlFor="firstName">Förnamn *</label>
             <input
             type="text"
             id="firstName"
@@ -216,8 +242,9 @@ export const Register = () => {
             value={formData.firstName}
             onChange={handleChange}
             />
-            {errors.firstName && <span className="error">{errors.firstName}</span>}
-            <label htmlFor="lastName">Efternamn</label>
+            {errors.firstName && <p className="error">{errors.firstName}</p>}
+           
+            <label htmlFor="lastName">Efternamn *</label>
             <input
             type="text"
             id="lastName"
@@ -225,9 +252,9 @@ export const Register = () => {
             value={formData.lastName}
             onChange={handleChange}
             />
-            {errors.lastName && <span className="error">{errors.lastName}</span>}
+            {errors.lastName && <p className="error">{errors.lastName}</p>}
             
-            <label htmlFor="month">Månad</label>
+            <label htmlFor="month">Månad *</label>
 <input
   type="number"
   id="month"
@@ -238,8 +265,8 @@ export const Register = () => {
   max="12"
   placeholder="Välj månad"
 />
-
-<label htmlFor="day">Dag</label>
+{errors.age && <span className="error">{errors.age}</span>}
+<label htmlFor="day">Dag *</label>
 <input
   type="number"
   id="day"
@@ -251,7 +278,7 @@ export const Register = () => {
   placeholder="Välj dag"
 />
 
-<label htmlFor="year">År</label>
+<label htmlFor="year">År *</label>
 <input
   type="number"
   id="year"
@@ -263,7 +290,7 @@ export const Register = () => {
   placeholder="Skriv in år (4 siffror)"
 />
             
-            <label htmlFor="city">Stad</label>
+            <label htmlFor="city">Stad *</label>
             <input
             type="text"
             id="city"
@@ -275,10 +302,15 @@ export const Register = () => {
             </>
             
         )}
-        
+{filteredErrors.map(([key, value]) => (
+  <p key={key} style={{ color: 'red', fontSize: '16px' }}>
+    {value}
+  </p>
+))}
+
         {step === 2 && (
             <>
-            <label htmlFor="gender">Kön</label>
+            <label htmlFor="gender">Kön * </label>
             <select
             id="gender"
             name="gender"
@@ -291,14 +323,14 @@ export const Register = () => {
             </select>
             {errors.gender && <span className="error">{errors.gender}</span>}
             
-            <label htmlFor="sexualOrientation">Sexuell läggning</label>
+            <label htmlFor="sexualOrientation">Sexuell läggning *</label>
             <select
             id="sexualOrientation"
             name="sexualOrientation"
             value={formData.sexualOrientation}
             onChange={handleChange}
             >
-            <option value="">Välj sexuell läggning</option>
+            <option value="">Välj sexuell läggning *</option>
             <option value="Hetero">Hetero</option>
             <option value="Homo">Homo</option>
             <option value="Bi">Bisexuell</option>
@@ -310,7 +342,7 @@ export const Register = () => {
         
         {step === 3 && (
             <>
-            <label htmlFor="religion">Religion</label>
+            <label htmlFor="religion">Religion *</label>
             <select
             id="religion"
             name="religion"
@@ -327,7 +359,7 @@ export const Register = () => {
             </select>
             {errors.religion && <span className="error"> </span>}
 
-            <label htmlFor="interests">Välj 5 intressen:</label>
+            <label htmlFor="interests">Välj 5 intressen: * </label>
             <div className="interest-buttons">
             {intresseLista.map((interest) => (
                 <button
@@ -413,7 +445,7 @@ export const Register = () => {
         
         {step === 5 && (
             <>
-            <label htmlFor="relationshipStatus">Vad söker du?</label>
+            <label htmlFor="relationshipStatus">Vad söker du? *</label>
             <select
             id="relationshipStatus"
             name="relationshipStatus"
@@ -434,7 +466,7 @@ export const Register = () => {
             value={formData.education}
             onChange={handleChange}
             >
-            <option value="">Välj utbildning</option>
+            <option value="">Välj utbildning *</option>
             <option value="Grundskola">Grundskola</option>
             <option value="Gymnasium">Gymnasium</option>
             <option value="Universitet">Universitet</option>
@@ -447,7 +479,7 @@ export const Register = () => {
         {step === 6 && (
             <>
             
-            <label htmlFor="favoriteSong">Favorit låt:</label>
+            <label htmlFor="favoriteSong">Favorit låt: *</label>
             <input
             type="text"
             id="favoriteSong"
@@ -456,7 +488,7 @@ export const Register = () => {
             onChange={handleChange}
             />
             
-            <label htmlFor="favoriteMovie">Favorit film:</label>
+            <label htmlFor="favoriteMovie">Favorit film: *</label>
             <input
             type="text"
             id="favoriteMovie"
@@ -464,7 +496,7 @@ export const Register = () => {
             value={formData.favoriteMovie || ''}
             onChange={handleChange}
             />
-            <p> Avsluta meningen </p>
+            <p> Avsluta meningen * </p>
             <label>Jag skulle aldrig kunna leva utan...</label>
             <input
             type="text"
@@ -490,11 +522,13 @@ export const Register = () => {
             onChange={handleCheckboxChange}
             />
             <label htmlFor="agreeTerms">
-            Jag godkänner{' '}
+            Jag godkänner * {' '}
             <a href="#" onClick={handleShowTerms}>
-            användarvillkoren
+            användarvillkoren 
             </a>
             </label>
+
+
 
                </div>
             <div className="for-rechapta"> 
@@ -512,6 +546,7 @@ export const Register = () => {
         {step === 6 && <button className="accountBtn" type="submit" 
         disabled={!(agreedToTerms && isReClicked)}>Registrera</button>}
         </div>
+       
         {isRegistered && (
             <div className="confirmation-message">
             <p>Välkommen till Trublind! Verifiering mejl har skickats till din e-post, verifiera dig innan du kan komma in</p>

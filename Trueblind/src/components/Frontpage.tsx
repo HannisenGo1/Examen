@@ -1,6 +1,6 @@
 import logga from '../img/logga.png'
 import { useNavigate } from 'react-router-dom';
-
+import bild from '../img/bild.png'
 
 
 export const Frontpage = () => {
@@ -41,5 +41,9 @@ export const Frontpage = () => {
     Hitta din dröm partner här!
     </h2>
     </div> 
+
+    <div className="logga3">
+      <img src={bild} alt="bild" className="img3" />
+    </div>
     </>
   )}
