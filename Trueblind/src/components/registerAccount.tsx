@@ -5,7 +5,7 @@ import {validateFormData, intresseLista} from '../validering'
 import { FormData } from '../interface/interfaceUser';
 import { Anvandarpolicy } from './UseInfo';
 import { doSendEmailVerification, doSignUpWithEmailAndPassword } from './data/UserAuth';
-import ReCAPTCHA from "react-google-recaptcha"
+import YourRechaptcha from './Recaptcha';
 
 
 export const Register = () => {
@@ -496,9 +496,7 @@ export const Register = () => {
 
                </div>
             <div className="for-rechapta"> 
-        <ReCAPTCHA
-    sitekey="6Lft3OkqAAAAAPuCJoXWHjEgBaBE5tYSC2hHf1kq"
-    onChange={onChangeRe} />
+        <YourRechaptcha onVerify={onChangeRe}/>
 </div>
      </>
         )}
