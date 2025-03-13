@@ -74,49 +74,65 @@ export const Register = () => {
     
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
-      
+    
         let newValue = value;
+    
+        // För att konvertera e-post till små bokstäver
         if (name === 'email') {
-          newValue = value.toLowerCase();
+            newValue = value.toLowerCase();
         }
-      
+    
         setFormData((prevData) => {
+            // För 'age' objektet, uppdatera månads-, dags- eller års-fältet
             if (['month', 'day', 'year'].includes(name)) {
                 return {
-                  ...prevData,
-                  age: {
-                    ...prevData.age,
-                    [name]: newValue, 
-                  },
+                    ...prevData,
+                    age: {
+                        ...prevData.age,
+                        [name]: newValue,
+                    },
                 };
-              } else if (type === 'checkbox') {
-            const checked = (e.target as HTMLInputElement).checked;
+            }
+    
+            // För checkbox, sätt 'true' eller 'false' baserat på om den är markerad eller inte
+            if (type === 'checkbox') {
+                const checked = (e.target as HTMLInputElement).checked;
+                return {
+                    ...prevData,
+                    [name]: checked,
+                };
+            }
+    
+            // För select-multiple, hantera val av flera alternativ
+            if (type === 'select-multiple') {
+                const options = (e.target as HTMLSelectElement).selectedOptions;
+                const values = Array.from(options).map((option) => option.value);
+                return {
+                    ...prevData,
+                    [name]: values,
+                };
+            }
+    
+            // För alla andra typer (text, radio, etc.), uppdatera värdet direkt
             return {
-              ...prevData,
-              [name]: checked,
+                ...prevData,
+                [name]: newValue,
             };
-          } else if (type === 'select-multiple') {
-            const options = (e.target as HTMLSelectElement).selectedOptions;
-            const values = Array.from(options).map((option) => option.value);
-            return {
-              ...prevData,
-              [name]: values,
-            };
-          } else {
-            return {
-              ...prevData,
-              [name]: newValue,
-            };
-          }
         });
-        
-      };
-    const handleCheckboxChange = (e:any) => {
-        setAgreedToTerms(e.target.checked);
     };
-      const onChangeRe = () => {
-        setIsReClicked(true)
-    }
+    const handleCheckboxChange = (e:any) => {
+        const checked = e.target.checked;
+        setAgreedToTerms(checked);
+        if (checked) {
+            delete errors.agreeTerms;
+        } else {
+            errors.agreeTerms = 'Du måste godkänna användarvillkoren'; 
+        setErrors({...errors});
+    };
+}
+    const onChangeRe = (value: string | null) => {
+        setIsReClicked(!!value);
+      };
     const handleShowTerms = () => {
         setIsTermsVisible(true);  
     };
@@ -135,8 +151,9 @@ export const Register = () => {
     };
     
     const handleNext = () => {
-        const validationErrors = validateFormData(step, formData); 
-      
+
+        const validationErrors = validateFormData(step, formData);
+        
         const stepFields: Record<number, string[]> = {
           1: ['firstName', 'lastName', 'password', 'age', 'city', 'email'],
           2: ['gender', 'sexualOrientation'],
@@ -145,19 +162,23 @@ export const Register = () => {
           5: ['relationshipStatus', 'education'],
           6: ['favoriteSong', 'favoriteMovie', 'lifeStatement1', 'lifeStatement2', 'agreeTerms'],
         };
-      
+        
         const filteredErrors = Object.entries(validationErrors).filter(([key]) =>
           stepFields[step]?.includes(key)
         );
-      
-        setErrors(validationErrors);
-        setFilteredErrors(filteredErrors);
-  if (filteredErrors.length === 0 && Object.keys(validationErrors).length === 0) {
-        setStep(step + 1); 
-    }
-      };
-      
     
+        if (filteredErrors.length > 0) {
+            setErrors(validationErrors);
+            setFilteredErrors(filteredErrors);
+        } else {
+            setFilteredErrors([]);
+            setStep(step + 1);  
+            console.log("agreedToTerms:", agreedToTerms);
+            console.log("isReClicked:", isReClicked);
+            console.log("errors:", errors);
+        }
+    };
+
     const handlePrevious = () => {
         setStep((prev) => Math.max(prev - 1, 1));
     };
@@ -165,21 +186,24 @@ export const Register = () => {
     
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
+        if (!(agreedToTerms && isReClicked && Object.keys(errors).length === 0)) {
+            return; 
+        }
+    
         try {
             const success = await doSignUpWithEmailAndPassword(formData);
-            if (success === true) {
+            if (success) {
                 setIsRegistered(true);
                 await doSendEmailVerification();
             } else {
-                setErrors2('Registrerad! '); 
+                setErrors2('Registrerad!');
             }
         } catch (error) {
             console.error('Fel vid registrering:', error);
-            setErrors2('Ett fel uppstod vid registrering.' );
+            setErrors2('Ett fel uppstod vid registrering.');
         }
     };
-    
 
     return (
         <>
@@ -534,12 +558,22 @@ export const Register = () => {
         
         <div className="buttoncontainerinRegister">
         {step > 1 && <button className="accountBtn2" aria-label="Gå tillbaka" onClick={handlePrevious}> <i className="fas fa-arrow-left"></i></button>}
-        {step < 6 && <button className="accountBtn" aria-label="Nästa steg" onClick={handleNext}>Nästa</button>}
+        {step < 7 && <button className="accountBtn" aria-label="Nästa steg" onClick={handleNext}>Nästa</button>}
 
-        {step === 6 && <button className="accountBtn" type="submit" 
-        disabled={!(agreedToTerms && isReClicked)}>Registrera</button>}
         </div>
-       
+        {step === 7 && (
+                <div className="step7">
+                    <div className="buttoncontainerinRegister">
+                        
+                        <button 
+  className="accountBtn" 
+  type="submit" 
+  disabled={!(agreedToTerms && isReClicked && Object.keys(errors).length === 0)}>
+  Registrera
+</button>
+                    </div>
+                </div>
+            )}
         {isRegistered && (
             <div className="confirmation-message">
             <p>Välkommen till Trublind! Verifiering mejl har skickats till din e-post, verifiera dig innan du kan komma in</p>
