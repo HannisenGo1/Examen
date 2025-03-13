@@ -104,6 +104,7 @@ export const Register = () => {
             };
           }
         });
+        
       };
     const handleCheckboxChange = (e:any) => {
         setAgreedToTerms(e.target.checked);
@@ -197,13 +198,13 @@ export const Register = () => {
         {step === 1 && (
             <>
             <label htmlFor="email">E-post</label>
-            <input type="email" id="email"
+            <input type="email" id="email" aria-label="E-postadress" 
             name="email" value={formData.email}
             onChange={handleChange} placeholder="Skriv din e-post" />
             {errors.email && <span className="error">{errors.email}</span>}
             <label htmlFor="password">Lösenord </label>
             <input type="password" id="password" name="password" value={formData.password}
-            onChange={handleChange} placeholder="Skriv in lösenord" />
+            onChange={handleChange} aria-label="lösenord"  placeholder="Skriv in lösenord" />
             <p className="ptext"> Minst 8 tecken långt,En stor bokstav och ett tecken</p>
             {errors.password && <span className="error">{errors.password}</span>}
             
@@ -324,7 +325,8 @@ export const Register = () => {
             <option value="Annat">Annat</option>
             <option value="Ingen">Ingen</option>
             </select>
-            {errors.religion && <span className="error">{errors.religion}</span>}
+            {errors.religion && <span className="error"> </span>}
+
             <label htmlFor="interests">Välj 5 intressen:</label>
             <div className="interest-buttons">
             {intresseLista.map((interest) => (
@@ -338,6 +340,7 @@ export const Register = () => {
                 {interest}
                 </button>
             ))}
+
             </div>
             {errors.interests && <span className="error">{errors.interests}</span>}
             </>
@@ -401,7 +404,7 @@ export const Register = () => {
             checked={formData.smokes === 'feströker'}
             onChange={handleChange}
             />
-            Feströker
+            Ibland
             </label>
             </div>
             {errors.smokes && <span className="error">{errors.smokes}</span>}
@@ -503,13 +506,18 @@ export const Register = () => {
         )}
         
         <div className="buttoncontainerinRegister">
-        {step > 1 && <button className="accountBtn2" onClick={handlePrevious}> <i className="fas fa-arrow-left"></i></button>}
-        {step < 6 && <button className="accountBtn" onClick={handleNext}>Nästa</button>}
+        {step > 1 && <button className="accountBtn2" aria-label="Gå tillbaka" onClick={handlePrevious}> <i className="fas fa-arrow-left"></i></button>}
+        {step < 6 && <button className="accountBtn" aria-label="Nästa steg" onClick={handleNext}>Nästa</button>}
 
         {step === 6 && <button className="accountBtn" type="submit" 
         disabled={!(agreedToTerms && isReClicked)}>Registrera</button>}
         </div>
-        
+        {isRegistered && (
+            <div className="confirmation-message">
+            <p>Välkommen till Trublind! Verifiering mejl har skickats till din e-post, verifiera dig innan du kan komma in</p>
+            <button className="accountBtn" onClick={goBackToHome}>Till startsidan</button>
+            </div>
+        )}
         </form> 
         {isTermsVisible && (
             <Anvandarpolicy
