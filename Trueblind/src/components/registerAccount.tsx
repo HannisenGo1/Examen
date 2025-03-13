@@ -7,10 +7,6 @@ import { Anvandarpolicy } from './UseInfo';
 import { doSendEmailVerification, doSignUpWithEmailAndPassword } from './data/UserAuth';
 import ReCAPTCHA from "react-google-recaptcha"
 
-const publickey = {
-    publicRe: import.meta.env.VITE_PUBLIC_RE
-  };
-
 export const Register = () => {
 
     const navigate = useNavigate();
@@ -500,7 +496,7 @@ export const Register = () => {
                </div>
             <div className="for-rechapta"> 
         <ReCAPTCHA
-    sitekey={publickey.publicRe}
+    sitekey="6Le2GPMqAAAAAAzKGmzp0K8kbsG_C_kJUb8nBfXs"
     onChange={onChangeRe} />
 </div>
      </>
