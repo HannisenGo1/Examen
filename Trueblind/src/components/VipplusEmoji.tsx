@@ -3,8 +3,8 @@ import { useUserStore } from '../storage/storage';
 import heart2 from '../img/imgProdukter/heart2.png';
 import vipblomma1 from '../img/imgProdukter/vipblomma1.png';
 import vipblomma2 from '../img/imgProdukter/vipblomma2.png';
-import vipnalle from '../img/imgProdukter/vipnalle.png';
-
+// import vipnalle from '../img/imgProdukter/vipnalle.png';
+// { name: 'vipnalle', src: vipnalle, className: 'small-emoji' },
 
 interface VipPlusEmojisProps {
   chatRoomId?: string;
@@ -20,7 +20,7 @@ const VipPlusEmojis = ({ chatRoomId, sendEmoji }: VipPlusEmojisProps) => {
     { name: 'heart2', src: heart2, className: '' },
     { name: 'vipblomma1', src: vipblomma1, className: 'small-emoji' }, 
     { name: 'vipblomma2', src: vipblomma2, className: 'small-emoji' },
-    { name: 'vipnalle', src: vipnalle, className: 'small-emoji' },
+   
   ];
   
   const handleVipPlusEmojiClick = async (emojiSrc: string) => {
